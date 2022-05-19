@@ -8,9 +8,117 @@
 #pragma once
 #include <Langulus.Core.hpp>
 
+LANGULUS_EXCEPTION(DivisionByZero);
+
+#define LANGULUS_SIMD(a) LANGULUS_SIMD_##a()
+
+///																									
+///	Detect available SIMD																	
+///																									
+#if defined (__AVX512BW__)
+	#define LANGULUS_SIMD_AVX512BW() 1
+#else
+	#define LANGULUS_SIMD_AVX512BW() 0
+#endif
+
+#if defined(__AVX512CD__)
+	#define LANGULUS_SIMD_AVX512CD() 1
+#else
+	#define LANGULUS_SIMD_AVX512CD() 0
+#endif
+
+#if defined(__AVX512DQ__)
+	#define LANGULUS_SIMD_AVX512DQ() 1
+#else
+	#define LANGULUS_SIMD_AVX512DQ() 0
+#endif
+
+#if defined(__AVX512F__)
+	#define LANGULUS_SIMD_AVX512F() 1
+#else
+	#define LANGULUS_SIMD_AVX512F() 0
+#endif
+
+#if defined(__AVX512VL__)
+	#define LANGULUS_SIMD_AVX512VL() 1
+#else
+	#define LANGULUS_SIMD_AVX512VL() 0
+#endif
+
+#if LANGULUS_SIMD(AVX512BW) && LANGULUS_SIMD(AVX512CD) && LANGULUS_SIMD(AVX512DQ) && LANGULUS_SIMD(AVX512F) && LANGULUS_SIMD(AVX512VL)
+	#define LANGULUS_SIMD_AVX512() 1
+#else
+	#define LANGULUS_SIMD_AVX512() 0
+#endif
+
+#if defined(__AVX2__)
+	#define LANGULUS_SIMD_AVX2() 1
+#else
+	#define LANGULUS_SIMD_AVX2() 0
+#endif
+
+#if defined(__AVX__)
+	#define LANGULUS_SIMD_AVX() 1
+#else
+	#define LANGULUS_SIMD_AVX() 0
+#endif
+
+#if defined(__SSE4_2__)
+	#define LANGULUS_SIMD_SSE4_2() 1
+#else
+	#define LANGULUS_SIMD_SSE4_2() 0
+#endif
+
+#if defined(__SSE4_1__)
+	#define LANGULUS_SIMD_SSE4_1() 1
+#else
+	#define LANGULUS_SIMD_SSE4_1() 0
+#endif
+
+#if defined(__SSSE3__)
+	#define LANGULUS_SIMD_SSSE3() 1
+#else
+	#define LANGULUS_SIMD_SSSE3() 0
+#endif
+
+#if defined(__SSE3__)
+	#define LANGULUS_SIMD_SSE3() 1
+#else
+	#define LANGULUS_SIMD_SSE3() 0
+#endif
+
+#if defined(__SSE2__)
+	#define LANGULUS_SIMD_SSE2() 1
+#else
+	#define LANGULUS_SIMD_SSE2() 0
+#endif
+
+#if defined(__SSE__)
+	#define LANGULUS_SIMD_SSE() 1
+#else
+	#define LANGULUS_SIMD_SSE() 0
+#endif
+
+
+///																									
+///	Memory alignment for vectorization													
+///																									
+#if LANGULUS_SIMD(AVX512) && LANGULUS_ALIGN() < 64
+	#undef LANGULUS_ALIGN
+	#define LANGULUS_ALIGN() 64
+#elif (LANGULUS_SIMD(AVX) || LANGULUS_SIMD(AVX2)) && LANGULUS_ALIGN() < 32
+	#undef LANGULUS_ALIGN
+	#define LANGULUS_ALIGN() 32
+#elif (LANGULUS_SIMD(SSE) || LANGULUS_SIMD(SSE2) || LANGULUS_SIMD(SSE3) || LANGULUS_SIMD(SSSE3) || LANGULUS_SIMD(SSE4_1) || LANGULUS_SIMD(SSE4_2)) && LANGULUS_ALIGN() < 16
+	#undef LANGULUS_ALIGN
+	#define LANGULUS_ALIGN() 16
+#endif
+
+
 /// Make sure everything SIMDe includes is included before SIMDe itself,		
 /// so that we	can capsulate it in our namespace later, without encapsulating	
 /// std stuff																						
+#include <complex>
 #include <simde/simde-common.h>
 #include <cstdint>
 #include <type_traits>
@@ -20,7 +128,6 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <complex>
 
 #if defined(SIMDE_X86_MMX_NATIVE)
 	#define SIMDE_X86_MMX_USE_NATIVE_TYPE
@@ -47,11 +154,20 @@
 	#include <arm_acle.h>
 #endif
 
-namespace Langulus::SIMD
+namespace Langulus::CT
 {
 
-	template<class T1, class T2>
-	concept Same = CT::Same<T1, T2>;
+	/// Vector concept																			
+	template<class T>
+	concept Vector = requires (T a) {
+		CT::Number<decltype(a.mComponents)>;
+		CT::Array<decltype(a.mComponents)>;
+	};
+
+}
+
+namespace Langulus::SIMD
+{
 
 	#include <simde/x86/avx512.h>
 	#include <simde/x86/avx2.h>
@@ -83,6 +199,18 @@ namespace Langulus::SIMD
 
 	template<class T>
 	constexpr bool IsNotSupported = CT::Same<T, NotSupported>;
+
+	/// When given two arithmetic types, choose the one that is most lossless	
+	/// after an arithmetic operation of any kind is performed between both		
+	template<CT::Number T1, CT::Number T2>
+	using TLossless = Conditional<
+				// Always pick real numbers if available							
+				(CT::Real<T1> && CT::Integer<T2>)
+				// Always pick signed numbers if available						
+			|| (CT::Signed<T1> && CT::Unsigned<T2>)
+				// Always pick the larger number as a last resort				
+			|| (sizeof(Decay<T1>) > sizeof(Decay<T2>)
+		), Decay<T1>, Decay<T2>>;
 
 	///																								
 	inline simde__m128 _mm_halfflip(const simde__m128& what) noexcept {
@@ -286,4 +414,4 @@ namespace Langulus::SIMD
 			return 1;
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

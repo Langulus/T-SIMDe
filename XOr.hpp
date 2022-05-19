@@ -12,7 +12,7 @@
 namespace Langulus::SIMD
 {
 		
-	template<Number T, pcptr S>
+	template<CT::Number T, Count S>
 	auto XOrInner(const NotSupported&, const NotSupported&) noexcept {
 		return NotSupported{};
 	}
@@ -23,31 +23,31 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the xor'd elements as a register										
-	template<Number T, pcptr S, class REGISTER>
+	template<CT::Number T, Count S, class REGISTER>
 	auto XOrInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
-		if constexpr (Same<REGISTER, simde__m128i>)
+		if constexpr (CT::Same<REGISTER,simde__m128i>)
 			return simde_mm_xor_si128(lhs, rhs);
-		else if constexpr (Same<REGISTER, simde__m128>)
+		else if constexpr (CT::Same<REGISTER,simde__m128>)
 			return simde_mm_xor_ps(lhs, rhs);
-		else if constexpr (Same<REGISTER, simde__m128d>)
+		else if constexpr (CT::Same<REGISTER,simde__m128d>)
 			return simde_mm_xor_pd(lhs, rhs);
-		else if constexpr (Same<REGISTER, simde__m256i>)
+		else if constexpr (CT::Same<REGISTER,simde__m256i>)
 			return simde_mm256_xor_si256(lhs, rhs);
-		else if constexpr (Same<REGISTER, simde__m256>)
+		else if constexpr (CT::Same<REGISTER,simde__m256>)
 			return simde_mm256_xor_ps(lhs, rhs);
-		else if constexpr (Same<REGISTER, simde__m256d>)
+		else if constexpr (CT::Same<REGISTER,simde__m256d>)
 			return simde_mm256_xor_pd(lhs, rhs);
-		else if constexpr (Same<REGISTER, simde__m512i>)
+		else if constexpr (CT::Same<REGISTER,simde__m512i>)
 			return simde_mm512_xor_si512(lhs, rhs);
-		else if constexpr (Same<REGISTER, simde__m512>)
+		else if constexpr (CT::Same<REGISTER,simde__m512>)
 			return simde_mm512_xor_ps(lhs, rhs);
-		else if constexpr (Same<REGISTER, simde__m512d>)
+		else if constexpr (CT::Same<REGISTER,simde__m512d>)
 			return simde_mm512_xor_pd(lhs, rhs);
 		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerXOr");
 	}
 
 	///																								
-	template<Number LHS, Number RHS>
+	template<CT::Number LHS, CT::Number RHS>
 	NOD() auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = TRegister<LHS, RHS>;
 		using LOSSLESS = TLossless<LHS, RHS>;
@@ -64,30 +64,30 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<Number LHS, Number RHS, Number OUT>
+	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
 	void XOr(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = XOr<LHS, RHS>(lhs, rhs);
 		if constexpr (TSIMD<decltype(result)>) {
 			// Extract from register													
 			SIMD::Store(result, output);
 		}
-		else if constexpr (Number<decltype(result)>) {
+		else if constexpr (CT::Number<decltype(result)>) {
 			// Extract from number														
 			output = result;
 		}
 		else {
 			// Extract from std::array													
-			for (pcptr i = 0; i < pcExtentOf<OUT>; ++i)
+			for (Offset i = 0; i < ExtentOf<OUT>; ++i)
 				output[i] = result[i];
 		}
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, Number LHS, Number RHS>
+	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER XOrWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		XOr<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

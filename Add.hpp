@@ -40,9 +40,9 @@ namespace Langulus::SIMD
 				return simde_mm_add_epi32(lhs, rhs);
 			else if constexpr (Integer64<T>)
 				return simde_mm_add_epi64(lhs, rhs);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm_add_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm_add_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 16-byte package");
 		}
@@ -59,9 +59,9 @@ namespace Langulus::SIMD
 				return simde_mm256_add_epi32(lhs, rhs);
 			else if constexpr (Integer64<T>)
 				return simde_mm256_add_epi64(lhs, rhs);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm256_add_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm256_add_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 32-byte package");
 		}
@@ -78,9 +78,9 @@ namespace Langulus::SIMD
 				return simde_mm512_add_epi32(lhs, rhs);
 			else if constexpr (Integer64<T>)
 				return simde_mm512_add_epi64(lhs, rhs);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_add_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm512_add_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 64-byte package");
 		}
@@ -124,11 +124,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER AddWrap(const LHS& lhs, const RHS& rhs) noexcept {
 		WRAPPER result;
-		Add<LHS, RHS>(lhs, rhs, result.mArray);
+		Add<LHS, RHS>(lhs, rhs, result.mComponents);
 		return result;
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

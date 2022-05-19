@@ -34,7 +34,7 @@ namespace Langulus::SIMD
 				return simde_mm_abs_epi64(v);
 			else if constexpr (Same < T, float> )
 				return simde_mm_andnot_ps(simde_mm_set1_ps(-0.0F), v);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm_andnot_pd(simde_mm_set1_pd(-0.0F), v);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAbs of 16-byte package");
 		}
@@ -47,9 +47,9 @@ namespace Langulus::SIMD
 				return simde_mm256_abs_epi32(v);
 			else if constexpr (SignedInteger64<T>)
 				return simde_mm256_abs_epi64(v);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm256_andnot_ps(simde_mm256_set1_ps(-0.0F), v);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm256_andnot_pd(simde_mm256_set1_pd(-0.0F), v);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAbs of 32-byte package");
 		}
@@ -62,9 +62,9 @@ namespace Langulus::SIMD
 				return simde_mm512_abs_epi32(v);
 			else if constexpr (SignedInteger64<T>)
 				return simde_mm512_abs_epi64(v);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_andnot_ps(simde_mm512_set1_ps(-0.0F), v);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm512_andnot_pd(simde_mm512_set1_pd(-0.0F), v);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAbs of 64-byte package");
 		}
@@ -76,4 +76,4 @@ namespace Langulus::SIMD
 		return InnerAbs<T, S>(Load<0>(value));
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

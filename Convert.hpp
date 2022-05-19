@@ -11,7 +11,7 @@
 #include "ConvertFrom256.hpp"
 #include "ConvertFrom512.hpp"
 
-#if LANGULUS_COMPILER_IS(GCC)
+#if LANGULUS_COMPILER(GCC)
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
@@ -109,8 +109,8 @@ namespace Langulus::SIMD
 		}
 	}
 	
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD
 
-#if LANGULUS_COMPILER_IS(GCC)
+#if LANGULUS_COMPILER(GCC)
 	#pragma GCC diagnostic pop
 #endif

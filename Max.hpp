@@ -40,22 +40,22 @@ namespace Langulus::SIMD
 			else if constexpr (UnsignedInteger32<T>)
 				return simde_mm_max_epu32(lhs, rhs);
 			else if constexpr (SignedInteger64<T>) {
-				#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+				#if LANGULUS_SIMD(AVX512)
 					return _mm_max_epi64(lhs, rhs);
 				#else
 					return SIMD::NotSupported{};
 				#endif
 			}
 			else if constexpr (UnsignedInteger64<T>) {
-				#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+				#if LANGULUS_SIMD(AVX512)
 					return simde_mm_max_epu64(lhs, rhs);
 				#else
 					return SIMD::NotSupported{};
 				#endif
 			}
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm_max_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm_max_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMax of 16-byte package");
 		}
@@ -73,22 +73,22 @@ namespace Langulus::SIMD
 			else if constexpr (UnsignedInteger32<T>)
 				return simde_mm256_max_epu32(lhs, rhs);
 			else if constexpr (SignedInteger64<T>) {
-				#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+				#if LANGULUS_SIMD(AVX512)
 					return _mm_max_epi64(lhs, rhs);
 				#else
 					return SIMD::NotSupported{};
 				#endif
 			}
 			else if constexpr (UnsignedInteger64<T>) {
-				#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+				#if LANGULUS_SIMD(AVX512)
 					return _mm_max_epu64(lhs, rhs);
 				#else
 					return SIMD::NotSupported{};
 				#endif
 			}
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm256_max_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm256_max_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMax of 32-byte package");
 		}
@@ -109,9 +109,9 @@ namespace Langulus::SIMD
 				return simde_mm512_max_epi64(lhs, rhs);
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm512_max_epu64(lhs, rhs);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_max_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm512_max_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMax of 64-byte package");
 		}
@@ -155,11 +155,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER MaxWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Max<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

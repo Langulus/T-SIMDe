@@ -30,23 +30,23 @@ namespace Langulus::SIMD
 			"SIMD::InnerPow doesn't work for whole numbers");
 
 		if constexpr (SIMD128<REGISTER>) {
-			if constexpr (Same<T, float>)
+			if constexpr (CT::Same<T, float>)
 				return simde_mm_pow_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm_pow_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerPow of 16-byte package");
 		}
 		else if constexpr (SIMD256<REGISTER>) {
-			if constexpr (Same<T, float>)
+			if constexpr (CT::Same<T, float>)
 				return simde_mm256_pow_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm256_pow_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerPow of 32-byte package");
 		}
 		else if constexpr (SIMD512<REGISTER>) {
-			if constexpr (Same<T, float>)
+			if constexpr (CT::Same<T, float>)
 				return simde_mm512_pow_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm512_pow_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerPow of 64-byte package");
 		}
@@ -90,11 +90,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER PowerWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Power<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

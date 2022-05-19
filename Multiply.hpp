@@ -46,15 +46,15 @@ namespace Langulus::SIMD
 			else if constexpr (Integer32<T>)
 				return simde_mm_mullo_epi32(lhs, rhs);
 			else if constexpr (Integer64<T>) {
-				#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+				#if LANGULUS_SIMD(AVX512)
 					return _mm_mullo_epi64(lhs, rhs);
 				#else
 					return SIMD::NotSupported{};
 				#endif
 			}
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm_mul_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm_mul_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMul of 16-byte package");
 		}
@@ -78,15 +78,15 @@ namespace Langulus::SIMD
 			else if constexpr (Integer32<T>)
 				return simde_mm256_mullo_epi32(lhs, rhs);
 			else if constexpr (Integer64<T>) {
-				#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+				#if LANGULUS_SIMD(AVX512)
 					return _mm256_mullo_epi64(lhs, rhs);
 				#else
 					return SIMD::NotSupported{};
 				#endif
 			}
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm256_mul_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm256_mul_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMul of 32-byte package");
 		}
@@ -110,15 +110,15 @@ namespace Langulus::SIMD
 			else if constexpr (Integer32<T>)
 				return simde_mm512_mullo_epi32(lhs, rhs);
 			else if constexpr (Integer64<T>) {
-				#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+				#if LANGULUS_SIMD(AVX512)
 					return _mm512_mullo_epi64(lhs, rhs);
 				#else
 					return SIMD::NotSupported{};
 				#endif
 			}
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_mul_ps(lhs, rhs);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm512_mul_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMul of 64-byte package");
 		}
@@ -162,11 +162,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER MultiplyWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Multiply<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

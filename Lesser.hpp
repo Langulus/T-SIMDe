@@ -27,7 +27,7 @@ namespace Langulus::SIMD
 	template<CT::Number T, Count S, TSIMD REGISTER>
 	auto LesserInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (SIMD128<REGISTER>) {
-			#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+			#if LANGULUS_SIMD(AVX512)
 				if constexpr (SignedInteger8<T>)
 					return _mm_cmplt_epi8_mask(lhs, rhs) == 0xFFFF;
 				else if constexpr (UnsignedInteger8<T>)
@@ -44,9 +44,9 @@ namespace Langulus::SIMD
 					return _mm_cmplt_epi64_mask(lhs, rhs) == 0x7;
 				else if constexpr (UnsignedInteger64<T>)
 					return _mm_cmplt_epu64_mask(lhs, rhs) == 0x7;
-				else if constexpr (Same<T, pcr32>)
+				else if constexpr (CT::Same<T, pcr32>)
 					return _mm_cmp_ps_mask(lhs, rhs, _CMP_LT_OQ) == 0xF;
-				else if constexpr (Same<T, pcr64>)
+				else if constexpr (CT::Same<T, pcr64>)
 					return _mm_cmp_pd_mask(lhs, rhs, _CMP_LT_OQ)) == 0x7;
 			#else
 				if constexpr (Integer8<T>)
@@ -57,15 +57,15 @@ namespace Langulus::SIMD
 					return simde_mm_movemask_epi8(simde_mm_cmplt_epi32(lhs, rhs)) == 0xFFFF;
 				else if constexpr (Integer64<T>)
 					return NotSupported{};
-				else if constexpr (Same<T, float>)
+				else if constexpr (CT::Same<T, float>)
 					return simde_mm_movemask_ps(_mm_cmplt_ps(lhs, rhs)) == 0xF;
-				else if constexpr (Same<T, double>)
+				else if constexpr (CT::Same<T, double>)
 					return simde_mm_movemask_pd(_mm_cmplt_pd(lhs, rhs)) == 0x7;
 			#endif
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLower of 16-byte package");
 		}
 		else if constexpr (SIMD256<REGISTER>) {
-			#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
+			#if LANGULUS_SIMD(AVX512)
 				if constexpr (SignedInteger8<T>)
 					return _mm256_cmplt_epi8_mask(lhs, rhs) == 0xFFFFFFFF;
 				else if constexpr (UnsignedInteger8<T>)
@@ -82,9 +82,9 @@ namespace Langulus::SIMD
 					return _mm256_cmplt_epi64_mask(lhs, rhs) == 0xF;
 				else if constexpr (UnsignedInteger64<T>)
 					return _mm256_cmplt_epu64_mask(lhs, rhs) == 0xF;
-				else if constexpr (Same<T, pcr32>)
+				else if constexpr (CT::Same<T, pcr32>)
 					return _mm256_cmp_ps_mask(lhs, rhs, _CMP_LT_OQ) == 0xFF;
-				else if constexpr (Same<T, pcr64>)
+				else if constexpr (CT::Same<T, pcr64>)
 					return _mm256_cmp_pd_mask(lhs, rhs, _CMP_LT_OQ)) == 0xF;
 				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLower of 32-byte package");
 			#else
@@ -100,9 +100,9 @@ namespace Langulus::SIMD
 				else if constexpr (Integer64<T>)
 					return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi64(lhs, rhs)) == 0 &&
 							 simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(lhs, rhs)) == 0;
-				else if constexpr (Same<T, float>)
+				else if constexpr (CT::Same<T, float>)
 					return simde_mm256_movemask_ps(simde_mm256_cmp_ps(lhs, rhs, _CMP_LT_OQ)) == 0xFF;
-				else if constexpr (Same<T, double>)
+				else if constexpr (CT::Same<T, double>)
 					return simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_LT_OQ)) == 0xF;
 			#endif
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLower of 32-byte package");
@@ -124,9 +124,9 @@ namespace Langulus::SIMD
 				return simde_mm512_cmplt_epi64_mask(lhs, rhs) == 0xFF;
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm512_cmplt_epu64_mask(lhs, rhs) == 0xFF;
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_LT_OQ) == 0xFFFF;
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_LT_OQ) == 0xFF;
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLower of 64-byte package");
 		}
@@ -165,4 +165,4 @@ namespace Langulus::SIMD
 		}
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

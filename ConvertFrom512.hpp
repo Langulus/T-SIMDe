@@ -415,4 +415,4 @@ namespace Langulus::SIMD
 		else LANGULUS_ASSERT("Can't convert from __m512i to unsupported");
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

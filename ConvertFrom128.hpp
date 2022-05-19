@@ -227,15 +227,15 @@ namespace Langulus::SIMD
 			}
 			else if constexpr (UnsignedInteger32<FT> && S <= 4) {
 				// pcu32[4] -> float[4]													
-				return simde_mm256_cvtpd_ps(simde_mm256_cvtepu32_pd(v));
+				return simde_mm256_cvtpd_ps(_mm256_cvtepu32_pd(v));
 			}
 			else if constexpr (SignedInteger64<FT> && S <= 2) {
 				// pci64[2] -> float[2]													
-				return simde_mm_cvtepi64_ps(v);
+				return _mm_cvtepi64_ps(v);
 			}
 			else if constexpr (UnsignedInteger64<FT> && S <= 2) {
 				// pcu64[2] -> float[2]													
-				return simde_mm_cvtepu64_ps(v);
+				return _mm_cvtepu64_ps(v);
 			}
 			else LANGULUS_ASSERT("Can't convert from __m128i to __m128");
 		}
@@ -587,4 +587,4 @@ namespace Langulus::SIMD
 		else LANGULUS_ASSERT("Can't convert from __m128i to unsupported");
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

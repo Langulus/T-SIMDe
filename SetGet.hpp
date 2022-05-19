@@ -66,9 +66,9 @@ namespace Langulus::SIMD
 				return simde_mm_set_epi64x(InnerGet<DEF, INDICES, 2, true>(values)...);
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm_set_epi64x(InnerGet<DEF, INDICES, 2, true>(reinterpret_cast<const int64_t(&)[S]>(values))...);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm_setr_ps(InnerGet<DEF, INDICES, 4>(values)...);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm_setr_pd(InnerGet<DEF, INDICES, 2>(values)...);
 			else LANGULUS_ASSERT("Can't SIMD::InnerSet 16-byte package");
 		}
@@ -89,9 +89,9 @@ namespace Langulus::SIMD
 				return simde_mm256_setr_epi64x(InnerGet<DEF, INDICES, 4>(values)...);
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm256_setr_epi64x(InnerGet<DEF, INDICES, 4>(reinterpret_cast<const int64_t(&)[S]>(values))...);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm256_setr_ps(InnerGet<DEF, INDICES, 8>(values)...);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm256_setr_pd(InnerGet<DEF, INDICES, 4>(values)...);
 			else LANGULUS_ASSERT("Can't SIMD::InnerSet 32-byte package");
 		}
@@ -112,9 +112,9 @@ namespace Langulus::SIMD
 				return simde_mm512_setr_epi64(InnerGet<DEF, INDICES, 8>(values)...);
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm512_setr_epi64(InnerGet<DEF, INDICES, 8>(reinterpret_cast<const int64_t(&)[S]>(values))...);
-			else if constexpr (Same<T, float>)
+			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_setr_ps(InnerGet<DEF, INDICES, 16>(values)...);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm512_setr_pd(InnerGet<DEF, INDICES, 8>(values)...);
 			else LANGULUS_ASSERT("Can't SIMD::InnerSet 64-byte package");
 		}
@@ -139,4 +139,4 @@ namespace Langulus::SIMD
 		}
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

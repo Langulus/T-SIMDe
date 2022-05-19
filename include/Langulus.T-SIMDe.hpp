@@ -31,7 +31,6 @@
 #include "../SetGet.hpp"
 #include "../ShiftLeft.hpp"
 #include "../ShiftRight.hpp"
-#include "../SIMD.hpp"
 #include "../Store.hpp"
 #include "../Subtract.hpp"
 #include "../XOr.hpp"

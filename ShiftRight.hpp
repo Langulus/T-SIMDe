@@ -19,7 +19,7 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the shifted elements as a register									
-	template<Number T, pcptr S, TSIMD REGISTER>
+	template<CT::Number T, Count S, TSIMD REGISTER>
 	auto ShiftRightInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (SIMD128<REGISTER>) {
 			if constexpr (Integer16<T>)
@@ -52,7 +52,7 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<Number LHS, Number RHS>
+	template<CT::Number LHS, CT::Number RHS>
 	NOD() auto ShiftRight(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = TRegister<LHS, RHS>;
 		using LOSSLESS = TLossless<LHS, RHS>;
@@ -69,30 +69,30 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<Number LHS, Number RHS, Number OUT>
+	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
 	void ShiftRight(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = ShiftRight<LHS, RHS>(lhs, rhs);
 		if constexpr (TSIMD<decltype(result)>) {
 			// Extract from register													
 			SIMD::Store(result, output);
 		}
-		else if constexpr (Number<decltype(result)>) {
+		else if constexpr (CT::Number<decltype(result)>) {
 			// Extract from number														
 			output = result;
 		}
 		else {
 			// Extract from std::array													
-			for (pcptr i = 0; i < pcExtentOf<OUT>; ++i)
+			for (Offset i = 0; i < ExtentOf<OUT>; ++i)
 				output[i] = result[i];
 		}
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, Number LHS, Number RHS>
+	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER ShiftRightWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
-		ShiftRight<LHS, RHS>(lhs, rhs, result.mArray);
+		ShiftRight<LHS, RHS>(lhs, rhs, result.mComponents);
 		return result;
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

@@ -26,9 +26,9 @@ namespace Langulus::SIMD
 			if constexpr (denseSize == 16 && Dense<T>) {
 				if constexpr (IntegerNumber<T>)
 					return simde_mm_loadu_si128(reinterpret_cast<const simde__m128i*>(v));
-				else if constexpr (Same<T, float>)
+				else if constexpr (CT::Same<T, float>)
 					return simde_mm_loadu_ps(v);
-				else if constexpr (Same<T, double>)
+				else if constexpr (CT::Same<T, double>)
 					return simde_mm_loadu_pd(v);
 				else LANGULUS_ASSERT("Unsupported type for SIMD::Load 16-byte package");
 			}
@@ -39,9 +39,9 @@ namespace Langulus::SIMD
 			if constexpr (denseSize == 32 && Dense<T>) {
 				if constexpr (IntegerNumber<T>)
 					return simde_mm256_loadu_si256(reinterpret_cast<const simde__m256i*>(v));
-				else if constexpr (Same<T, float>)
+				else if constexpr (CT::Same<T, float>)
 					return simde_mm256_loadu_ps(v);
-				else if constexpr (Same<T, double>)
+				else if constexpr (CT::Same<T, double>)
 					return simde_mm256_loadu_pd(v);
 				else LANGULUS_ASSERT("Unsupported type for SIMD::Load 32-byte package");
 			}
@@ -52,9 +52,9 @@ namespace Langulus::SIMD
 			if constexpr (denseSize == 64 && Dense<T>) {
 				if constexpr (IntegerNumber<T>)
 					return simde_mm512_loadu_si512(v);
-				else if constexpr (Same<T, float>)
+				else if constexpr (CT::Same<T, float>)
 					return simde_mm512_loadu_ps(v);
-				else if constexpr (Same<T, double>)
+				else if constexpr (CT::Same<T, double>)
 					return simde_mm512_loadu_pd(v);
 				else LANGULUS_ASSERT("Unsupported type for SIMD::Load 64-byte package");
 			}
@@ -72,4 +72,4 @@ namespace Langulus::SIMD
 		decltype(SIMD::Load<0>(Uneval<TLossless<LHS, RHS>[ExtentOf<RHS>]>()))
 	>;
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

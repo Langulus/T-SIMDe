@@ -67,12 +67,12 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm_div_epi64(lhs, rhs);
 			}
-			else if constexpr (Same<T, float>) {
+			else if constexpr (CT::Same<T, float>) {
 				if (simde_mm_movemask_ps(simde_mm_cmpeq_ps(rhs, simde_mm_setzero_ps())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_ps(lhs, rhs);
 			}
-			else if constexpr (Same<T, double>) {
+			else if constexpr (CT::Same<T, double>) {
 				if (simde_mm_movemask_pd(simde_mm_cmpeq_pd(rhs, simde_mm_setzero_pd())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_pd(lhs, rhs);
@@ -120,12 +120,12 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epi64(lhs, rhs);
 			}
-			else if constexpr (Same<T, float>) {
+			else if constexpr (CT::Same<T, float>) {
 				if (simde_mm256_movemask_ps(simde_mm256_cmp_ps(rhs, simde_mm256_setzero_ps(), _CMP_EQ_OQ)))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_ps(lhs, rhs);
 			}
-			else if constexpr (Same<T, double>) {
+			else if constexpr (CT::Same<T, double>) {
 				if (simde_mm256_movemask_pd(simde_mm256_cmp_pd(rhs, simde_mm256_setzero_pd(), _CMP_EQ_OQ)))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_pd(lhs, rhs);
@@ -173,12 +173,12 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epi64(lhs, rhs);
 			}
-			else if constexpr (Same<T, float>) {
+			else if constexpr (CT::Same<T, float>) {
 				if (simde_mm512_cmp_ps(rhs, simde_mm512_setzero_ps(), _CMP_EQ_OQ))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_ps(lhs, rhs);
 			}
-			else if constexpr (Same<T, double>) {
+			else if constexpr (CT::Same<T, double>) {
 				if (simde_mm512_cmp_pd(rhs, simde_mm512_setzero_pd(), _CMP_EQ_OQ))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_pd(lhs, rhs);
@@ -227,11 +227,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER DivideWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Divide<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

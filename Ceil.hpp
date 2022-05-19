@@ -24,23 +24,23 @@ namespace Langulus::SIMD
 			"SIMD::InnerFloor is suboptimal and pointless for whole numbers, avoid calling it on such");
 
 		if constexpr (SIMD128<REGISTER>) {
-			if constexpr (Same<T, float>)
+			if constexpr (CT::Same<T, float>)
 				return simde_mm_ceil_ps(value);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm_ceil_pd(value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 16-byte package");
 		}
 		else if constexpr (SIMD256<REGISTER>) {
-			if constexpr (Same<T, float>)
+			if constexpr (CT::Same<T, float>)
 				return simde_mm256_ceil_ps(value);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm256_ceil_pd(value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 32-byte package");
 		}
 		else if constexpr (SIMD512<REGISTER>) {
-			if constexpr (Same<T, float>)
+			if constexpr (CT::Same<T, float>)
 				return simde_mm512_ceil_ps(value);
-			else if constexpr (Same<T, double>)
+			else if constexpr (CT::Same<T, double>)
 				return simde_mm512_ceil_pd(value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 64-byte package");
 		}
@@ -52,4 +52,4 @@ namespace Langulus::SIMD
 		return InnerCeil<T, S>(Load<0>(value));
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

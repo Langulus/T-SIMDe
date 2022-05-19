@@ -19,7 +19,7 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the shifted elements as a register									
-	template<Number T, pcptr S, TSIMD REGISTER>
+	template<CT::Number T, Count S, TSIMD REGISTER>
 	auto ShiftLeftInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (SIMD128<REGISTER>) {
 			if constexpr (Integer16<T>)
@@ -52,7 +52,7 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<Number LHS, Number RHS>
+	template<CT::Number LHS, CT::Number RHS>
 	NOD() auto ShiftLeft(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = TRegister<LHS, RHS>;
 		using LOSSLESS = TLossless<LHS, RHS>;
@@ -69,23 +69,23 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, Number LHS, Number RHS>
+	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER ShiftLeftWrap(LHS& lhs, RHS& rhs) noexcept {
 		const auto result = ShiftLeft<LHS, RHS>(lhs, rhs);
 		if constexpr (TSIMD<decltype(result)>) {
 			// Extract from register													
 			typename WRAPPER::MemberType output[WRAPPER::MemberCount];
 			SIMD::Store(result, output);
-			return WRAPPER{ result };
+			return WRAPPER {result};
 		}
 		else if constexpr (Number<decltype(result)>) {
 			// Extract from std::array													
-			return WRAPPER{ result };
+			return WRAPPER {result};
 		}
 		else {
 			// Extract from std::array													
-			return WRAPPER{ result.data() };
+			return WRAPPER {result.data()};
 		}
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD

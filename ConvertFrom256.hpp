@@ -339,7 +339,7 @@ namespace Langulus::SIMD
 				}
 				else LANGULUS_ASSERT("Can't convert from pcu8 to unsupported TT");
 			}
-			else if constexpr (Same<FT, pci16>) {
+			else if constexpr (Same<FT, int16_t>) {
 				//																				
 				// Converting TO	pci8[8], pcu8[8], pci16[8], pcu16[8]		
 				//						pci32[4], pcu32[4], pci64[2], pcu64[2]		
@@ -536,4 +536,4 @@ namespace Langulus::SIMD
 		else LANGULUS_ASSERT("Can't convert from __m256i to unsupported");
 	}
 
-} // namespace Langulus::TSIMDe
+} // namespace Langulus::SIMD
