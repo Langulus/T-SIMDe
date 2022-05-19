@@ -1,12 +1,19 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Intrinsics.hpp"
 
-#if LANGULUS_COMPILER_IS(GCC)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wignored-attributes"
+#if LANGULUS_COMPILER(GCC)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 
 	/// Fill a register with a single value												
@@ -14,7 +21,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam T - type of data to use for filling									
 	///	@param value - the value to use for filling									
 	///	@return the filled register														
-	template<TSIMD REGISTER, Number T>
+	template<TSIMD REGISTER, CT::Number T>
 	NOD() decltype(auto) Fill(const T& valueOrig) noexcept {
 		auto& value = pcVal(valueOrig);
 		if constexpr (Same<REGISTER, T>)
@@ -31,12 +38,12 @@ namespace PCFW::Math::SIMD
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m128i");
 		}
 		else if constexpr (Same<REGISTER, simde__m128>) {
-			if constexpr (Same<T, pcr32>)
+			if constexpr (Same<T, float>)
 				return simde_mm_broadcast_ss(&value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m128");
 		}
 		else if constexpr (Same<REGISTER, simde__m128d>) {
-			if constexpr (Same<T, pcr64>)
+			if constexpr (Same<T, double>)
 				return simde_mm_set1_pd(value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m128d");
 		}
@@ -52,12 +59,12 @@ namespace PCFW::Math::SIMD
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m256i");
 		}
 		else if constexpr (Same<REGISTER, simde__m256>) {
-			if constexpr (Same<T, pcr32>)
+			if constexpr (Same<T, float>)
 				return simde_mm256_broadcast_ss(&value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill __m256");
 		}
 		else if constexpr (Same<REGISTER, simde__m256d>) {
-			if constexpr (Same<T, pcr64>)
+			if constexpr (Same<T, double>)
 				return simde_mm256_broadcast_sd(&value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m256d");
 		}
@@ -73,20 +80,20 @@ namespace PCFW::Math::SIMD
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m512i");
 		}
 		else if constexpr (Same<REGISTER, simde__m512>) {
-			if constexpr (Same<T, pcr32>)
+			if constexpr (Same<T, float>)
 				return simde_mm512_set1_ps(value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill __m512");
 		}
 		else if constexpr (Same<REGISTER, simde__m512d>) {
-			if constexpr (Same<T, pcr64>)
+			if constexpr (Same<T, double>)
 				return simde_mm512_set1_pd(&value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m512d");
 		}
 		else LANGULUS_ASSERT("Bad REGISTER type for SIMD::Fill");
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe
 
-#if LANGULUS_COMPILER_IS(GCC)
-#pragma GCC diagnostic pop
+#if LANGULUS_COMPILER(GCC)
+	#pragma GCC diagnostic pop
 #endif

@@ -1,37 +1,88 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
-#include <simde/x86/avx512.h>
-#include <simde/x86/avx2.h>
-#include <simde/x86/avx.h>
-#include <simde/x86/sse4.2.h>
-#include <simde/x86/sse4.1.h>
-#include <simde/x86/ssse3.h>
-#include <simde/x86/sse3.h>
-#include <simde/x86/sse2.h>
-#include <simde/x86/sse.h>
-#include <simde/x86/svml.h>
+#include <Langulus.Core.hpp>
 
-namespace PCFW::Math::SIMD
+/// Make sure everything SIMDe includes is included before SIMDe itself,		
+/// so that we	can capsulate it in our namespace later, without encapsulating	
+/// std stuff																						
+#include <simde/simde-common.h>
+#include <cstdint>
+#include <type_traits>
+#include <bit>
+#include <utility>
+#include <cmath>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <complex>
+
+#if defined(SIMDE_X86_MMX_NATIVE)
+	#define SIMDE_X86_MMX_USE_NATIVE_TYPE
+#elif defined(SIMDE_X86_SSE_NATIVE)
+	#define SIMDE_X86_MMX_USE_NATIVE_TYPE
+#endif
+
+#if defined(SIMDE_X86_MMX_USE_NATIVE_TYPE)
+	#include <mmintrin.h>
+#elif defined(SIMDE_ARM_NEON_A32V7_NATIVE)
+	#include <arm_neon.h>
+#elif defined(SIMDE_MIPS_LOONGSON_MMI_NATIVE)
+	#include <loongson-mmiintrin.h>
+#endif
+
+#include <stdint.h>
+#include <limits.h>
+
+#if defined(_WIN32) && !defined(SIMDE_X86_SSE_NATIVE) && defined(_MSC_VER)
+	#include <windows.h>
+#endif
+
+#if defined(__ARM_ACLE)
+	#include <arm_acle.h>
+#endif
+
+namespace Langulus::SIMD
 {
+
+	template<class T1, class T2>
+	concept Same = CT::Same<T1, T2>;
+
+	#include <simde/x86/avx512.h>
+	#include <simde/x86/avx2.h>
+	#include <simde/x86/avx.h>
+	#include <simde/x86/sse4.2.h>
+	#include <simde/x86/sse4.1.h>
+	#include <simde/x86/ssse3.h>
+	#include <simde/x86/sse3.h>
+	#include <simde/x86/sse2.h>
+	#include <simde/x86/sse.h>
+	#include <simde/x86/svml.h>
 
 	class NotSupported {};
 
 	template<class T>
 	concept SIMD128 =
-		Same<T, simde__m128> || Same<T, simde__m128d> || Same<T, simde__m128i>;
+		CT::Same<T, simde__m128> || CT::Same<T, simde__m128d> || CT::Same<T, simde__m128i>;
 
 	template<class T>
 	concept SIMD256 =
-		Same<T, simde__m256> || Same<T, simde__m256d> || Same<T, simde__m256i>;
+		CT::Same<T, simde__m256> || CT::Same<T, simde__m256d> || CT::Same<T, simde__m256i>;
 
 	template<class T>
 	concept SIMD512 =
-		Same<T, simde__m512> || Same<T, simde__m512d> || Same<T, simde__m512i>;
+		CT::Same<T, simde__m512> || CT::Same<T, simde__m512d> || CT::Same<T, simde__m512i>;
 
 	template<class T>
 	concept TSIMD = SIMD128<T> || SIMD256<T> || SIMD512<T>;
 
 	template<class T>
-	constexpr bool IsNotSupported = Same<T, NotSupported>;
+	constexpr bool IsNotSupported = CT::Same<T, NotSupported>;
 
 	///																								
 	inline simde__m128 _mm_halfflip(const simde__m128& what) noexcept {
@@ -71,165 +122,168 @@ namespace PCFW::Math::SIMD
 	}
 
 	///																								
-	inline pcu8 _mm_hmax_epu8(const __m128i v) noexcept {
+	inline uint8_t _mm_hmax_epu8(const __m128i v) noexcept {
 		__m128i vmax = v;
 		vmax = _mm_max_epu8(vmax, _mm_alignr_epi8(vmax, vmax, 1)); // SSSE3 + SSE2
 		vmax = _mm_max_epu8(vmax, _mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
 		vmax = _mm_max_epu8(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(1, 2, 3, 0))); // SSE2
 		vmax = _mm_max_epu8(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(2, 3, 0, 1))); // SSE2
 		const auto result = _mm_extract_epi8(vmax, 0); // SSE4.1
-		return reinterpret_cast<const pcu8&>(result); 
+		return reinterpret_cast<const uint8_t&>(result);
 	}
 
-	inline pcu16 _mm_hmax_epu16(const __m128i v) noexcept {
+	inline uint16_t _mm_hmax_epu16(const __m128i v) noexcept {
 		__m128i vmax = v;
 		vmax = _mm_max_epu16(vmax, _mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
 		vmax = _mm_max_epu16(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(1, 2, 3, 0))); // SSE2
 		vmax = _mm_max_epu16(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(2, 3, 0, 1))); // SSE2
 		const auto result = _mm_extract_epi16(vmax, 0); // SSE2
-		return reinterpret_cast<const pcu16&>(result);
+		return reinterpret_cast<const uint16_t&>(result);
 	}
 
-	inline pcu32 _mm_hmax_epu32(const __m128i v) noexcept {
+	inline uint32_t _mm_hmax_epu32(const __m128i v) noexcept {
 		__m128i vmax = v;
 		vmax = _mm_max_epu32(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(1, 2, 3, 0))); // SSE2
 		vmax = _mm_max_epu32(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(2, 3, 0, 1))); // SSE2
 		const auto result = _mm_extract_epi32(vmax, 0); // SSE4.1
-		return reinterpret_cast<const pcu32&>(result);
+		return reinterpret_cast<const uint32_t&>(result);
 	}
 
-	inline pcu64 _mm_hmax_epu64(const __m128i v) noexcept {
+	inline uint64_t _mm_hmax_epu64(const __m128i v) noexcept {
 		__m128i vmax = v;
 		vmax = _mm_max_epu64(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(2, 3, 0, 1))); // SSE2
-		#if LANGULUS_ARCHITECTURE_IS(32BIT)
+		#if LANGULUS_BITNESS() == 32
 			alignas(16) pcu64 stored[2];
 			_mm_store_si128(reinterpret_cast<__m128i*>(stored), v);		// SSE2
 			return stored[0];
 		#else
 			const auto result = _mm_extract_epi64(vmax, 0); // SSE4.1
-			return reinterpret_cast<const pcu64&>(result);
+			return reinterpret_cast<const uint64_t&>(result);
 		#endif
 	}
 
-	inline pci8 _mm_hmax_epi8(const __m128i v) noexcept {
+	inline int8_t _mm_hmax_epi8(const __m128i v) noexcept {
 		__m128i vmax = v;
 		vmax = _mm_max_epi8(vmax, _mm_alignr_epi8(vmax, vmax, 1)); // SSSE3 + SSE2
 		vmax = _mm_max_epi8(vmax, _mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
 		vmax = _mm_max_epi8(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(1, 2, 3, 0))); // SSE2
 		vmax = _mm_max_epi8(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(2, 3, 0, 1))); // SSE2
 		const auto result = _mm_extract_epi8(vmax, 0); // SSE4.1
-		return reinterpret_cast<const pci8&>(result);
+		return reinterpret_cast<const int8_t&>(result);
 	}
 
-	inline pci16 _mm_hmax_epi16(const __m128i v) noexcept {
+	inline int16_t _mm_hmax_epi16(const __m128i v) noexcept {
 		__m128i vmax = v;
 		vmax = _mm_max_epi16(vmax, _mm_alignr_epi8(vmax, vmax, 2)); // SSSE3 + SSE2
 		vmax = _mm_max_epi16(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(1, 2, 3, 0))); // SSE2
 		vmax = _mm_max_epi16(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(2, 3, 0, 1))); // SSE2
 		const auto result = _mm_extract_epi16(vmax, 0); // SSE2
-		return reinterpret_cast<const pci16&>(result);
+		return reinterpret_cast<const int16_t&>(result);
 	}
 
-	inline pci32 _mm_hmax_epi32(const __m128i v) noexcept {
+	inline int32_t _mm_hmax_epi32(const __m128i v) noexcept {
 		__m128i vmax = v;
 		vmax = _mm_max_epi32(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(1, 2, 3, 0))); // SSE2
 		vmax = _mm_max_epi32(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(2, 3, 0, 1))); // SSE2
 		return _mm_extract_epi32(vmax, 0);	// SSE2
 	}
 
-	inline pci64 _mm_hmax_epi64(const __m128i v) noexcept {
+	inline int64_t _mm_hmax_epi64(const __m128i v) noexcept {
 		__m128i vmax = v;
 		vmax = _mm_max_epi64(vmax, _mm_shuffle_epi32(vmax, _MM_SHUFFLE(2, 3, 0, 1))); // SSE2
-		#if LANGULUS_ARCHITECTURE_IS(32BIT)
+		#if LANGULUS_BITNESS() == 32
 			alignas(16) pci64 stored[2];
 			_mm_store_si128(reinterpret_cast<__m128i*>(stored), v);		// SSE2
 			return stored[0];
 		#else
 			const auto result = _mm_extract_epi64(vmax, 0); // SSE4.1
-			return reinterpret_cast<const pcu64&>(result);
+			return reinterpret_cast<const int64_t&>(result);
 		#endif
 	}
+
+	template<class LOSSLESS, class FFALL>
+	concept Invocable = ::std::invocable<FFALL, LOSSLESS, LOSSLESS>;
 
 	/// Fallback OP on a single pair of dense numbers									
 	/// It converts LHS and RHS to the most lossless of the two						
 	///	@tparam LHS - left number type (deducible)									
 	///	@tparam RHS - right number type (deducible)									
-	///	@tparam OP - the operation to invoke (deducible)							
+	///	@tparam FFALL - the operation to invoke on fallback (deducible)		
 	///	@param lhs - left argument															
 	///	@param rhs - right argument														
-	///	@param op - the function to invoke												
+	///	@param op - the fallback function to invoke									
 	///	@return the resulting number or std::array									
-	template<class LOSSLESS, Number LHS, Number RHS, class FFALL>
-	NOD() auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op)
-	requires ::std::invocable<FFALL, LOSSLESS, LOSSLESS> {
+	template<class LOSSLESS, CT::Number LHS, CT::Number RHS, class FFALL>
+	NOD() auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
 		using OUT = ::std::invoke_result_t<FFALL, LOSSLESS, LOSSLESS>;
-		if constexpr (pcIsArray<LHS> && pcIsArray<RHS>) {
+		if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
 			// Array OP Array																
-			constexpr pcptr S = ((pcExtentOf<LHS>) < (pcExtentOf<RHS>)) ? pcExtentOf<LHS> : pcExtentOf<RHS>;
+			constexpr auto S = ((ExtentOf<LHS>) < (ExtentOf<RHS>)) ? ExtentOf<LHS> : ExtentOf<RHS>;
 			::std::array<OUT, S> output;
-			for (pcptr i = 0; i < S; ++i)
-				output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], pcForward<decltype(op)>(op));
+			for (Count i = 0; i < S; ++i)
+				output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], Forward<decltype(op)>(op));
 			return output;
 		}
-		else if constexpr (pcIsArray<LHS>) {
+		else if constexpr (CT::Array<LHS>) {
 			// Array OP Scalar															
-			constexpr pcptr S = pcExtentOf<LHS>;
+			constexpr auto S = ExtentOf<LHS>;
 			::std::array<OUT, S> output;
-			if constexpr (Boolean<OUT>) {
-				auto& same_rhs = pcVal(rhs);
-				for (pcptr i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, pcForward<decltype(op)>(op));
+			if constexpr (CT::Bool<OUT>) {
+				auto& same_rhs = MakeDense(rhs);
+				for (Count i = 0; i < S; ++i)
+					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Forward<decltype(op)>(op));
 			}
 			else {
-				const auto same_rhs = static_cast<LOSSLESS>(pcVal(rhs));
-				for (pcptr i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, pcForward<decltype(op)>(op));
+				const auto same_rhs = static_cast<LOSSLESS>(MakeDense(rhs));
+				for (Count i = 0; i < S; ++i)
+					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Forward<decltype(op)>(op));
 			}
 			return output;
 		}
-		else if constexpr (pcIsArray<RHS>) {
+		else if constexpr (CT::Array<RHS>) {
 			// Scalar OP Array															
-			constexpr pcptr S = pcExtentOf<RHS>;
+			constexpr auto S = ExtentOf<RHS>;
 			::std::array<OUT, S> output;
-			if constexpr (Boolean<OUT>) {
-				auto& same_lhs = pcVal(lhs);
-				for (pcptr i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], pcForward<decltype(op)>(op));
+			if constexpr (CT::Bool<OUT>) {
+				auto& same_lhs = MakeDense(lhs);
+				for (Count i = 0; i < S; ++i)
+					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Forward<decltype(op)>(op));
 			}
 			else {
 				const auto same_lhs = static_cast<LOSSLESS>(pcVal(lhs));
-				for (pcptr i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], pcForward<decltype(op)>(op));
+				for (Count i = 0; i < S; ++i)
+					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Forward<decltype(op)>(op));
 			}
 			return output;
 		}
 		else {
 			// Scalar OP Scalar															
 			// Casts should be optimized-out if type is same (I hope)		
-			return op(static_cast<LOSSLESS>(pcVal(lhs)), static_cast<LOSSLESS>(pcVal(rhs)));
+			return op(
+				static_cast<LOSSLESS>(MakeDense(lhs)), 
+				static_cast<LOSSLESS>(MakeDense(rhs))
+			);
 		}
 	}
 
 	/// Constrexpr function to calculate required elements			 				
 	///	@tparam LHS - left number type (deducible)									
 	///	@tparam RHS - right number type (deducible)									
-	///	@param lhs - left argument															
-	///	@param rhs - right argument														
-	///	@return the size of the required register										
-	template<Number LHS, Number RHS>
-	NOD() constexpr pcptr ResultSize() noexcept {
-		if constexpr (pcIsArray<LHS> && pcIsArray<RHS>)
+	///	@return the overlapping count of LHS and RHS									
+	template<CT::Number LHS, CT::Number RHS>
+	NOD() constexpr Count ResultCount() noexcept {
+		if constexpr (CT::Array<LHS> && CT::Array<RHS>)
 			// Array OP Array																
-			return pcExtentOf<LHS> < pcExtentOf<RHS> ? pcExtentOf<LHS> : pcExtentOf<RHS>;
-		else if constexpr (pcIsArray<LHS>)
+			return ExtentOf<LHS> < ExtentOf<RHS> ? ExtentOf<LHS> : ExtentOf<RHS>;
+		else if constexpr (CT::Array<LHS>)
 			// Array OP Scalar															
-			return pcExtentOf<LHS>;
-		else if constexpr (pcIsArray<RHS>)
+			return ExtentOf<LHS>;
+		else if constexpr (CT::Array<RHS>)
 			// Scalar OP Array															
-			return pcExtentOf<RHS>;
+			return ExtentOf<RHS>;
 		else
 			// Scalar OP Scalar															
 			return 1;
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe

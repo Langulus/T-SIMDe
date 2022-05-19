@@ -1,6 +1,6 @@
 ///																									
-/// Langulus::T-SIMDe																			
-/// Copyright(C) 2019 - 2022 Dimo Markov <langulusteam@gmail.com>					
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
 ///																									
 /// Distributed under GNU General Public License v3+									
 /// See LICENSE file, or https://www.gnu.org/licenses									

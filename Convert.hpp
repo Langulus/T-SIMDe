@@ -1,3 +1,10 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Load.hpp"
 #include "ConvertFrom128.hpp"
@@ -5,11 +12,11 @@
 #include "ConvertFrom512.hpp"
 
 #if LANGULUS_COMPILER_IS(GCC)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wignored-attributes"
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 
 	/// Convert from one array to another using SIMD									
@@ -19,10 +26,10 @@ namespace PCFW::Math::SIMD
 	///	@tparam FT - type to convert from												
 	///	@param in - the input data															
 	///	@return the resulting register													
-	template<int DEF, class TT, pcptr S, class FT>
+	template<int DEF, class TT, Count S, class FT>
 	auto Convert(const FT(&in)[S]) noexcept {
-		using FROM = decltype(SIMD::Load<DEF>(std::declval<pcDecay<FT>[S]>()));
-		using TO = decltype(SIMD::Load<DEF>(std::declval<pcDecay<TT>[S]>()));
+		using FROM = decltype(SIMD::Load<DEF>(Uneval<Decay<FT>[S]>()));
+		using TO = decltype(SIMD::Load<DEF>(Uneval<Decay<TT>[S]>()));
 		const FROM loaded = SIMD::Load<DEF>(in);
 
 		if constexpr (SIMD::IsNotSupported<FROM> || SIMD::IsNotSupported<TO>)
@@ -66,30 +73,30 @@ namespace PCFW::Math::SIMD
 	///	@param opSIMD - the function to invoke											
 	///	@param opFALL - the function to invoke											
 	///	@return the result (either std::array, number, or register)				
-	template<int DEF, class REGISTER, class LOSSLESS, Number LHS, Number RHS, class FSIMD, class FFALL>
+	template<int DEF, class REGISTER, class LOSSLESS, CT::Number LHS, CT::Number RHS, class FSIMD, class FFALL>
 	NOD() auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL)
-	requires (::std::invocable<FSIMD, REGISTER, REGISTER> && ::std::invocable<FFALL, LOSSLESS, LOSSLESS>) {
+	requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
 		using OUTSIMD = ::std::invoke_result_t<FSIMD, REGISTER, REGISTER>;
 		constexpr auto S = ResultSize<LHS, RHS>();
 		if constexpr (S < 2 || IsNotSupported<REGISTER> || IsNotSupported<OUTSIMD>) {
 			// Call the fallback routine if unsupported or size 1				
-			return Fallback<LOSSLESS>(lhs, rhs, pcForward<decltype(opFALL)>(opFALL));
+			return Fallback<LOSSLESS>(lhs, rhs, Forward<decltype(opFALL)>(opFALL));
 		}
-		else if constexpr (pcIsArray<LHS> && pcIsArray<RHS>) {
+		else if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
 			// Both LHS and RHS are arrays, so wrap in registers				
 			return opSIMD(
-				SIMD::Convert<DEF, LOSSLESS>(reinterpret_cast<const pcDecay<LHS>(&)[S]>(lhs)),
-				SIMD::Convert<DEF, LOSSLESS>(reinterpret_cast<const pcDecay<RHS>(&)[S]>(rhs))
+				SIMD::Convert<DEF, LOSSLESS>(reinterpret_cast<const Decay<LHS>(&)[S]>(lhs)),
+				SIMD::Convert<DEF, LOSSLESS>(reinterpret_cast<const Decay<RHS>(&)[S]>(rhs))
 			);
 		}
-		else if constexpr (pcIsArray<LHS>) {
+		else if constexpr (CT::Array<LHS>) {
 			// LHS is array, RHS is scalar											
 			return opSIMD(
 				SIMD::Convert<DEF, LOSSLESS>(lhs),
 				SIMD::Fill<REGISTER>(static_cast<LOSSLESS>(rhs))
 			);
 		}
-		else if constexpr (pcIsArray<RHS>) {
+		else if constexpr (CT::Array<RHS>) {
 			// LHS is scalar, RHS is array											
 			return opSIMD(
 				SIMD::Fill<REGISTER>(static_cast<LOSSLESS>(lhs)),
@@ -98,12 +105,12 @@ namespace PCFW::Math::SIMD
 		}
 		else {
 			// Both LHS and RHS are scalars											
-			return Fallback<LOSSLESS>(lhs, rhs, pcForward<decltype(opFALL)>(opFALL));
+			return Fallback<LOSSLESS>(lhs, rhs, Forward<decltype(opFALL)>(opFALL));
 		}
 	}
 	
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe
 
 #if LANGULUS_COMPILER_IS(GCC)
-#pragma GCC diagnostic pop
+	#pragma GCC diagnostic pop
 #endif

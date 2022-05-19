@@ -1,7 +1,14 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Load.hpp"
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 
 	/// Convert __m128 to any other register												
@@ -11,7 +18,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - register to convert to												
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom128(const simde__m128& v) noexcept {
 		//																						
 		// Converting FROM float[4]													
@@ -107,7 +114,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - register to convert to												
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom128d(const simde__m128d& v) noexcept {
 		//																						
 		// Converting FROM double[2]													
@@ -178,7 +185,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - register to convert to												
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom128i(const simde__m128i& v) noexcept {
 		//																						
 		// Converting FROM pci8[16], pcu8[16], pci16[8], pcu16[8]			
@@ -220,15 +227,15 @@ namespace PCFW::Math::SIMD
 			}
 			else if constexpr (UnsignedInteger32<FT> && S <= 4) {
 				// pcu32[4] -> float[4]													
-				return simde_mm256_cvtpd_ps(_mm256_cvtepu32_pd(v));
+				return simde_mm256_cvtpd_ps(simde_mm256_cvtepu32_pd(v));
 			}
 			else if constexpr (SignedInteger64<FT> && S <= 2) {
 				// pci64[2] -> float[2]													
-				return _mm_cvtepi64_ps(v);
+				return simde_mm_cvtepi64_ps(v);
 			}
 			else if constexpr (UnsignedInteger64<FT> && S <= 2) {
 				// pcu64[2] -> float[2]													
-				return _mm_cvtepu64_ps(v);
+				return simde_mm_cvtepu64_ps(v);
 			}
 			else LANGULUS_ASSERT("Can't convert from __m128i to __m128");
 		}
@@ -580,4 +587,4 @@ namespace PCFW::Math::SIMD
 		else LANGULUS_ASSERT("Can't convert from __m128i to unsupported");
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe

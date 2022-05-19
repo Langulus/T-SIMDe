@@ -1,7 +1,14 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Load.hpp"
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 
 	/// Convert __m256 to any other register												
@@ -11,7 +18,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - type of register to convert to									
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom256(const simde__m256& v) noexcept {
 		//																						
 		// Converting FROM float[8]													
@@ -58,22 +65,22 @@ namespace PCFW::Math::SIMD
 				vu32_16 = simde_mm256_packus_epi32(vu32_16, vu32_16);
 				return simde_mm256_castsi256_si128(vu32_16);
 			}
-			else if constexpr (Same<TT, pci32> && S <= 4) {
+			else if constexpr (Same<TT, int32_t> && S <= 4) {
 				// float[4] -> pci32[4]													
 				return simde_mm_cvtps_epi32(simde_mm256_castps256_ps128(v));
 			}
-			else if constexpr (Same<TT, pcu32> && S <= 4) {
+			else if constexpr (Same<TT, uint32_t> && S <= 4) {
 				// float[4] -> pcu32[4]													
 				return simde_mm_cvtps_epi32(simde_mm256_castps256_ps128(v));
 			}
-			else if constexpr (Same<TT, pci64> && S <= 2) {
+			else if constexpr (Same<TT, int64_t> && S <= 2) {
 				// float[2] -> pci64[2]													
 				const auto vi32 = simde_mm256_cvtps_epi32(v);
 				const auto vi32_128 = simde_mm256_castsi256_si128(vi32);
 				const auto vi64 = simde_mm256_cvtepi32_epi64(vi32_128);
 				return simde_mm256_castsi256_si128(vi64);
 			}
-			else if constexpr (Same<TT, pcu64> && S <= 2) {
+			else if constexpr (Same<TT, uint64_t> && S <= 2) {
 				// float[2] -> pcu64[2]													
 				const auto vu32 = simde_mm256_cvtps_epi32(v);
 				const auto vu32_128 = simde_mm256_castsi256_si128(vu32);
@@ -86,12 +93,12 @@ namespace PCFW::Math::SIMD
 			//																					
 			// Converting TO pci64[4], pcu64[4]										
 			//																					
-			if constexpr (Same<TT, pci64> && S <= 4) {
+			if constexpr (Same<TT, int64_t> && S <= 4) {
 				// float[4] -> pci64[4]													
 				const auto v32 = simde_mm_cvtps_epi32(simde_mm256_castps256_ps128(v));
 				return simde_mm256_cvtepi32_epi64(v32);
 			}
-			else if constexpr (Same<TT, pcu64> && S <= 4) {
+			else if constexpr (Same<TT, uint64_t> && S <= 4) {
 				// float[4] -> pcu64[4] 												
 				const auto v32 = simde_mm_cvtps_epi32(simde_mm256_castps256_ps128(v));
 				return simde_mm256_cvtepu32_epi64(v32);
@@ -115,7 +122,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - type of register to convert to									
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom256d(const simde__m256d& v) noexcept {
 		//																						
 		// Converting FROM double[4]													
@@ -185,7 +192,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - type of register to convert to									
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom256i(const simde__m256i& v) noexcept {
 		//																						
 		// Converting FROM	pci8[32], pcu8[32], pci16[16], pcu16[16]		
@@ -195,22 +202,22 @@ namespace PCFW::Math::SIMD
 			//																					
 			// Converting TO float[4]													
 			//																					
-			if constexpr (Same<pci8, FT> && S <= 4) {
+			if constexpr (Same<int8_t, FT> && S <= 4) {
 				// pci8[4] -> float[4]													
 				const auto v32 = simde_mm_cvtepi8_epi32(simde_mm256_castsi256_si128(v));
 				return simde_mm_cvtepi32_ps(v32);
 			}
-			else if constexpr (Same<pcu8, FT> && S <= 4) {
+			else if constexpr (Same<uint8_t, FT> && S <= 4) {
 				// pci8[4] -> float[4]													
 				const auto v32 = simde_mm_cvtepu8_epi32(simde_mm256_castsi256_si128(v));
 				return simde_mm_cvtepi32_ps(v32);
 			}
-			else if constexpr (Same<pci16, FT> && S <= 4) {
+			else if constexpr (Same<int16_t, FT> && S <= 4) {
 				// pci16[4] -> float[4]													
 				const auto v32 = simde_mm_cvtepi16_epi32(simde_mm256_castsi256_si128(v));
 				return simde_mm_cvtepi32_ps(v32);
 			}
-			else if constexpr (Same<pcu16, FT> && S <= 4) {
+			else if constexpr (Same<uint16_t, FT> && S <= 4) {
 				// pci16[4] -> float[4]													
 				const auto v32 = simde_mm_cvtepu16_epi32(simde_mm256_castsi256_si128(v));
 				return simde_mm_cvtepi32_ps(v32);
@@ -232,22 +239,22 @@ namespace PCFW::Math::SIMD
 			//																					
 			// Converting TO double[2]													
 			//																					
-			if constexpr (Same<FT, pci8> && S <= 2) {
+			if constexpr (Same<FT, int8_t> && S <= 2) {
 				// pci8[2] -> double[2]													
 				const auto v32 = simde_mm_cvtepi8_epi32(simde_mm256_castsi256_si128(v));
 				return simde_mm_cvtepi32_pd(v32);
 			}
-			else if constexpr (Same<FT, pcu8> && S <= 2) {
+			else if constexpr (Same<FT, uint8_t> && S <= 2) {
 				// pcu8[2] -> double[2]													
 				const auto v32 = simde_mm_cvtepu8_epi32(simde_mm256_castsi256_si128(v));
 				return simde_mm_cvtepi32_pd(v32);
 			}
-			else if constexpr (Same<FT, pci16> && S <= 2) {
+			else if constexpr (Same<FT, int16_t> && S <= 2) {
 				// pci16[2] -> double[2]												
 				const auto v32 = simde_mm_cvtepi16_epi32(simde_mm256_castsi256_si128(v));
 				return simde_mm_cvtepi32_pd(v32);
 			}
-			else if constexpr (Same<FT, pcu16> && S <= 2) {
+			else if constexpr (Same<FT, uint16_t> && S <= 2) {
 				// pcu16[2] -> double[2]												
 				const auto v32 = simde_mm_cvtepu16_epi32(simde_mm256_castsi256_si128(v));
 				return simde_mm_cvtepi32_pd(v32);
@@ -266,7 +273,7 @@ namespace PCFW::Math::SIMD
 			else LANGULUS_ASSERT("Can't convert from __m256i to __m128d");
 		}
 		else if constexpr (Same<TO, simde__m128i>) {
-			if constexpr (Same<FT, pci8>) {
+			if constexpr (Same<FT, int8_t>) {
 				//																				
 				// Converting TO	pci8[16], pcu8[16], pci16[8], pcu16[8]		
 				//						pci32[4], pcu32[4], pci64[2], pcu64[2]		
@@ -299,7 +306,7 @@ namespace PCFW::Math::SIMD
 				}
 				else LANGULUS_ASSERT("Can't convert from pci8 to unsupported TT");
 			}
-			else if constexpr (Same<FT, pcu8>) {
+			else if constexpr (Same<FT, uint8_t>) {
 				//																				
 				// Converting TO	pci8[16], pcu8[16], pci16[8], pcu16[8]		
 				//						pci32[4], pcu32[4], pci64[2], pcu64[2]		
@@ -349,25 +356,25 @@ namespace PCFW::Math::SIMD
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pci16[8] to pcu16[8]");
 				}
-				else if constexpr (Same<TT, pci32> && S <= 4) {
+				else if constexpr (Same<TT, int32_t> && S <= 4) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pci16[4] to pci32[4]");
 				}
-				else if constexpr (Same<TT, pcu32> && S <= 4) {
+				else if constexpr (Same<TT, uint32_t> && S <= 4) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pci16[4] to pcu32[4]");
 				}
-				else if constexpr (Same<TT, pci64> && S <= 2) {
+				else if constexpr (Same<TT, int64_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pci16[2] to pci64[2]");
 				}
-				else if constexpr (Same<TT, pcu64> && S <= 2) {
+				else if constexpr (Same<TT, uint64_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pci16[2] to pcu64[2]");
 				}
 				else LANGULUS_ASSERT("Can't convert from pci16 to unsupported TT");
 			}
-			else if constexpr (Same<FT, pcu16>) {
+			else if constexpr (Same<FT, uint16_t>) {
 				//																				
 				// Converting TO	pci8[8], pcu8[8], pci16[8], pcu16[8]		
 				//						pci32[4], pcu32[4], pci64[2], pcu64[2]		
@@ -384,19 +391,19 @@ namespace PCFW::Math::SIMD
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pcu16[8] to pci16[8]");
 				}
-				else if constexpr (Same<TT, pci32> && S <= 4) {
+				else if constexpr (Same<TT, int32_t> && S <= 4) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pcu16[4] to pci32[4]");
 				}
-				else if constexpr (Same<TT, pcu32> && S <= 4) {
+				else if constexpr (Same<TT, uint32_t> && S <= 4) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pcu16[4] to pcu32[4]");
 				}
-				else if constexpr (Same<TT, pci64> && S <= 2) {
+				else if constexpr (Same<TT, int64_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pcu16[2] to pci64[2]");
 				}
-				else if constexpr (Same<TT, pcu64> && S <= 2) {
+				else if constexpr (Same<TT, uint64_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pcu16[2] to pcu64[2]");
 				}
@@ -442,19 +449,19 @@ namespace PCFW::Math::SIMD
 					// pci32[4] -> pcu32[4]												
 					return simde_mm256_castsi256_si128(v);
 				}
-				else if constexpr (Same<TT, pci64> && S <= 2) {
+				else if constexpr (Same<TT, int64_t> && S <= 2) {
 					// pci32[2] -> pci64[2]												
 					const auto v64 = simde_mm256_cvtepi32_epi64(simde_mm256_castsi256_si128(v));
 					return simde_mm256_castsi256_si128(v64);
 				}
-				else if constexpr (Same<TT, pcu64> && S <= 2) {
+				else if constexpr (Same<TT, uint64_t> && S <= 2) {
 					// pci32[2] -> pcu64[2]												
 					const auto v64 = simde_mm256_cvtepu32_epi64(simde_mm256_castsi256_si128(v));
 					return simde_mm256_castsi256_si128(v64);
 				}
 				else LANGULUS_ASSERT("Can't convert from pci32 to unsupported TT");
 			}
-			else if constexpr (Same<FT, pci64>) {
+			else if constexpr (Same<FT, int64_t>) {
 				//																				
 				// Converting TO	pci8[2], pcu8[2], pci16[2], pcu16[2]		
 				//						pci32[2], pcu32[2], pci64[2], pcu64[2]		
@@ -475,21 +482,21 @@ namespace PCFW::Math::SIMD
 					// pci8[16] -> pcu8[16]											
 					LANGULUS_ASSERT("Can't convert from pci64[2] to pcu16[2]");
 				}
-				else if constexpr (Same<TT, pci32> && S <= 2) {
+				else if constexpr (Same<TT, int32_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]											
 					LANGULUS_ASSERT("Can't convert from pci64[2] to pci32[2]");
 				}
-				else if constexpr (Same<TT, pcu32> && S <= 2) {
+				else if constexpr (Same<TT, uint32_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]											
 					LANGULUS_ASSERT("Can't convert from pci64[2] to pcu32[2]");
 				}
-				else if constexpr (Same<TT, pcu64> && S <= 2) {
+				else if constexpr (Same<TT, uint64_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]											
 					LANGULUS_ASSERT("Can't convert from pci64[2] to pcu64[2]");
 				}
 				else LANGULUS_ASSERT("Can't convert from pci64 to unsupported TT");
 			}
-			else if constexpr (Same<FT, pcu64>) {
+			else if constexpr (Same<FT, uint64_t>) {
 				//																				
 				// Converting TO	pci8[2], pcu8[2], pci16[2], pcu16[2]		
 				//						pci32[2], pcu32[2], pci64[2], pcu64[2]		
@@ -510,15 +517,15 @@ namespace PCFW::Math::SIMD
 					// pci8[16] -> pcu8[16]											
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pcu16[2]");
 				}
-				else if constexpr (Same<TT, pci32> && S <= 2) {
+				else if constexpr (Same<TT, int32_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]											
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pci32[2]");
 				}
-				else if constexpr (Same<TT, pcu32> && S <= 2) {
+				else if constexpr (Same<TT, uint32_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]											
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pcu32[2]");
 				}
-				else if constexpr (Same<TT, pci64> && S <= 2) {
+				else if constexpr (Same<TT, int64_t> && S <= 2) {
 					// pci8[16] -> pcu8[16]											
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pci64[2]");
 				}
@@ -529,4 +536,4 @@ namespace PCFW::Math::SIMD
 		else LANGULUS_ASSERT("Can't convert from __m256i to unsupported");
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe

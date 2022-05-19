@@ -1,7 +1,14 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Load.hpp"
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 
 	/// Convert __m512 to any other register												
@@ -11,7 +18,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - type of register to convert to									
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom512(const simde__m512& v) noexcept {
 		//																						
 		// Converting FROM float[16]													
@@ -170,7 +177,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - type of register to convert to									
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom512d(const simde__m512d& v) noexcept {
 		//																						
 		// Converting FROM double[8]													
@@ -261,7 +268,7 @@ namespace PCFW::Math::SIMD
 	///	@tparam TO - type of register to convert to									
 	///	@param v - the input data															
 	///	@return the resulting register													
-	template<class TT, pcptr S, class FT, class TO>
+	template<class TT, Count S, class FT, class TO>
 	auto ConvertFrom512i(const simde__m512i& v) noexcept {
 		//																						
 		// Converting FROM pci8[64], pcu8[64], pci16[32], pcu16[32]			
@@ -408,4 +415,4 @@ namespace PCFW::Math::SIMD
 		else LANGULUS_ASSERT("Can't convert from __m512i to unsupported");
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe

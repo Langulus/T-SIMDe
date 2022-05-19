@@ -1,8 +1,15 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Fill.hpp"
 #include "Convert.hpp"
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 
 	/// Get floored values via SIMD															
@@ -45,4 +52,4 @@ namespace PCFW::Math::SIMD
 		return InnerRound<T, S>(Load<0>(value));
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe

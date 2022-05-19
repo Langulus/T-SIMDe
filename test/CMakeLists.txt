@@ -1,4 +1,4 @@
-project(TestT-SIMDe)
+project(Langulus_Test_TSIMDe)
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
 
 # Configure Catch2 library
@@ -12,5 +12,5 @@ download_project(
 )
 add_subdirectory(${Catch2_SOURCE_DIR} ${Catch2_BINARY_DIR})
 
-add_executable(TestT-SIMDe ${SOURCE_FILES}) 
-target_link_libraries(TestT-SIMDe PRIVATE T-SIMDe Catch2)
+add_executable(Test.TSIMDe ${SOURCE_FILES}) 
+target_link_libraries(Test.TSIMDe PRIVATE Langulus.TSIMDe Catch2)

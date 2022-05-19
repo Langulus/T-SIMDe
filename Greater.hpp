@@ -1,11 +1,18 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Fill.hpp"
 #include "Convert.hpp"
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 
-	template<Number T, pcptr S>
+	template<CT::Number T, Count S>
 	auto GreaterInner(const NotSupported&, const NotSupported&) noexcept {
 		return NotSupported{};
 	}
@@ -17,7 +24,7 @@ namespace PCFW::Math::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return true if lhs is greater than rhs										
-	template<Number T, pcptr S, TSIMD REGISTER>
+	template<CT::Number T, Count S, TSIMD REGISTER>
 	auto GreaterInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (SIMD128<REGISTER>) {
 			#if LANGULUS_SIMD() >= LANGULUS_SIMD_AVX512()
@@ -50,9 +57,9 @@ namespace PCFW::Math::SIMD
 					return simde_mm_movemask_epi8(simde_mm_cmpgt_epi32(lhs, rhs)) == 0xFFFF;
 				else if constexpr (Integer64<T>)
 					return NotSupported{};
-				else if constexpr (Same<T, pcr32>)
+				else if constexpr (Same<T, float>)
 					return simde_mm_movemask_ps(_mm_cmpgt_ps(lhs, rhs)) == 0xF;
-				else if constexpr (Same<T, pcr64>)
+				else if constexpr (Same<T, double>)
 					return simde_mm_movemask_pd(_mm_cmpgt_pd(lhs, rhs)) == 0x7;
 			#endif
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerGreater of 16-byte package");
@@ -75,9 +82,9 @@ namespace PCFW::Math::SIMD
 					return _mm256_cmpgt_epi64_mask(lhs, rhs) == 0xF;
 				else if constexpr (UnsignedInteger64<T>)
 					return _mm256_cmpgt_epu64_mask(lhs, rhs) == 0xF;
-				else if constexpr (Same<T, pcr32>)
+				else if constexpr (Same<T, float>)
 					return _mm256_cmp_ps_mask(lhs, rhs, _CMP_GT_OQ) == 0xFF;
-				else if constexpr (Same<T, pcr64>)
+				else if constexpr (Same<T, double>)
 					return _mm256_cmp_pd_mask(lhs, rhs, _CMP_GT_OQ)) == 0xF;
 				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerGreater of 32-byte package");
 			#else
@@ -89,9 +96,9 @@ namespace PCFW::Math::SIMD
 					return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi32(lhs, rhs)) == 0xFF;
 				else if constexpr (Integer64<T>)
 					return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi64(lhs, rhs)) == 0xF;
-				else if constexpr (Same<T, pcr32>)
+				else if constexpr (Same<T, float>)
 					return simde_mm256_movemask_ps(simde_mm256_cmp_ps(lhs, rhs, _CMP_GT_OQ)) == 0xFF;
-				else if constexpr (Same<T, pcr64>)
+				else if constexpr (Same<T, double>)
 					return simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_GT_OQ)) == 0xF;
 			#endif
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerGreater of 32-byte package");
@@ -113,9 +120,9 @@ namespace PCFW::Math::SIMD
 				return simde_mm512_cmpgt_epi64_mask(lhs, rhs) == 0xFF;
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm512_cmpgt_epu64_mask(lhs, rhs) == 0xFF;
-			else if constexpr (Same<T, pcr32>)
+			else if constexpr (Same<T, float>)
 				return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_GT_OQ) == 0xFFFF;
-			else if constexpr (Same<T, pcr64>)
+			else if constexpr (Same<T, double>)
 				return simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_GT_OQ) == 0xFF;
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerGreater of 64-byte package");
 		}
@@ -128,7 +135,7 @@ namespace PCFW::Math::SIMD
 	///	@param lhsOrig - the left array or number										
 	///	@param rhsOrig - the right array or number									
 	///	@return true if all elements match												
-	template<Number LHS, Number RHS>
+	template<CT::Number LHS, CT::Number RHS>
 	NOD() bool Greater(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = TRegister<LHS, RHS>;
 		using LOSSLESS = TLossless<LHS, RHS>;
@@ -143,7 +150,7 @@ namespace PCFW::Math::SIMD
 			}
 		);
 
-		if constexpr (Boolean<decltype(result)>)
+		if constexpr (CT::Bool<decltype(result)>)
 			// EqualsInner was called successfully, just return				
 			return result;
 		else {
@@ -154,4 +161,4 @@ namespace PCFW::Math::SIMD
 		}
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe

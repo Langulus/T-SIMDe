@@ -1,8 +1,15 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Fill.hpp"
 #include "Convert.hpp"
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 		
 	template<Number T, pcptr S>
@@ -83,4 +90,4 @@ namespace PCFW::Math::SIMD
 		return result;
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe

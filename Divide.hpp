@@ -1,11 +1,18 @@
+///																									
+/// Langulus::TSIMDe																				
+/// Copyright(C) 2019 Dimo Markov <langulusteam@gmail.com>							
+///																									
+/// Distributed under GNU General Public License v3+									
+/// See LICENSE file, or https://www.gnu.org/licenses									
+///																									
 #pragma once
 #include "Fill.hpp"
 #include "Convert.hpp"
 
-namespace PCFW::Math::SIMD
+namespace Langulus::SIMD
 {
 
-	template<Number T, pcptr S>
+	template<CT::Number T, Count S>
 	auto DivideInner(const NotSupported&, const NotSupported&) noexcept {
 		return NotSupported{};
 	}
@@ -17,7 +24,7 @@ namespace PCFW::Math::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the divided elements as a register									
-	template<Number T, pcptr S, TSIMD REGISTER>
+	template<CT::Number T, Count S, TSIMD REGISTER>
 	auto DivideInner(const REGISTER& lhs, const REGISTER& rhs) {
 		if constexpr (SIMD128<REGISTER>) {
 			if constexpr (UnsignedInteger8<T>) {
@@ -60,12 +67,12 @@ namespace PCFW::Math::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm_div_epi64(lhs, rhs);
 			}
-			else if constexpr (Same<T, pcr32>) {
+			else if constexpr (Same<T, float>) {
 				if (simde_mm_movemask_ps(simde_mm_cmpeq_ps(rhs, simde_mm_setzero_ps())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_ps(lhs, rhs);
 			}
-			else if constexpr (Same<T, pcr64>) {
+			else if constexpr (Same<T, double>) {
 				if (simde_mm_movemask_pd(simde_mm_cmpeq_pd(rhs, simde_mm_setzero_pd())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_pd(lhs, rhs);
@@ -113,12 +120,12 @@ namespace PCFW::Math::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epi64(lhs, rhs);
 			}
-			else if constexpr (Same<T, pcr32>) {
+			else if constexpr (Same<T, float>) {
 				if (simde_mm256_movemask_ps(simde_mm256_cmp_ps(rhs, simde_mm256_setzero_ps(), _CMP_EQ_OQ)))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_ps(lhs, rhs);
 			}
-			else if constexpr (Same<T, pcr64>) {
+			else if constexpr (Same<T, double>) {
 				if (simde_mm256_movemask_pd(simde_mm256_cmp_pd(rhs, simde_mm256_setzero_pd(), _CMP_EQ_OQ)))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_pd(lhs, rhs);
@@ -166,12 +173,12 @@ namespace PCFW::Math::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epi64(lhs, rhs);
 			}
-			else if constexpr (Same<T, pcr32>) {
+			else if constexpr (Same<T, float>) {
 				if (simde_mm512_cmp_ps(rhs, simde_mm512_setzero_ps(), _CMP_EQ_OQ))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_ps(lhs, rhs);
 			}
-			else if constexpr (Same<T, pcr64>) {
+			else if constexpr (Same<T, double>) {
 				if (simde_mm512_cmp_pd(rhs, simde_mm512_setzero_pd(), _CMP_EQ_OQ))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_pd(lhs, rhs);
@@ -182,7 +189,7 @@ namespace PCFW::Math::SIMD
 	}
 
 	///																								
-	template<Number LHS, Number RHS>
+	template<CT::Number LHS, CT::Number RHS>
 	NOD() auto Divide(LHS& lhsOrig, RHS& rhsOrig) {
 		using REGISTER = TRegister<LHS, RHS>;
 		using LOSSLESS = TLossless<LHS, RHS>;
@@ -201,30 +208,30 @@ namespace PCFW::Math::SIMD
 	}
 
 	///																								
-	template<Number LHS, Number RHS, Number OUT>
+	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
 	void Divide(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = Divide<LHS, RHS>(lhs, rhs);
 		if constexpr (TSIMD<decltype(result)>) {
 			// Extract from register													
 			SIMD::Store(result, output);
 		}
-		else if constexpr (Number<decltype(result)>) {
+		else if constexpr (CT::Number<decltype(result)>) {
 			// Extract from number														
 			output = result;
 		}
 		else {
 			// Extract from std::array													
-			for (pcptr i = 0; i < pcExtentOf<OUT>; ++i)
+			for (Offset i = 0; i < ExtentOf<OUT>; ++i)
 				output[i] = result[i];
 		}
 	}
 
 	///																								
-	template<ComplexNumber WRAPPER, Number LHS, Number RHS>
+	template<ComplexNumber WRAPPER, CT::Number LHS, CT::Number RHS>
 	NOD() WRAPPER DivideWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Divide<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
 	}
 
-} // namespace PCFW::Math::SIMD
+} // namespace Langulus::TSIMDe
