@@ -21,19 +21,19 @@ namespace Langulus::SIMD
 	///	@tparam T - type of data to use for filling									
 	///	@param value - the value to use for filling									
 	///	@return the filled register														
-	template<TSIMD REGISTER, CT::Number T>
+	template<CT::TSIMD REGISTER, CT::Number T>
 	NOD() decltype(auto) Fill(const T& valueOrig) noexcept {
 		auto& value = pcVal(valueOrig);
 		if constexpr (CT::Same<REGISTER,T>)
 			return value;
 		else if constexpr (CT::Same<REGISTER,simde__m128i>) {
-			if constexpr (Integer8<T>)
+			if constexpr (CT::Integer8<T>)
 				return simde_mm_set1_epi8(value);
-			else if constexpr (Integer16<T>)
+			else if constexpr (CT::Integer16<T>)
 				return simde_mm_set1_epi16(value);
-			else if constexpr (Integer32<T>)
+			else if constexpr (CT::Integer32<T>)
 				return simde_mm_set1_epi32(value);
-			else if constexpr (Integer64<T>)
+			else if constexpr (CT::Integer64<T>)
 				return simde_mm_set1_epi64x(value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m128i");
 		}
@@ -48,13 +48,13 @@ namespace Langulus::SIMD
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m128d");
 		}
 		else if constexpr (CT::Same<REGISTER,simde__m256i>) {
-			if constexpr (Integer8<T>)
+			if constexpr (CT::Integer8<T>)
 				return simde_mm256_set1_epi8(value);
-			else if constexpr (Integer16<T>)
+			else if constexpr (CT::Integer16<T>)
 				return simde_mm256_set1_epi16(value);
-			else if constexpr (Integer32<T>)
+			else if constexpr (CT::Integer32<T>)
 				return simde_mm256_set1_epi32(value);
-			else if constexpr (Integer64<T>)
+			else if constexpr (CT::Integer64<T>)
 				return simde_mm256_set1_epi64x(value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m256i");
 		}
@@ -69,13 +69,13 @@ namespace Langulus::SIMD
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m256d");
 		}
 		else if constexpr (CT::Same<REGISTER,simde__m512i>) {
-			if constexpr (Integer8<T>)
+			if constexpr (CT::Integer8<T>)
 				return simde_mm512_set1_epi8(value);
-			else if constexpr (Integer16<T>)
+			else if constexpr (CT::Integer16<T>)
 				return simde_mm512_set1_epi16(value);
-			else if constexpr (Integer32<T>)
+			else if constexpr (CT::Integer32<T>)
 				return simde_mm512_set1_epi32(value);
-			else if constexpr (Integer64<T>)
+			else if constexpr (CT::Integer64<T>)
 				return simde_mm512_set1_epi64(value);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::Fill of __m512i");
 		}

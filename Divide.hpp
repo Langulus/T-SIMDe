@@ -13,8 +13,8 @@ namespace Langulus::SIMD
 {
 
 	template<CT::Number T, Count S>
-	auto DivideInner(const NotSupported&, const NotSupported&) noexcept {
-		return NotSupported{};
+	auto DivideInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+		return CT::Inner::NotSupported{};
 	}
 
 	/// Divide two arrays using SIMD															
@@ -24,25 +24,25 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the divided elements as a register									
-	template<CT::Number T, Count S, TSIMD REGISTER>
+	template<CT::Number T, Count S, CT::TSIMD REGISTER>
 	auto DivideInner(const REGISTER& lhs, const REGISTER& rhs) {
-		if constexpr (SIMD128<REGISTER>) {
-			if constexpr (UnsignedInteger8<T>) {
+		if constexpr (CT::SIMD128<REGISTER>) {
+			if constexpr (CT::UnsignedInteger8<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(rhs, simde_mm_setzero_si128())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_epu8(lhs, rhs);
 			}
-			else if constexpr (SignedInteger8<T>) {
+			else if constexpr (CT::SignedInteger8<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(rhs, simde_mm_setzero_si128())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_epi8(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger16<T>) {
+			else if constexpr (CT::UnsignedInteger16<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi16(rhs, simde_mm_setzero_si128())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_epu16(lhs, rhs);
 			}
-			else if constexpr (SignedInteger16<T>) {
+			else if constexpr (CT::SignedInteger16<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi16(rhs, simde_mm_setzero_si128())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_epi16(lhs, rhs);
@@ -52,7 +52,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm_div_epu32(lhs, rhs);
 			}
-			else if constexpr (SignedInteger32<T>) {
+			else if constexpr (CT::SignedInteger32<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi32(rhs, simde_mm_setzero_si128())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_epi32(lhs, rhs);
@@ -62,7 +62,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm_div_epu64(lhs, rhs);
 			}
-			else if constexpr (SignedInteger64<T>) {
+			else if constexpr (CT::SignedInteger64<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi64(rhs, simde_mm_setzero_si128())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_epi64(lhs, rhs);
@@ -79,23 +79,23 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerDiv of 16-byte package");
 		}
-		else if constexpr (SIMD256<REGISTER>) {
-			if constexpr (UnsignedInteger8<T>) {
+		else if constexpr (CT::SIMD256<REGISTER>) {
+			if constexpr (CT::UnsignedInteger8<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epu8(lhs, rhs);
 			}
-			else if constexpr (SignedInteger8<T>) {
+			else if constexpr (CT::SignedInteger8<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epi8(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger16<T>) {
+			else if constexpr (CT::UnsignedInteger16<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi16(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epu16(lhs, rhs);
 			}
-			else if constexpr (SignedInteger16<T>) {
+			else if constexpr (CT::SignedInteger16<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi16(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epi16(lhs, rhs);
@@ -105,7 +105,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epu32(lhs, rhs);
 			}
-			else if constexpr (SignedInteger32<T>) {
+			else if constexpr (CT::SignedInteger32<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi32(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epi32(lhs, rhs);
@@ -115,7 +115,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epu64(lhs, rhs);
 			}
-			else if constexpr (SignedInteger64<T>) {
+			else if constexpr (CT::SignedInteger64<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epi64(lhs, rhs);
@@ -132,23 +132,23 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerDiv of 32-byte package");
 		}
-		else if constexpr (SIMD512<REGISTER>) {
-			if constexpr (UnsignedInteger8<T>) {
+		else if constexpr (CT::SIMD512<REGISTER>) {
+			if constexpr (CT::UnsignedInteger8<T>) {
 				if (simde_mm512_cmpeq_epi8(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epu8(lhs, rhs);
 			}
-			else if constexpr (SignedInteger8<T>) {
+			else if constexpr (CT::SignedInteger8<T>) {
 				if (simde_mm512_cmpeq_epi8(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epi8(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger16<T>) {
+			else if constexpr (CT::UnsignedInteger16<T>) {
 				if (simde_mm512_cmpeq_epi16(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epu16(lhs, rhs);
 			}
-			else if constexpr (SignedInteger16<T>) {
+			else if constexpr (CT::SignedInteger16<T>) {
 				if (simde_mm512_cmpeq_epi16(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epi16(lhs, rhs);
@@ -158,7 +158,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epu32(lhs, rhs);
 			}
-			else if constexpr (SignedInteger32<T>) {
+			else if constexpr (CT::SignedInteger32<T>) {
 				if (simde_mm512_cmpeq_epi32(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epi32(lhs, rhs);
@@ -168,7 +168,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epu64(lhs, rhs);
 			}
-			else if constexpr (SignedInteger64<T>) {
+			else if constexpr (CT::SignedInteger64<T>) {
 				if (simde_mm512_cmpeq_epi64(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epi64(lhs, rhs);
@@ -191,8 +191,8 @@ namespace Langulus::SIMD
 	///																								
 	template<CT::Number LHS, CT::Number RHS>
 	NOD() auto Divide(LHS& lhsOrig, RHS& rhsOrig) {
-		using REGISTER = TRegister<LHS, RHS>;
-		using LOSSLESS = TLossless<LHS, RHS>;
+		using REGISTER = CT::Register<LHS, RHS>;
+		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = ResultSize<LHS, RHS>();
 		return AttemptSIMD<1, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
@@ -211,7 +211,7 @@ namespace Langulus::SIMD
 	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
 	void Divide(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = Divide<LHS, RHS>(lhs, rhs);
-		if constexpr (TSIMD<decltype(result)>) {
+		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
 			SIMD::Store(result, output);
 		}

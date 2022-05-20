@@ -10,7 +10,6 @@
 #include <cstdint>
 
 using namespace Langulus;
-using namespace Langulus::SIMD;
 
 //#define LANGULUS_STD_BENCHMARK
 

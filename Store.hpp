@@ -22,7 +22,7 @@ namespace Langulus::SIMD
 	///	@tparam S - the number of elements to write									
 	///	@param from - the source register												
 	///	@param to - the destination array												
-	template<TSIMD FROM, CT::Number T, Count S>
+	template<CT::TSIMD FROM, CT::Number T, Count S>
 	void Store(const FROM& from, T(&to)[S]) noexcept {
 		static_assert(S > 1, 
 			"Storing less than two elements is suboptimal - avoid SIMD operations on such arrays as a whole");
@@ -31,8 +31,8 @@ namespace Langulus::SIMD
 		//																						
 		// __m128*																			
 		//																						
-		if constexpr (Same<FROM, simde__m128>) {
-			if constexpr (Dense<T> && toSize == 16) {
+		if constexpr (CT::Same<FROM, simde__m128>) {
+			if constexpr (CT::Dense<T> && toSize == 16) {
 				// Save to a dense array												
 				simde_mm_storeu_ps(to, from);
 			}
@@ -40,14 +40,14 @@ namespace Langulus::SIMD
 				// Save to a sparse array, or a differently sized array		
 				alignas(16) float temp[4];
 				simde_mm_store_ps(temp, from);
-				if constexpr (Dense<T>)
+				if constexpr (CT::Dense<T>)
 					pcCopyMemory(temp, to, toSize);
 				else for(Count i = 0; i < S; ++i)
 					MakeDense(to[i]) = temp[i];
 			}
 		}
-		else if constexpr (Same<FROM, simde__m128d>) {
-			if constexpr (Dense<T> && toSize == 16) {
+		else if constexpr (CT::Same<FROM, simde__m128d>) {
+			if constexpr (CT::Dense<T> && toSize == 16) {
 				// Save to a dense array												
 				simde_mm_storeu_pd(to, from);
 			}
@@ -58,8 +58,8 @@ namespace Langulus::SIMD
 					simde_mm_storeh_pd(MakeSparse(to[1]), from);
 			}
 		}
-		else if constexpr (Same<FROM, simde__m128i>) {
-			if constexpr (Dense<T> && toSize == 16) {
+		else if constexpr (CT::Same<FROM, simde__m128i>) {
+			if constexpr (CT::Dense<T> && toSize == 16) {
 				// Save to a dense array												
 				simde_mm_storeu_si128(reinterpret_cast<simde__m128i*>(to), from);
 			}
@@ -75,8 +75,8 @@ namespace Langulus::SIMD
 		//																						
 		// __m256*																			
 		//																						
-		else if constexpr (Same<FROM, simde__m256>) {
-			if constexpr (Dense<T> && toSize == 32) {
+		else if constexpr (CT::Same<FROM, simde__m256>) {
+			if constexpr (CT::Dense<T> && toSize == 32) {
 				// Save to a dense array												
 				simde_mm256_storeu_ps(to, from);
 			}
@@ -84,14 +84,14 @@ namespace Langulus::SIMD
 				// Save to a sparse array, or a differently sized array		
 				alignas(32) float temp[8];
 				simde_mm256_store_ps(temp, from);
-				if constexpr (Dense<T>)
+				if constexpr (CT::Dense<T>)
 					pcCopyMemory(temp, to, toSize);
 				else for (Offset i = 0; i < S; ++i)
 					MakeDense(to[i]) = temp[i];
 			}
 		}
-		else if constexpr (Same<FROM, simde__m256d>) {
-			if constexpr (Dense<T> && toSize == 32) {
+		else if constexpr (CT::Same<FROM, simde__m256d>) {
+			if constexpr (CT::Dense<T> && toSize == 32) {
 				// Save to a dense array												
 				simde_mm256_storeu_pd(to, from);
 			}
@@ -99,14 +99,14 @@ namespace Langulus::SIMD
 				// Save to a sparse array, or a differently sized array		
 				alignas(32) double temp[4];
 				simde_mm256_store_pd(temp, from);
-				if constexpr (Dense<T>)
+				if constexpr (CT::Dense<T>)
 					pcCopyMemory(temp, to, toSize);
 				else for (Offset i = 0; i < S; ++i)
 					MakeDense(to[i]) = temp[i];
 			}
 		}
-		else if constexpr (Same<FROM, simde__m256i>) {
-			if constexpr (Dense<T> && toSize == 32) {
+		else if constexpr (CT::Same<FROM, simde__m256i>) {
+			if constexpr (CT::Dense<T> && toSize == 32) {
 				// Save to a dense array												
 				simde_mm256_storeu_si256(reinterpret_cast<simde__m256i*>(to), from);
 			}
@@ -114,7 +114,7 @@ namespace Langulus::SIMD
 				// Save to a sparse array, or a differently sized array		
 				alignas(32) Byte temp[32];
 				simde_mm256_store_si256(reinterpret_cast<simde__m256i*>(temp), from);
-				if constexpr (Dense<T>)
+				if constexpr (CT::Dense<T>)
 					pcCopyMemory(temp, to, toSize);
 				else for (Offset i = 0; i < S; ++i)
 					MakeDense(to[i]) = reinterpret_cast<const Decay<T>*>(temp)[i];
@@ -124,8 +124,8 @@ namespace Langulus::SIMD
 		//																						
 		// __m512*																			
 		//																						
-		else if constexpr (Same<FROM, simde__m512>) {
-			if constexpr (Dense<T> && toSize == 64) {
+		else if constexpr (CT::Same<FROM, simde__m512>) {
+			if constexpr (CT::Dense<T> && toSize == 64) {
 				// Save to a dense array												
 				simde_mm512_storeu_ps(to, from);
 			}
@@ -139,7 +139,7 @@ namespace Langulus::SIMD
 					MakeDense(to[i]) = temp[i];
 			}
 		}
-		else if constexpr (Same<FROM, simde__m512d>) {
+		else if constexpr (CT::Same<FROM, simde__m512d>) {
 			if constexpr (Dense<T> && toSize == 64) {
 				// Save to a dense array												
 				simde_mm512_storeu_pd(to, from);
@@ -154,7 +154,7 @@ namespace Langulus::SIMD
 					MakeDense(to[i]) = temp[i];
 			}
 		}
-		else if constexpr (Same<FROM, simde__m512i>) {
+		else if constexpr (CT::Same<FROM, simde__m512i>) {
 			if constexpr (Dense<T> && toSize == 64) {
 				// Save to a dense array												
 				simde_mm512_storeu_si512(to, from);

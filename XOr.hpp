@@ -13,8 +13,8 @@ namespace Langulus::SIMD
 {
 		
 	template<CT::Number T, Count S>
-	auto XOrInner(const NotSupported&, const NotSupported&) noexcept {
-		return NotSupported{};
+	auto XOrInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+		return CT::Inner::NotSupported{};
 	}
 
 	/// XOr two arrays left using SIMD (shifting in zeroes)							
@@ -49,8 +49,8 @@ namespace Langulus::SIMD
 	///																								
 	template<CT::Number LHS, CT::Number RHS>
 	NOD() auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-		using REGISTER = TRegister<LHS, RHS>;
-		using LOSSLESS = TLossless<LHS, RHS>;
+		using REGISTER = CT::Register<LHS, RHS>;
+		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = ResultSize<LHS, RHS>();
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 

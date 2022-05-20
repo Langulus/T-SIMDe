@@ -23,26 +23,26 @@ namespace Langulus::SIMD
 		//																						
 		// Converting FROM float[16]													
 		//																						
-		if constexpr (Same<TO, simde__m128> && S <= 4) {
+		if constexpr (CT::Same<TO, simde__m128> && S <= 4) {
 			//																					
 			// Converting TO float[4]													
 			//																					
 			// float[4] -> float[4]														
 			return simde_mm512_castps512_ps128(v);
 		}
-		else if constexpr (Same<TO, simde__m128d> && S <= 2) {
+		else if constexpr (CT::Same<TO, simde__m128d> && S <= 2) {
 			//																					
 			// Converting TO double[2]													
 			//																					
 			// float[2] -> double[2]													
 			return simde_mm_cvtps_pd(simde_mm512_castps512_ps128(v));
 		}
-		else if constexpr (Same<TO, simde__m128i>) {
+		else if constexpr (CT::Same<TO, simde__m128i>) {
 			//																					
 			// Converting TO  pci8[16], pcu8[16], pci16[8], pcu16[8]			
 			//						pci32[4], pcu32[4], pci64[2], pcu64[2]			
 			//																					
-			if constexpr (SignedInteger8<TT> && S <= 16) {
+			if constexpr (CT::SignedInteger8<TT> && S <= 16) {
 				// float[16] -> pci8[16]												
 				auto
 				v2 = simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(_mm_halfflip(v)));
@@ -53,7 +53,7 @@ namespace Langulus::SIMD
 				v1 = simde_mm256_packs_epi16(v1, v2);
 				return simde_mm256_castsi256_si128(v1);
 			}
-			else if constexpr (UnsignedInteger8<TT> && S <= 16) {
+			else if constexpr (CT::UnsignedInteger8<TT> && S <= 16) {
 				// float[16] -> pcu8[16]												
 				auto
 				v2 = simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(_mm_halfflip(v)));
@@ -64,7 +64,7 @@ namespace Langulus::SIMD
 				v1 = simde_mm256_packus_epi16(v1, v2);
 				return simde_mm256_castsi256_si128(v1);
 			}
-			else if constexpr (SignedInteger16<TT> && S <= 8) {
+			else if constexpr (CT::SignedInteger16<TT> && S <= 8) {
 				// float[8] -> pci16[8]													
 				auto
 				v2 = simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(_mm_halfflip(v)));
@@ -73,7 +73,7 @@ namespace Langulus::SIMD
 				v1 = simde_mm256_packs_epi32(v1, v2);
 				return simde_mm256_castsi256_si128(v1);
 			}
-			else if constexpr (UnsignedInteger16<TT> && S <= 8) {
+			else if constexpr (CT::UnsignedInteger16<TT> && S <= 8) {
 				// float[8] -> pcu16[8]													
 				auto
 				v2 = simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(_mm_halfflip(v)));
@@ -82,12 +82,12 @@ namespace Langulus::SIMD
 				v1 = simde_mm256_packus_epi32(v1, v2);
 				return simde_mm256_castsi256_si128(v1);
 			}
-			else if constexpr (Integer32<TT> && S <= 4) {
+			else if constexpr (CT::Integer32<TT> && S <= 4) {
 				// float[4] -> pci32[4]													
 				// float[4] -> pcu32[4]													
 				return simde_mm_cvtps_epi32(simde_mm512_castps512_ps128(v));
 			}
-			else if constexpr (Integer64<TT> && S <= 2) {
+			else if constexpr (CT::Integer64<TT> && S <= 2) {
 				// float[2] -> pci64[2]													
 				// float[2] -> pcu64[2]													
 				const auto i32 = simde_mm_cvtps_epi32(simde_mm512_castps512_ps128(v));
@@ -95,26 +95,26 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Can't convert from __m512 to __m128i");
 		}
-		else if constexpr (Same<TO, simde__m256> && S <= 8) {
+		else if constexpr (CT::Same<TO, simde__m256> && S <= 8) {
 			//																					
 			// Converting TO float[8]													
 			//																					
 			// float[8] -> float[8]														
 			return simde_mm512_castps512_ps256(v);
 		}
-		else if constexpr (Same<TO, simde__m256d> && S <= 4) {
+		else if constexpr (CT::Same<TO, simde__m256d> && S <= 4) {
 			//																					
 			// Converting TO double[4]													
 			//																					
 			// float[4] -> double[4]													
 			return simde_mm256_cvtps_pd(simde_mm512_castps512_ps128(v));
 		}
-		else if constexpr (Same<TO, simde__m256i>) {
+		else if constexpr (CT::Same<TO, simde__m256i>) {
 			//																					
 			// Converting TO  pci8[16], pcu8[16], pci16[16], pcu16[16]		
 			//						pci32[8], pcu32[8], pci64[4], pcu64[4]			
 			//																					
-			if constexpr (SignedInteger8<TT> && S <= 16) {
+			if constexpr (CT::SignedInteger8<TT> && S <= 16) {
 				// float[16] -> pci8[16]												
 				auto
 				v2 = simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(_mm_halfflip(v)));
@@ -125,7 +125,7 @@ namespace Langulus::SIMD
 				v1 = simde_mm256_packs_epi16(v1, v2);
 				return v1;
 			}
-			else if constexpr (UnsignedInteger8<TT> && S <= 16) {
+			else if constexpr (CT::UnsignedInteger8<TT> && S <= 16) {
 				// float[16] -> pcu8[16]												
 				auto
 				v2 = simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(_mm_halfflip(v)));
@@ -136,7 +136,7 @@ namespace Langulus::SIMD
 				v1 = simde_mm256_packus_epi16(v1, v2);
 				return v1;
 			}
-			else if constexpr (SignedInteger16<TT> && S <= 16) {
+			else if constexpr (CT::SignedInteger16<TT> && S <= 16) {
 				// float[16] -> pci16[16]												
 				auto
 				v2 = simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(_mm_halfflip(v)));
@@ -145,7 +145,7 @@ namespace Langulus::SIMD
 				v1 = simde_mm256_packs_epi32(v1, v2);
 				return v1;
 			}
-			else if constexpr (UnsignedInteger16<TT> && S <= 16) {
+			else if constexpr (CT::UnsignedInteger16<TT> && S <= 16) {
 				// float[16] -> pcu16[16]												
 				auto
 				v2 = simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(_mm_halfflip(v)));
@@ -154,12 +154,12 @@ namespace Langulus::SIMD
 				v1 = simde_mm256_packus_epi32(v1, v2);
 				return v1;
 			}
-			else if constexpr (Integer32<TT> && S <= 8) {
+			else if constexpr (CT::Integer32<TT> && S <= 8) {
 				// float[8] -> pci32[8]													
 				// float[8] -> pcu32[8]													
 				return simde_mm256_cvtps_epi32(simde_mm512_castps512_ps256(v));
 			}
-			else if constexpr (Integer64<TT> && S <= 4) {
+			else if constexpr (CT::Integer64<TT> && S <= 4) {
 				// float[4] -> pci64[4]													
 				// float[4] -> pcu64[4]													
 				const auto i32 = simde_mm_cvtps_epi32(simde_mm512_castps512_ps128(v));
@@ -182,26 +182,26 @@ namespace Langulus::SIMD
 		//																						
 		// Converting FROM double[8]													
 		//																						
-		if constexpr (Same<TO, simde__m128> && S <= 4) {
+		if constexpr (CT::Same<TO, simde__m128> && S <= 4) {
 			//																					
 			// Converting TO float[4]													
 			//																					
 			// double[4] -> float[4]													
 			return simde_mm256_cvtpd_ps(simde_mm512_castpd512_pd256(v));
 		}
-		else if constexpr (Same<TO, simde__m128d> && S <= 2) {
+		else if constexpr (CT::Same<TO, simde__m128d> && S <= 2) {
 			//																					
 			// Converting TO double[2]													
 			//																					
 			// double[2] -> double[2]													
 			return simde_mm512_castpd512_pd128(v);
 		}
-		else if constexpr (Same<TO, simde__m128i>) {
+		else if constexpr (CT::Same<TO, simde__m128i>) {
 			//																					
 			// Converting TO	pci8[8], pcu8[8], pci16[8], pcu16[8]			
 			//						pci32[4], pcu32[4], pci64[2], pcu64[2]			
 			//																					
-			if constexpr (SignedInteger8<TT> && S <= 8) {
+			if constexpr (CT::SignedInteger8<TT> && S <= 8) {
 				// double[8] -> pci8[8]													
 				const auto
 				f = simde_mm512_castps512_ps256(simde_mm512_castpd_ps(v));
@@ -211,7 +211,7 @@ namespace Langulus::SIMD
 				i = simde_mm256_packs_epi16(i, i);
 				return simde_mm256_castsi256_si128(i);
 			}
-			else if constexpr (UnsignedInteger8<TT> && S <= 8) {
+			else if constexpr (CT::UnsignedInteger8<TT> && S <= 8) {
 				// double[8] -> pcu8[8]													
 				const auto
 				f = simde_mm512_castps512_ps256(simde_mm512_castpd_ps(v));
@@ -221,7 +221,7 @@ namespace Langulus::SIMD
 				i = simde_mm256_packus_epi16(i, i);
 				return simde_mm256_castsi256_si128(i);
 			}
-			else if constexpr (SignedInteger16<TT> && S <= 8) {
+			else if constexpr (CT::SignedInteger16<TT> && S <= 8) {
 				// double[8] -> pci16[8]												
 				const auto
 				f = simde_mm512_castps512_ps256(simde_mm512_castpd_ps(v));
@@ -230,7 +230,7 @@ namespace Langulus::SIMD
 				i = simde_mm256_packs_epi32(i, i);
 				return simde_mm256_castsi256_si128(i);
 			}
-			else if constexpr (UnsignedInteger16<TT> && S <= 8) {
+			else if constexpr (CT::UnsignedInteger16<TT> && S <= 8) {
 				// double[8] -> pcu16[8]												
 				const auto
 				f = simde_mm512_castps512_ps256(simde_mm512_castpd_ps(v));
@@ -239,14 +239,14 @@ namespace Langulus::SIMD
 				i = simde_mm256_packus_epi32(i, i);
 				return simde_mm256_castsi256_si128(i);
 			}
-			else if constexpr (Integer32<TT> && S <= 4) {
+			else if constexpr (CT::Integer32<TT> && S <= 4) {
 				// double[4] -> pci32[4]												
 				// double[4] -> pcu32[4]												
 				const auto
 				f = simde_mm512_castps512_ps256(simde_mm512_castpd_ps(v));
 				return simde_mm256_castsi256_si128(simde_mm256_cvtps_epi32(f));
 			}
-			else if constexpr (Integer64<TT> && S <= 2) {
+			else if constexpr (CT::Integer64<TT> && S <= 2) {
 				// double[2] -> pci64[2]												
 				// double[2] -> pcu64[2]												
 				const auto
@@ -274,11 +274,11 @@ namespace Langulus::SIMD
 		// Converting FROM pci8[64], pcu8[64], pci16[32], pcu16[32]			
 		//						 pci32[16], pcu32[16], pci64[8], pcu64[8]			
 		//																						
-		if constexpr (Same<TO, simde__m128>) {
+		if constexpr (CT::Same<TO, simde__m128>) {
 			//																					
 			// Converting TO float[4]													
 			//																					
-			if constexpr (Integer8<FT> && S <= 4) {
+			if constexpr (CT::Integer8<FT> && S <= 4) {
 				// pci8[4] -> float[4]													
 				// pcu8[4] -> float[4]													
 				auto
@@ -287,7 +287,7 @@ namespace Langulus::SIMD
 				i16_32 = simde_mm_unpacklo_epi16(i16_32, simde_mm_setzero_si128());
 				return simde_mm_cvtepi32_ps(i16_32);
 			}
-			else if constexpr (Integer16<FT> && S <= 4) {
+			else if constexpr (CT::Integer16<FT> && S <= 4) {
 				// pci16[4] -> float[4]													
 				// pcu16[4] -> float[4]													
 				auto
@@ -295,12 +295,12 @@ namespace Langulus::SIMD
 				i32 = simde_mm_unpacklo_epi16(i32, simde_mm_setzero_si128());
 				return simde_mm_cvtepi32_ps(i32);
 			}
-			else if constexpr (Integer32<FT> && S <= 4) {
+			else if constexpr (CT::Integer32<FT> && S <= 4) {
 				// pci32[4] -> float[4]													
 				// pcu32[4] -> float[4]													
 				return simde_mm_cvtepi32_ps(simde_mm512_castsi512_si128(v));
 			}
-			else if constexpr (Integer64<FT> && S <= 2) {
+			else if constexpr (CT::Integer64<FT> && S <= 2) {
 				// pci64[2] -> float[2]													
 				// pcu64[2] -> float[2]													
 				auto i32 = simde_mm512_cvtsepi64_epi32(v);
@@ -308,11 +308,11 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Can't convert from __m512i to __m128");
 		}
-		else if constexpr (Same<TO, simde__m128d>) {
+		else if constexpr (CT::Same<TO, simde__m128d>) {
 			//																					
 			// Converting TO double[2]													
 			//																					
-			if constexpr (Integer8<FT> && S <= 4) {
+			if constexpr (CT::Integer8<FT> && S <= 4) {
 				// pci8[4] -> float[4]													
 				// pcu8[4] -> float[4]													
 				auto
@@ -321,7 +321,7 @@ namespace Langulus::SIMD
 				i16_32 = simde_mm_unpacklo_epi16(i16_32, simde_mm_setzero_si128());
 				return simde_mm_cvtepi32_pd(i16_32);
 			}
-			else if constexpr (Integer16<FT> && S <= 4) {
+			else if constexpr (CT::Integer16<FT> && S <= 4) {
 				// pci16[4] -> float[4]													
 				// pcu16[4] -> float[4]													
 				auto
@@ -329,12 +329,12 @@ namespace Langulus::SIMD
 				i32 = simde_mm_unpacklo_epi16(i32, simde_mm_setzero_si128());
 				return simde_mm_cvtepi32_pd(i32);
 			}
-			else if constexpr (Integer32<FT> && S <= 4) {
+			else if constexpr (CT::Integer32<FT> && S <= 4) {
 				// pci32[4] -> float[4]													
 				// pcu32[4] -> float[4]													
 				return simde_mm_cvtepi32_pd(simde_mm512_castsi512_si128(v));
 			}
-			else if constexpr (Integer64<FT> && S <= 2) {
+			else if constexpr (CT::Integer64<FT> && S <= 2) {
 				// pci64[2] -> float[2]													
 				// pcu64[2] -> float[2]													
 				auto i32 = simde_mm512_cvtsepi64_epi32(v);
@@ -342,71 +342,71 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Can't convert from __m512i to __m128d");
 		}
-		else if constexpr (Same<TO, simde__m128i>) {
-			if constexpr (Integer8<FT>) {
+		else if constexpr (CT::Same<TO, simde__m128i>) {
+			if constexpr (CT::Integer8<FT>) {
 				//																				
 				// Converting TO	pci8[16], pcu8[16], pci16[8], pcu16[8]		
 				//						pci32[4], pcu32[4], pci64[2], pcu64[2]		
 				//																				
-				if constexpr (Integer8<TT> && S <= 16)
+				if constexpr (CT::Integer8<TT> && S <= 16)
 					return simde_mm512_castsi512_si128(v);
-				else if constexpr (Integer16<TT> && S <= 8)
+				else if constexpr (CT::Integer16<TT> && S <= 8)
 					return simde_mm_unpacklo_epi8(simde_mm512_castsi512_si128(v), simde_mm_setzero_si128());
-				else if constexpr (Integer32<TT> && S <= 4) {
+				else if constexpr (CT::Integer32<TT> && S <= 4) {
 					auto v16 = simde_mm_unpacklo_epi8(simde_mm512_castsi512_si128(v), simde_mm_setzero_si128());
 					return simde_mm_unpacklo_epi16(v16, simde_mm_setzero_si128());
 				}
-				else if constexpr (Integer64<TT> && S <= 2) {
+				else if constexpr (CT::Integer64<TT> && S <= 2) {
 					auto v16_32 = simde_mm_unpacklo_epi8(simde_mm512_castsi512_si128(v), simde_mm_setzero_si128());
 					v16_32 = simde_mm_unpacklo_epi16(v16_32, simde_mm_setzero_si128());
 					return simde_mm_unpacklo_epi32(v16_32, simde_mm_setzero_si128());
 				}
 				else LANGULUS_ASSERT("Can't convert from pci8/pcu8 to unsupported TT");
 			}
-			else if constexpr (Integer16<FT>) {
+			else if constexpr (CT::Integer16<FT>) {
 				//																				
 				// Converting TO	pci8[16], pcu8[16], pci16[8], pcu16[8]		
 				//						pci32[4], pcu32[4], pci64[2], pcu64[2]		
 				//																				
-				if constexpr (Integer8<TT> && S <= 16)
+				if constexpr (CT::Integer8<TT> && S <= 16)
 					return simde_mm256_castsi256_si128(simde_mm512_cvtsepi16_epi8(v));
-				else if constexpr (Integer16<TT> && S <= 8)
+				else if constexpr (CT::Integer16<TT> && S <= 8)
 					return simde_mm512_castsi512_si128(v);
-				else if constexpr (Integer32<TT> && S <= 4)
+				else if constexpr (CT::Integer32<TT> && S <= 4)
 					return simde_mm_unpacklo_epi16(simde_mm512_castsi512_si128(v), simde_mm_setzero_si128());
-				else if constexpr (Integer64<TT> && S <= 2) {
+				else if constexpr (CT::Integer64<TT> && S <= 2) {
 					auto v32 = simde_mm_unpacklo_epi16(simde_mm512_castsi512_si128(v), simde_mm_setzero_si128());
 					return simde_mm_unpacklo_epi32(v32, simde_mm_setzero_si128());
 				}
 				else LANGULUS_ASSERT("Can't convert from pci16/pcu16 to unsupported TT");
 			}
-			else if constexpr (Integer32<FT>) {
+			else if constexpr (CT::Integer32<FT>) {
 				//																				
 				// Converting TO	pci8[16], pcu8[16], pci16[8], pcu16[8]		
 				//						pci32[4], pcu32[4], pci64[2], pcu64[2]		
 				//																				
-				if constexpr (Integer8<TT> && S <= 16)
+				if constexpr (CT::Integer8<TT> && S <= 16)
 					return simde_mm512_cvtsepi32_epi8(v);
-				else if constexpr (Integer16<TT> && S <= 8)
+				else if constexpr (CT::Integer16<TT> && S <= 8)
 					return simde_mm256_castsi256_si128(simde_mm512_cvtsepi32_epi16(v));
-				else if constexpr (Integer32<TT> && S <= 4)
+				else if constexpr (CT::Integer32<TT> && S <= 4)
 					return simde_mm512_castsi512_si128(v);
-				else if constexpr (Integer64<TT> && S <= 2)
+				else if constexpr (CT::Integer64<TT> && S <= 2)
 					return simde_mm_cvtepi32_epi64(simde_mm512_castsi512_si128(v));
 				else LANGULUS_ASSERT("Can't convert from pci32/pcu32 to unsupported TT");
 			}
-			else if constexpr (Integer64<FT>) {
+			else if constexpr (CT::Integer64<FT>) {
 				//																				
 				// Converting TO	pci8[8], pcu8[8], pci16[8], pcu16[8]		
 				//						pci32[4], pcu32[4], pci64[2], pcu64[2]		
 				//																				
-				if constexpr (Integer8<TT> && S <= 8)
+				if constexpr (CT::Integer8<TT> && S <= 8)
 					return simde_mm512_cvtsepi64_epi8(v);
-				else if constexpr (Integer16<TT> && S <= 8)
+				else if constexpr (CT::Integer16<TT> && S <= 8)
 					return simde_mm512_cvtsepi64_epi16(v);
-				else if constexpr (Integer32<TT> && S <= 4)
+				else if constexpr (CT::Integer32<TT> && S <= 4)
 					return simde_mm256_castsi256_si128(simde_mm512_cvtsepi64_epi32(v));
-				else if constexpr (Integer64<TT> && S <= 2)
+				else if constexpr (CT::Integer64<TT> && S <= 2)
 					return simde_mm512_castsi512_si128(v);
 				else LANGULUS_ASSERT("Can't convert from pci64/pcu64 to unsupported TT");
 			}

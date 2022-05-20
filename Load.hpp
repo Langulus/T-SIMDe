@@ -63,13 +63,17 @@ namespace Langulus::SIMD
 		else LANGULUS_ASSERT("Unsupported array size for SIMD::Load");
 	}
 
-	
+} // namespace Langulus::SIMD
+
+namespace Langulus::CT
+{
+
 	/// Determine a SIMD register type that can wrap LHS and RHS					
 	template<CT::Number LHS, CT::Number RHS>
-	using TRegister = Conditional<
+	using Register = Conditional<
 		(ExtentOf<LHS> > ExtentOf<RHS>),
-		decltype(SIMD::Load<0>(Uneval<TLossless<LHS, RHS>[ExtentOf<LHS>]>())),
-		decltype(SIMD::Load<0>(Uneval<TLossless<LHS, RHS>[ExtentOf<RHS>]>()))
+		decltype(SIMD::Load<0>(Uneval<Lossless<LHS, RHS>[ExtentOf<LHS>]>())),
+		decltype(SIMD::Load<0>(Uneval<Lossless<LHS, RHS>[ExtentOf<RHS>]>()))
 	>;
 
-} // namespace Langulus::SIMD
+} // namespace Langulus::CT

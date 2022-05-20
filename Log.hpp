@@ -27,12 +27,12 @@ namespace Langulus::SIMD
 	///	@tparam REGISTER - the register type (deducible)							
 	///	@param value - the array 															
 	///	@return the logarithm values														
-	template<LogStyle STYLE = LogStyle::Base10, CT::Number T, Count S, TSIMD REGISTER>
+	template<LogStyle STYLE = LogStyle::Base10, CT::Number T, Count S, CT::TSIMD REGISTER>
 	REGISTER InnerLog(const REGISTER& value) noexcept {
 		static_assert(CT::Real<T>, 
 			"SIMD::InnerLog doesn't work for whole numbers");
 
-		if constexpr (SIMD128<REGISTER>) {
+		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::Same<T, float>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm_log_ps(value);
@@ -61,7 +61,7 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLog of 16-byte package");
 		}
-		else if constexpr (SIMD256<REGISTER>) {
+		else if constexpr (CT::SIMD256<REGISTER>) {
 			if constexpr (CT::Same<T, float>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm256_log_ps(value);
@@ -90,7 +90,7 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLog of 32-byte package");
 		}
-		else if constexpr (SIMD512<REGISTER>) {
+		else if constexpr (CT::SIMD512<REGISTER>) {
 			if constexpr (CT::Same<T, float>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm512_log_ps(value);

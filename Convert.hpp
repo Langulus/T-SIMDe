@@ -7,9 +7,18 @@
 ///																									
 #pragma once
 #include "Load.hpp"
-#include "ConvertFrom128.hpp"
-#include "ConvertFrom256.hpp"
-#include "ConvertFrom512.hpp"
+
+#if LANGULUS_SIMD(128BIT)
+	#include "ConvertFrom128.hpp"
+#endif
+
+#if LANGULUS_SIMD(256BIT)
+	#include "ConvertFrom256.hpp"
+#endif
+
+#if LANGULUS_SIMD(512BIT)
+	#include "ConvertFrom512.hpp"
+#endif
 
 #if LANGULUS_COMPILER(GCC)
 	#pragma GCC diagnostic push
@@ -28,32 +37,38 @@ namespace Langulus::SIMD
 	///	@return the resulting register													
 	template<int DEF, class TT, Count S, class FT>
 	auto Convert(const FT(&in)[S]) noexcept {
-		using FROM = decltype(SIMD::Load<DEF>(Uneval<Decay<FT>[S]>()));
-		using TO = decltype(SIMD::Load<DEF>(Uneval<Decay<TT>[S]>()));
-		const FROM loaded = SIMD::Load<DEF>(in);
+		using FROM = decltype(Load<DEF>(Uneval<Decay<FT>[S]>()));
+		using TO = decltype(Load<DEF>(Uneval<Decay<TT>[S]>()));
+		const FROM loaded = Load<DEF>(in);
 
-		if constexpr (SIMD::IsNotSupported<FROM> || SIMD::IsNotSupported<TO>)
-			return SIMD::NotSupported{};
-		else if constexpr (Same<TT, FT>)
+		if constexpr (CT::NotSupported<FROM> || CT::NotSupported<TO>)
+			return CT::Inner::NotSupported{};
+		else if constexpr (CT::Same<TT, FT>)
 			return loaded;
-		else if constexpr (Same<FROM, simde__m128>)
-			return SIMD::ConvertFrom128<TT, S, FT, TO>(loaded);
-		else if constexpr (Same<FROM, simde__m128d>)
-			return SIMD::ConvertFrom128d<TT, S, FT, TO>(loaded);
-		else if constexpr (Same<FROM, simde__m128i>)
-			return SIMD::ConvertFrom128i<TT, S, FT, TO>(loaded);
-		else if constexpr (Same<FROM, simde__m256>)
-			return SIMD::ConvertFrom256<TT, S, FT, TO>(loaded);
-		else if constexpr (Same<FROM, simde__m256d>)
-			return SIMD::ConvertFrom256d<TT, S, FT, TO>(loaded);
-		else if constexpr (Same<FROM, simde__m256i>)
-			return SIMD::ConvertFrom256i<TT, S, FT, TO>(loaded);
-		else if constexpr (Same<FROM, simde__m512>)
-			return SIMD::ConvertFrom512<TT, S, FT, TO>(loaded);
-		else if constexpr (Same<FROM, simde__m512d>)
-			return SIMD::ConvertFrom512d<TT, S, FT, TO>(loaded);
-		else if constexpr (Same<FROM, simde__m512i>)
-			return SIMD::ConvertFrom512i<TT, S, FT, TO>(loaded);
+		#if LANGULUS_SIMD(128BIT)
+			else if constexpr (CT::Same<FROM, simde__m128>)
+				return ConvertFrom128<TT, S, FT, TO>(loaded);
+			else if constexpr (CT::Same<FROM, simde__m128d>)
+				return ConvertFrom128d<TT, S, FT, TO>(loaded);
+			else if constexpr (CT::Same<FROM, simde__m128i>)
+				return ConvertFrom128i<TT, S, FT, TO>(loaded);
+		#endif
+		#if LANGULUS_SIMD(256BIT)
+			else if constexpr (CT::Same<FROM, simde__m256>)
+				return ConvertFrom256<TT, S, FT, TO>(loaded);
+			else if constexpr (CT::Same<FROM, simde__m256d>)
+				return ConvertFrom256d<TT, S, FT, TO>(loaded);
+			else if constexpr (CT::Same<FROM, simde__m256i>)
+				return ConvertFrom256i<TT, S, FT, TO>(loaded);
+		#endif
+		#if LANGULUS_SIMD(512BIT)
+			else if constexpr (CT::Same<FROM, simde__m512>)
+				return ConvertFrom512<TT, S, FT, TO>(loaded);
+			else if constexpr (CT::Same<FROM, simde__m512d>)
+				return ConvertFrom512d<TT, S, FT, TO>(loaded);
+			else if constexpr (CT::Same<FROM, simde__m512i>)
+				return ConvertFrom512i<TT, S, FT, TO>(loaded);
+		#endif
 		else LANGULUS_ASSERT("Can't convert from unsupported");
 	}
 	

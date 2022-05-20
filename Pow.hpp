@@ -13,8 +13,8 @@ namespace Langulus::SIMD
 {
 
 	template<CT::Number T, Count S>
-	auto PowerInner(const NotSupported&, const NotSupported&) noexcept {
-		return NotSupported{};
+	auto PowerInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+		return CT::Inner::NotSupported{};
 	}
 
 	/// Raise by a power using SIMD															
@@ -24,26 +24,26 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the raised values															
-	template<CT::Number T, Count S, TSIMD REGISTER>
+	template<CT::Number T, Count S, CT::TSIMD REGISTER>
 	auto PowerInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		static_assert(CT::Real<T>, 
 			"SIMD::InnerPow doesn't work for whole numbers");
 
-		if constexpr (SIMD128<REGISTER>) {
+		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::Same<T, float>)
 				return simde_mm_pow_ps(lhs, rhs);
 			else if constexpr (CT::Same<T, double>)
 				return simde_mm_pow_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerPow of 16-byte package");
 		}
-		else if constexpr (SIMD256<REGISTER>) {
+		else if constexpr (CT::SIMD256<REGISTER>) {
 			if constexpr (CT::Same<T, float>)
 				return simde_mm256_pow_ps(lhs, rhs);
 			else if constexpr (CT::Same<T, double>)
 				return simde_mm256_pow_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerPow of 32-byte package");
 		}
-		else if constexpr (SIMD512<REGISTER>) {
+		else if constexpr (CT::SIMD512<REGISTER>) {
 			if constexpr (CT::Same<T, float>)
 				return simde_mm512_pow_ps(lhs, rhs);
 			else if constexpr (CT::Same<T, double>)
@@ -56,8 +56,8 @@ namespace Langulus::SIMD
 	///																								
 	template<CT::Number LHS, CT::Number RHS>
 	NOD() auto Power(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-		using REGISTER = TRegister<LHS, RHS>;
-		using LOSSLESS = TLossless<LHS, RHS>;
+		using REGISTER = CT::Register<LHS, RHS>;
+		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = ResultSize<LHS, RHS>();
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 

@@ -13,8 +13,8 @@ namespace Langulus::SIMD
 {
 
 	template<CT::Number T, Count S>
-	auto GreaterInner(const NotSupported&, const NotSupported&) noexcept {
-		return NotSupported{};
+	auto GreaterInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+		return CT::Inner::NotSupported{};
 	}
 
 	/// Compare two arrays for greater using SIMD										
@@ -24,23 +24,23 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return true if lhs is greater than rhs										
-	template<CT::Number T, Count S, TSIMD REGISTER>
+	template<CT::Number T, Count S, CT::TSIMD REGISTER>
 	auto GreaterInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
-		if constexpr (SIMD128<REGISTER>) {
+		if constexpr (CT::SIMD128<REGISTER>) {
 			#if LANGULUS_SIMD(AVX512)
-				if constexpr (SignedInteger8<T>)
+				if constexpr (CT::SignedInteger8<T>)
 					return _mm_cmpgt_epi8_mask(lhs, rhs) == 0xFFFF;
-				else if constexpr (UnsignedInteger8<T>)
+				else if constexpr (CT::UnsignedInteger8<T>)
 					return _mm_cmpgt_epu8_mask(lhs, rhs) == 0xFFFF;
-				else if constexpr (SignedInteger16<T>)
+				else if constexpr (CT::SignedInteger16<T>)
 					return _mm_cmpgt_epi16_mask(lhs, rhs) == 0xFF;
-				else if constexpr (UnsignedInteger16<T>)
+				else if constexpr (CT::UnsignedInteger16<T>)
 					return _mm_cmpgt_epu16_mask(lhs, rhs) == 0xFF;
-				else if constexpr (SignedInteger32<T>)
+				else if constexpr (CT::SignedInteger32<T>)
 					return _mm_cmpgt_epi32_mask(lhs, rhs) == 0xF;
 				else if constexpr (UnsignedInteger32<T>)
 					return _mm_cmpgt_epu32_mask(lhs, rhs) == 0xF;
-				else if constexpr (SignedInteger64<T>)
+				else if constexpr (CT::SignedInteger64<T>)
 					return _mm_cmpgt_epi64_mask(lhs, rhs) == 0x7;
 				else if constexpr (UnsignedInteger64<T>)
 					return _mm_cmpgt_epu64_mask(lhs, rhs) == 0x7;
@@ -49,14 +49,14 @@ namespace Langulus::SIMD
 				else if constexpr (CT::Same<T, pcr64>)
 					return _mm_cmp_pd_mask(lhs, rhs, _CMP_GT_OQ)) == 0x7;
 			#else
-				if constexpr (Integer8<T>)
+				if constexpr (CT::Integer8<T>)
 					return simde_mm_movemask_epi8(simde_mm_cmpgt_epi8(lhs, rhs)) == 0xFFFF;
-				else if constexpr (Integer16<T>)
+				else if constexpr (CT::Integer16<T>)
 					return simde_mm_movemask_epi8(simde_mm_cmpgt_epi16(lhs, rhs)) == 0xFFFF;
-				else if constexpr (Integer32<T>)
+				else if constexpr (CT::Integer32<T>)
 					return simde_mm_movemask_epi8(simde_mm_cmpgt_epi32(lhs, rhs)) == 0xFFFF;
-				else if constexpr (Integer64<T>)
-					return NotSupported{};
+				else if constexpr (CT::Integer64<T>)
+					return CT::Inner::NotSupported{};
 				else if constexpr (CT::Same<T, float>)
 					return simde_mm_movemask_ps(_mm_cmpgt_ps(lhs, rhs)) == 0xF;
 				else if constexpr (CT::Same<T, double>)
@@ -64,21 +64,21 @@ namespace Langulus::SIMD
 			#endif
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerGreater of 16-byte package");
 		}
-		else if constexpr (SIMD256<REGISTER>) {
+		else if constexpr (CT::SIMD256<REGISTER>) {
 			#if LANGULUS_SIMD(AVX512)
-				if constexpr (SignedInteger8<T>)
+				if constexpr (CT::SignedInteger8<T>)
 					return _mm256_cmpgt_epi8_mask(lhs, rhs) == 0xFFFFFFFF;
-				else if constexpr (UnsignedInteger8<T>)
+				else if constexpr (CT::UnsignedInteger8<T>)
 					return _mm256_cmpgt_epu8_mask(lhs, rhs) == 0xFFFFFFFF;
-				else if constexpr (SignedInteger16<T>)
+				else if constexpr (CT::SignedInteger16<T>)
 					return _mm256_cmpgt_epi16_mask(lhs, rhs) == 0xFFFF;
-				else if constexpr (UnsignedInteger16<T>)
+				else if constexpr (CT::UnsignedInteger16<T>)
 					return _mm256_cmpgt_epu16_mask(lhs, rhs) == 0xFFFF;
-				else if constexpr (SignedInteger32<T>)
+				else if constexpr (CT::SignedInteger32<T>)
 					return _mm256_cmpgt_epi32_mask(lhs, rhs) == 0xFF;
 				else if constexpr (UnsignedInteger32<T>)
 					return _mm256_cmpgt_epu32_mask(lhs, rhs) == 0xFF;
-				else if constexpr (SignedInteger64<T>)
+				else if constexpr (CT::SignedInteger64<T>)
 					return _mm256_cmpgt_epi64_mask(lhs, rhs) == 0xF;
 				else if constexpr (UnsignedInteger64<T>)
 					return _mm256_cmpgt_epu64_mask(lhs, rhs) == 0xF;
@@ -88,13 +88,13 @@ namespace Langulus::SIMD
 					return _mm256_cmp_pd_mask(lhs, rhs, _CMP_GT_OQ)) == 0xF;
 				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerGreater of 32-byte package");
 			#else
-				if constexpr (Integer8<T>)
+				if constexpr (CT::Integer8<T>)
 					return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi8(lhs, rhs)) == 0xFFFFFFFF;
-				else if constexpr (Integer16<T>)
+				else if constexpr (CT::Integer16<T>)
 					return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi16(lhs, rhs)) == 0xFFFF;
-				else if constexpr (Integer32<T>)
+				else if constexpr (CT::Integer32<T>)
 					return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi32(lhs, rhs)) == 0xFF;
-				else if constexpr (Integer64<T>)
+				else if constexpr (CT::Integer64<T>)
 					return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi64(lhs, rhs)) == 0xF;
 				else if constexpr (CT::Same<T, float>)
 					return simde_mm256_movemask_ps(simde_mm256_cmp_ps(lhs, rhs, _CMP_GT_OQ)) == 0xFF;
@@ -103,20 +103,20 @@ namespace Langulus::SIMD
 			#endif
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerGreater of 32-byte package");
 		}
-		else if constexpr (SIMD512<REGISTER>) {
-			if constexpr (SignedInteger8<T>)
+		else if constexpr (CT::SIMD512<REGISTER>) {
+			if constexpr (CT::SignedInteger8<T>)
 				return simde_mm512_cmpgt_epi8_mask(lhs, rhs) == 0xFFFFFFFFFFFFFFFF;
-			else if constexpr (UnsignedInteger8<T>)
+			else if constexpr (CT::UnsignedInteger8<T>)
 				return simde_mm512_cmpgt_epu8_mask(lhs, rhs) == 0xFFFFFFFFFFFFFFFF;
-			else if constexpr (SignedInteger16<T>)
+			else if constexpr (CT::SignedInteger16<T>)
 				return simde_mm512_cmpgt_epi16_mask(lhs, rhs) == 0xFFFFFFFF;
-			else if constexpr (UnsignedInteger16<T>)
+			else if constexpr (CT::UnsignedInteger16<T>)
 				return simde_mm512_cmpgt_epu16_mask(lhs, rhs) == 0xFFFFFFFF;
-			else if constexpr (SignedInteger32<T>)
+			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm512_cmpgt_epi32_mask(lhs, rhs) == 0xFFFF;
 			else if constexpr (UnsignedInteger32<T>)
 				return simde_mm512_cmpgt_epu32_mask(lhs, rhs) == 0xFFFF;
-			else if constexpr (SignedInteger64<T>)
+			else if constexpr (CT::SignedInteger64<T>)
 				return simde_mm512_cmpgt_epi64_mask(lhs, rhs) == 0xFF;
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm512_cmpgt_epu64_mask(lhs, rhs) == 0xFF;
@@ -137,8 +137,8 @@ namespace Langulus::SIMD
 	///	@return true if all elements match												
 	template<CT::Number LHS, CT::Number RHS>
 	NOD() bool Greater(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-		using REGISTER = TRegister<LHS, RHS>;
-		using LOSSLESS = TLossless<LHS, RHS>;
+		using REGISTER = CT::Register<LHS, RHS>;
+		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = ResultSize<LHS, RHS>();
 		const auto result = AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 

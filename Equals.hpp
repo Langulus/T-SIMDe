@@ -13,8 +13,8 @@ namespace Langulus::SIMD
 {
 
 	template<CT::Number T, Count S>
-	auto EqualsInner(const NotSupported&, const NotSupported&) noexcept {
-		return NotSupported{};
+	auto EqualsInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+		return CT::Inner::NotSupported{};
 	}
 		
 	/// Compare two arrays for equality using SIMD										
@@ -24,38 +24,38 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return true if lhs is equal to rhs												
-	template<CT::Number T, Count S, TSIMD REGISTER>
+	template<CT::Number T, Count S, CT::TSIMD REGISTER>
 	auto EqualsInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
-		if constexpr (SIMD128<REGISTER>) {
-			if constexpr (SignedInteger8<T>) {
+		if constexpr (CT::SIMD128<REGISTER>) {
+			if constexpr (CT::SignedInteger8<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_cmpeq_epi8_mask(lhs, rhs) == 0xFFFF;	// AVX512BW + AVX512VL
 				#else
 					return simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(lhs, rhs)) == 0xFFFF; // SSE2
 				#endif
 			}
-			else if constexpr (UnsignedInteger8<T>) {
+			else if constexpr (CT::UnsignedInteger8<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_cmpeq_epu8_mask(lhs, rhs) == 0xFFFF;	// AVX512BW + AVX512VL
 				#else
 					return simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(lhs, rhs)) == 0xFFFF; // SSE2
 				#endif
 			}
-			else if constexpr (SignedInteger16<T>) {
+			else if constexpr (CT::SignedInteger16<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_cmpeq_epi16_mask(lhs, rhs) == 0xFF;	// AVX512BW + AVX512VL
 				#else
 					return simde_mm_movemask_epi8(simde_mm_cmpeq_epi16(lhs, rhs)) == 0xFFFF; // SSE2
 				#endif
 			}
-			else if constexpr (UnsignedInteger16<T>) {
+			else if constexpr (CT::UnsignedInteger16<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_cmpeq_epu16_mask(lhs, rhs) == 0xFF;	// AVX512BW + AVX512VL
 				#else
 					return simde_mm_movemask_epi8(simde_mm_cmpeq_epi16(lhs, rhs)) == 0xFFFF; // SSE2
 				#endif
 			}
-			else if constexpr (SignedInteger32<T>) {
+			else if constexpr (CT::SignedInteger32<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_cmpeq_epi32_mask(lhs, rhs) == 0xFF;	// AVX512F + AVX512VL
 				#else
@@ -69,7 +69,7 @@ namespace Langulus::SIMD
 					return simde_mm_movemask_epi8(simde_mm_cmpeq_epi32(lhs, rhs)) == 0xFFFF; // SSE2
 				#endif
 			}
-			else if constexpr (SignedInteger64<T>) {
+			else if constexpr (CT::SignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_cmpeq_epi64_mask(lhs, rhs) == 0x7;	// AVX512F + AVX512VL
 				#else
@@ -90,36 +90,36 @@ namespace Langulus::SIMD
 			else
 				LANGULUS_ASSERT("Unsupported type for SIMD::InnerEquals of 16-byte package");
 		}
-		else if constexpr (SIMD256<REGISTER>) {
-			if constexpr (SignedInteger8<T>) {
+		else if constexpr (CT::SIMD256<REGISTER>) {
+			if constexpr (CT::SignedInteger8<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epi8_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512BW + AVX512VL
 				#else
 					return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(lhs, rhs)) == 0xFFFFFFFF; // AVX2
 				#endif
 			}
-			else if constexpr (UnsignedInteger8<T>) {
+			else if constexpr (CT::UnsignedInteger8<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epu8_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512BW + AVX512VL
 				#else
 					return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(lhs, rhs)) == 0xFFFFFFFF; // AVX2
 				#endif
 			}
-			else if constexpr (SignedInteger16<T>) {
+			else if constexpr (CT::SignedInteger16<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epi16_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512BW + AVX512VL
 				#else
 					return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi16(lhs, rhs)) == 0xFFFFFFFF; // AVX2
 				#endif
 			}
-			else if constexpr (UnsignedInteger16<T>) {
+			else if constexpr (CT::UnsignedInteger16<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epu16_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512BW + AVX512VL
 				#else
 					return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi16(lhs, rhs)) == 0xFFFFFFFF; // AVX2
 				#endif
 			}
-			else if constexpr (SignedInteger32<T>) {
+			else if constexpr (CT::SignedInteger32<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epi32_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512F + AVX512VL
 				#else
@@ -133,7 +133,7 @@ namespace Langulus::SIMD
 					return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi32(lhs, rhs)) == 0xFFFFFFFF; // AVX2
 				#endif
 			}
-			else if constexpr (SignedInteger64<T>) {
+			else if constexpr (CT::SignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epi64_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512F + AVX512VL
 				#else
@@ -153,20 +153,20 @@ namespace Langulus::SIMD
 				return simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_EQ_OQ)) == 0xF;	// AVX
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerEquals of 32-byte package");
 		}
-		else if constexpr (SIMD512<REGISTER>) {
-			if constexpr (SignedInteger8<T>)
+		else if constexpr (CT::SIMD512<REGISTER>) {
+			if constexpr (CT::SignedInteger8<T>)
 				return simde_mm512_cmpeq_epi8_mask(lhs, rhs) == 0xFFFFFFFFFFFFFFFF;
-			else if constexpr (UnsignedInteger8<T>)
+			else if constexpr (CT::UnsignedInteger8<T>)
 				return simde_mm512_cmpeq_epu8_mask(lhs, rhs) == 0xFFFFFFFFFFFFFFFF;
-			else if constexpr (SignedInteger16<T>)
+			else if constexpr (CT::SignedInteger16<T>)
 				return simde_mm512_cmpeq_epi16_mask(lhs, rhs) == 0xFFFFFFFF;
-			else if constexpr (UnsignedInteger16<T>)
+			else if constexpr (CT::UnsignedInteger16<T>)
 				return simde_mm512_cmpeq_epu16_mask(lhs, rhs) == 0xFFFFFFFF;
-			else if constexpr (SignedInteger32<T>)
+			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm512_cmpeq_epi32_mask(lhs, rhs) == 0xFFFF;
 			else if constexpr (UnsignedInteger32<T>)
 				return simde_mm512_cmpeq_epu32_mask(lhs, rhs) == 0xFFFF;
-			else if constexpr (SignedInteger64<T>)
+			else if constexpr (CT::SignedInteger64<T>)
 				return simde_mm512_cmpeq_epi64_mask(lhs, rhs) == 0xFF;
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm512_cmpeq_epu64_mask(lhs, rhs) == 0xFF;
@@ -187,8 +187,8 @@ namespace Langulus::SIMD
 	///	@return true if all elements match												
 	template<CT::Number LHS, CT::Number RHS>
 	NOD() bool Equals(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-		using REGISTER = TRegister<LHS, RHS>;
-		using LOSSLESS = TLossless<LHS, RHS>;
+		using REGISTER = CT::Register<LHS, RHS>;
+		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = ResultSize<LHS, RHS>();
 		const auto result = AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 

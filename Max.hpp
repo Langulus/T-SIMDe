@@ -13,8 +13,8 @@ namespace Langulus::SIMD
 {
 		
 	template<CT::Number T, Count S>
-	auto MaxInner(const NotSupported&, const NotSupported&) noexcept {
-		return NotSupported{};
+	auto MaxInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+		return CT::Inner::NotSupported{};
 	}
 
 	/// Select the bigger values via SIMD													
@@ -24,33 +24,33 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the maxed values															
-	template<CT::Number T, Count S, TSIMD REGISTER>
+	template<CT::Number T, Count S, CT::TSIMD REGISTER>
 	auto MaxInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
-		if constexpr (SIMD128<REGISTER>) {
-			if constexpr (SignedInteger8<T>)
+		if constexpr (CT::SIMD128<REGISTER>) {
+			if constexpr (CT::SignedInteger8<T>)
 				return simde_mm_max_epi8(lhs, rhs);
-			else if constexpr (UnsignedInteger8<T>)
+			else if constexpr (CT::UnsignedInteger8<T>)
 				return simde_mm_max_epu8(lhs, rhs);
-			else if constexpr (SignedInteger16<T>)
+			else if constexpr (CT::SignedInteger16<T>)
 				return simde_mm_max_epi16(lhs, rhs);
-			else if constexpr (UnsignedInteger16<T>)
+			else if constexpr (CT::UnsignedInteger16<T>)
 				return simde_mm_max_epu16(lhs, rhs);
-			else if constexpr (SignedInteger32<T>)
+			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm_max_epi32(lhs, rhs);
 			else if constexpr (UnsignedInteger32<T>)
 				return simde_mm_max_epu32(lhs, rhs);
-			else if constexpr (SignedInteger64<T>) {
+			else if constexpr (CT::SignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_max_epi64(lhs, rhs);
 				#else
-					return SIMD::NotSupported{};
+					return CT::Inner::NotSupported{};
 				#endif
 			}
 			else if constexpr (UnsignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return simde_mm_max_epu64(lhs, rhs);
 				#else
-					return SIMD::NotSupported{};
+					return CT::Inner::NotSupported{};
 				#endif
 			}
 			else if constexpr (CT::Same<T, float>)
@@ -59,31 +59,31 @@ namespace Langulus::SIMD
 				return simde_mm_max_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMax of 16-byte package");
 		}
-		else if constexpr (SIMD256<REGISTER>) {
-			if constexpr (SignedInteger8<T>)
+		else if constexpr (CT::SIMD256<REGISTER>) {
+			if constexpr (CT::SignedInteger8<T>)
 				return simde_mm256_max_epi8(lhs, rhs);
-			else if constexpr (UnsignedInteger8<T>)
+			else if constexpr (CT::UnsignedInteger8<T>)
 				return simde_mm256_max_epu8(lhs, rhs);
-			else if constexpr (SignedInteger16<T>)
+			else if constexpr (CT::SignedInteger16<T>)
 				return simde_mm256_max_epi16(lhs, rhs);
-			else if constexpr (UnsignedInteger16<T>)
+			else if constexpr (CT::UnsignedInteger16<T>)
 				return simde_mm256_max_epu16(lhs, rhs);
-			else if constexpr (SignedInteger32<T>)
+			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm256_max_epi32(lhs, rhs);
 			else if constexpr (UnsignedInteger32<T>)
 				return simde_mm256_max_epu32(lhs, rhs);
-			else if constexpr (SignedInteger64<T>) {
+			else if constexpr (CT::SignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_max_epi64(lhs, rhs);
 				#else
-					return SIMD::NotSupported{};
+					return CT::Inner::NotSupported{};
 				#endif
 			}
 			else if constexpr (UnsignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_max_epu64(lhs, rhs);
 				#else
-					return SIMD::NotSupported{};
+					return CT::Inner::NotSupported{};
 				#endif
 			}
 			else if constexpr (CT::Same<T, float>)
@@ -92,20 +92,20 @@ namespace Langulus::SIMD
 				return simde_mm256_max_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMax of 32-byte package");
 		}
-		else if constexpr (SIMD512<REGISTER>) {
-			if constexpr (SignedInteger8<T>)
+		else if constexpr (CT::SIMD512<REGISTER>) {
+			if constexpr (CT::SignedInteger8<T>)
 				return simde_mm512_max_epi8(lhs, rhs);
-			else if constexpr (UnsignedInteger8<T>)
+			else if constexpr (CT::UnsignedInteger8<T>)
 				return simde_mm512_max_epu8(lhs, rhs);
-			else if constexpr (SignedInteger16<T>)
+			else if constexpr (CT::SignedInteger16<T>)
 				return simde_mm512_max_epi16(lhs, rhs);
-			else if constexpr (UnsignedInteger16<T>)
+			else if constexpr (CT::UnsignedInteger16<T>)
 				return simde_mm512_max_epu16(lhs, rhs);
-			else if constexpr (SignedInteger32<T>)
+			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm512_max_epi32(lhs, rhs);
 			else if constexpr (UnsignedInteger32<T>)
 				return simde_mm512_max_epu32(lhs, rhs);
-			else if constexpr (SignedInteger64<T>)
+			else if constexpr (CT::SignedInteger64<T>)
 				return simde_mm512_max_epi64(lhs, rhs);
 			else if constexpr (UnsignedInteger64<T>)
 				return simde_mm512_max_epu64(lhs, rhs);
@@ -121,8 +121,8 @@ namespace Langulus::SIMD
 	///																								
 	template<CT::Number LHS, CT::Number RHS>
 	NOD() auto Max(LHS& lhsOrig, RHS& rhsOrig) noexcept {
-		using REGISTER = TRegister<LHS, RHS>;
-		using LOSSLESS = TLossless<LHS, RHS>;
+		using REGISTER = CT::Register<LHS, RHS>;
+		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = ResultSize<LHS, RHS>();
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
@@ -139,7 +139,7 @@ namespace Langulus::SIMD
 	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
 	void Max(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = Max<LHS, RHS>(lhs, rhs);
-		if constexpr (TSIMD<decltype(result)>) {
+		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
 			SIMD::Store(result, output);
 		}
