@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 	///	@tparam REGISTER - the register type (deducible)							
 	///	@param value - the array 															
 	///	@return the floored values															
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto InnerFloor(const REGISTER& value) noexcept {
 		static_assert(CT::Real<T>,
 			"SIMD::InnerFloor is suboptimal and pointless for whole numbers, avoid calling it on such");
@@ -47,7 +47,7 @@ namespace Langulus::SIMD
 		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerFloor");
 	}
 
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto Floor(const T(&value)[S]) noexcept {
 		return InnerFloor<T, S>(Load<0>(value));
 	}

@@ -69,7 +69,7 @@ namespace Langulus::SIMD
 				// float[4] -> pci32[4]													
 				return simde_mm_cvtps_epi32(v);
 			}
-			else if constexpr (UnsignedInteger32<TT> && S <= 4) {
+			else if constexpr (CT::UnsignedInteger32<TT> && S <= 4) {
 				// float[4] -> pcu32[4]													
 				return _mm_cvtps_epu32(v);
 			}
@@ -77,7 +77,7 @@ namespace Langulus::SIMD
 				// float[2] -> pci64[2]													
 				return _mm_cvtps_epi64(v);
 			}
-			else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+			else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 				// float[2] -> pcu64[2]													
 				return _mm_cvtps_epu64(v);
 			}
@@ -91,7 +91,7 @@ namespace Langulus::SIMD
 				// float[4] -> pci64[4]													
 				return _mm256_cvtps_epi64(v);
 			}
-			else if constexpr (UnsignedInteger64<TT> && S <= 4) {
+			else if constexpr (CT::UnsignedInteger64<TT> && S <= 4) {
 				// float[4] -> pcu64[4]													
 				return _mm256_cvtps_epu64(v);
 			}
@@ -169,7 +169,7 @@ namespace Langulus::SIMD
 				// double[2] -> pci64[2] or pcu64[2]								
 				return _mm_cvtpd_epi64(v);
 			}
-			else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+			else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 				// double[2] -> pci64[2] or pcu64[2]								
 				return _mm_cvtpd_epu64(v);
 			}
@@ -225,7 +225,7 @@ namespace Langulus::SIMD
 				// pci32[4] -> float[4]													
 				return simde_mm_cvtepi32_ps(v);
 			}
-			else if constexpr (UnsignedInteger32<FT> && S <= 4) {
+			else if constexpr (CT::UnsignedInteger32<FT> && S <= 4) {
 				// pcu32[4] -> float[4]													
 				return simde_mm256_cvtpd_ps(_mm256_cvtepu32_pd(v));
 			}
@@ -233,7 +233,7 @@ namespace Langulus::SIMD
 				// pci64[2] -> float[2]													
 				return _mm_cvtepi64_ps(v);
 			}
-			else if constexpr (UnsignedInteger64<FT> && S <= 2) {
+			else if constexpr (CT::UnsignedInteger64<FT> && S <= 2) {
 				// pcu64[2] -> float[2]													
 				return _mm_cvtepu64_ps(v);
 			}
@@ -273,7 +273,7 @@ namespace Langulus::SIMD
 				// pci32[2] -> double[2]												
 				return simde_mm_cvtepi32_pd(v);
 			}
-			else if constexpr (UnsignedInteger32<FT> && S <= 2) {
+			else if constexpr (CT::UnsignedInteger32<FT> && S <= 2) {
 				// pcu32[2] -> double[2]												
 				return _mm_cvtepu32_pd(v);
 			}
@@ -281,7 +281,7 @@ namespace Langulus::SIMD
 				// pci64[2] -> double[2]												
 				return _mm_cvtepi64_pd(v);
 			}
-			else if constexpr (UnsignedInteger64<FT> && S <= 2) {
+			else if constexpr (CT::UnsignedInteger64<FT> && S <= 2) {
 				// pcu64[2] -> double[2]												
 				return _mm_cvtepu64_pd(v);
 			}
@@ -313,7 +313,7 @@ namespace Langulus::SIMD
 					// pci8[4] -> pci32[4]												
 					LANGULUS_ASSERT("Can't convert from pci8[4] to pci32[4]");
 				}
-				else if constexpr (UnsignedInteger32<TT> && S <= 4) {
+				else if constexpr (CT::UnsignedInteger32<TT> && S <= 4) {
 					// pci8[4] -> pcu32[4]												
 					LANGULUS_ASSERT("Can't convert from pci8[4] to pcu32[4]");
 				}
@@ -321,7 +321,7 @@ namespace Langulus::SIMD
 					// pci8[2] -> pci64[2]												
 					LANGULUS_ASSERT("Can't convert from pci8[2] to pci64[2]");
 				}
-				else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 					// pci8[2] -> pcu64[2]												
 					LANGULUS_ASSERT("Can't convert from pci8[2] to pcu64[2]");
 				}
@@ -348,7 +348,7 @@ namespace Langulus::SIMD
 					// pcu8[4] -> pci32[4]												
 					LANGULUS_ASSERT("Can't convert from pcu8[4] to pci32[4]");
 				}
-				else if constexpr (UnsignedInteger32<TT> && S <= 4) {
+				else if constexpr (CT::UnsignedInteger32<TT> && S <= 4) {
 					// pcu8[4] -> pcu32[4]												
 					LANGULUS_ASSERT("Can't convert from pcu8[4] to pcu32[4]");
 				}
@@ -356,7 +356,7 @@ namespace Langulus::SIMD
 					// pcu8[2] -> pci64[2]												
 					LANGULUS_ASSERT("Can't convert from pcu8[2] to pci64[2]");
 				}
-				else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 					// pcu8[2] -> pcu64[2]												
 					LANGULUS_ASSERT("Can't convert from pcu8[2] to pcu64[2]");
 				}
@@ -383,7 +383,7 @@ namespace Langulus::SIMD
 					// pci16[4] -> pci32[4]												
 					LANGULUS_ASSERT("Can't convert from pci16[4] to pci32[4]");
 				}
-				else if constexpr (UnsignedInteger32<TT> && S <= 4) {
+				else if constexpr (CT::UnsignedInteger32<TT> && S <= 4) {
 					// pci16[4] -> pcu32[4]												
 					LANGULUS_ASSERT("Can't convert from pci16[4] to pcu32[4]");
 				}
@@ -391,7 +391,7 @@ namespace Langulus::SIMD
 					// pci16[2] -> pci64[2]												
 					LANGULUS_ASSERT("Can't convert from pci16[2] to pci64[2]");
 				}
-				else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 					// pci16[2] -> pcu64[2]												
 					LANGULUS_ASSERT("Can't convert from pci16[2] to pcu64[2]");
 				}
@@ -418,7 +418,7 @@ namespace Langulus::SIMD
 					// pcu16[4] -> pci32[4]												
 					LANGULUS_ASSERT("Can't convert from pcu16[4] to pci32[4]");
 				}
-				else if constexpr (UnsignedInteger32<TT> && S <= 4) {
+				else if constexpr (CT::UnsignedInteger32<TT> && S <= 4) {
 					// pcu16[4] -> pcu32[4]												
 					LANGULUS_ASSERT("Can't convert from pcu16[4] to pcu32[4]");
 				}
@@ -426,7 +426,7 @@ namespace Langulus::SIMD
 					// pcu16[2] -> pci64[2]												
 					LANGULUS_ASSERT("Can't convert from pcu16[2] to pci64[2]");
 				}
-				else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 					// pcu16[2] -> pcu64[2]												
 					LANGULUS_ASSERT("Can't convert from pcu16[2] to pcu64[2]");
 				}
@@ -453,7 +453,7 @@ namespace Langulus::SIMD
 					// pci32[4] -> pci32[4]												
 					return v;
 				}
-				else if constexpr (UnsignedInteger32<TT> && S <= 4) {
+				else if constexpr (CT::UnsignedInteger32<TT> && S <= 4) {
 					// pci32[4] -> pcu32[4]												
 					return v;
 				}
@@ -461,13 +461,13 @@ namespace Langulus::SIMD
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pci32[2] to pci64[2]");
 				}
-				else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 					// pci8[16] -> pcu8[16]												
 					LANGULUS_ASSERT("Can't convert from pci32[2] to pcu64[2]");
 				}
 				else LANGULUS_ASSERT("Can't convert from pci32 to unsupported TT");
 			}
-			else if constexpr (UnsignedInteger32<FT>) {
+			else if constexpr (CT::UnsignedInteger32<FT>) {
 				if constexpr (CT::SignedInteger8<TT> && S <= 4) {
 					// pcu32[4] -> pci8[4]												
 					return simde_mm_packus_epi16(simde_mm_packus_epi32(v, simde_mm_setzero_si128()), simde_mm_setzero_si128());
@@ -490,7 +490,7 @@ namespace Langulus::SIMD
 					auto up = _mm_halfflip(_mm_cvtepi64_epi32(simde_mm_cvtepu32_epi64(_mm_halfflip(v))));
 					return simde_mm_add_epi32(lo, up);
 				}
-				else if constexpr (UnsignedInteger32<TT> && S <= 4) {
+				else if constexpr (CT::UnsignedInteger32<TT> && S <= 4) {
 					// pcu32[4] -> pci32[4]												
 					auto lo = _mm_cvtepi64_epi32(simde_mm_cvtepu32_epi64(v));
 					auto up = _mm_halfflip(_mm_cvtepi64_epi32(simde_mm_cvtepu32_epi64(_mm_halfflip(v))));
@@ -500,7 +500,7 @@ namespace Langulus::SIMD
 					// pcu32[2] -> pci64[2]												
 					return simde_mm_cvtepu32_epi64(v);
 				}
-				else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 					// pcu32[2] -> pcu64[2]												
 					return simde_mm_cvtepu32_epi64(v);
 				}
@@ -527,7 +527,7 @@ namespace Langulus::SIMD
 					// pci64[2] -> pci32[2]												
 					LANGULUS_ASSERT("Can't convert from pci64[2] to pci32[2]");
 				}
-				else if constexpr (UnsignedInteger32<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger32<TT> && S <= 2) {
 					// pci64[2] -> pcu32[2]												
 					LANGULUS_ASSERT("Can't convert from pci64[2] to pcu32[2]");
 				}
@@ -535,13 +535,13 @@ namespace Langulus::SIMD
 					// pci64[2] -> pci64[2]												
 					LANGULUS_ASSERT("Can't convert from pci64[2] to pci64[2]");
 				}
-				else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 					// pci64[2] -> pcu64[2]												
 					LANGULUS_ASSERT("Can't convert from pci64[2] to pcu64[2]");
 				}
 				else LANGULUS_ASSERT("Can't convert from pci64 to unsupported TT");
 			}
-			else if constexpr (UnsignedInteger64<FT>) {
+			else if constexpr (CT::UnsignedInteger64<FT>) {
 				if constexpr (CT::SignedInteger8<TT> && S <= 2) {
 					// pcu64[2] -> pci8[2]												
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pci8[2]");
@@ -562,7 +562,7 @@ namespace Langulus::SIMD
 					// pcu64[2] -> pci32[2]												
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pci32[2]");
 				}
-				else if constexpr (UnsignedInteger32<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger32<TT> && S <= 2) {
 					// pcu64[2] -> pcu32[2]												
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pcu32[2]");
 				}
@@ -570,7 +570,7 @@ namespace Langulus::SIMD
 					// pcu64[2] -> pci64[2]												
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pci64[2]");
 				}
-				else if constexpr (UnsignedInteger64<TT> && S <= 2) {
+				else if constexpr (CT::UnsignedInteger64<TT> && S <= 2) {
 					// pcu64[2] -> pcu64[2]												
 					LANGULUS_ASSERT("Can't convert from pcu64[2] to pcu64[2]");
 				}

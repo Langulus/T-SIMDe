@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 	///	@tparam REGISTER - the register type (deducible)							
 	///	@param value - the array 															
 	///	@return the ceiling values															
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto InnerCeil(const REGISTER& value) noexcept {
 		static_assert(CT::Real<T>,
 			"SIMD::InnerFloor is suboptimal and pointless for whole numbers, avoid calling it on such");
@@ -47,7 +47,7 @@ namespace Langulus::SIMD
 		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil");
 	}
 
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto Ceil(const T(&value)[S]) noexcept {
 		return InnerCeil<T, S>(Load<0>(value));
 	}

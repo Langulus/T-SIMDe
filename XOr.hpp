@@ -12,7 +12,7 @@
 namespace Langulus::SIMD
 {
 		
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto XOrInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
@@ -23,7 +23,7 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the xor'd elements as a register										
-	template<CT::Number T, Count S, class REGISTER>
+	template<class T, Count S, class REGISTER>
 	auto XOrInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::Same<REGISTER,simde__m128i>)
 			return simde_mm_xor_si128(lhs, rhs);
@@ -47,11 +47,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Number LHS, CT::Number RHS>
+	template<class LHS, class RHS>
 	NOD() auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
-		constexpr auto S = ResultSize<LHS, RHS>();
+		constexpr auto S = OverlapCount<LHS, RHS>();
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
 			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
@@ -64,14 +64,14 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
+	template<class LHS, class RHS, class OUT>
 	void XOr(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = XOr<LHS, RHS>(lhs, rhs);
-		if constexpr (TSIMD<decltype(result)>) {
+		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
-			SIMD::Store(result, output);
+			Store(result, output);
 		}
-		else if constexpr (CT::Number<decltype(result)>) {
+		else if constexpr (ExtentOf<OUT> == 1) {
 			// Extract from number														
 			output = result;
 		}
@@ -83,7 +83,7 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, class LHS, class RHS>
 	NOD() WRAPPER XOrWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		XOr<LHS, RHS>(lhs, rhs, result.mArray);

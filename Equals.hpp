@@ -12,7 +12,7 @@
 namespace Langulus::SIMD
 {
 
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto EqualsInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
@@ -24,7 +24,7 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return true if lhs is equal to rhs												
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto EqualsInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::SignedInteger8<T>) {
@@ -62,7 +62,7 @@ namespace Langulus::SIMD
 					return simde_mm_movemask_epi8(simde_mm_cmpeq_epi32(lhs, rhs)) == 0xFFFF; // SSE2
 				#endif
 			}
-			else if constexpr (UnsignedInteger32<T>) {
+			else if constexpr (CT::UnsignedInteger32<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_cmpeq_epu32_mask(lhs, rhs) == 0xFF;	// AVX512F + AVX512VL
 				#else
@@ -76,7 +76,7 @@ namespace Langulus::SIMD
 					return simde_mm_movemask_epi8(simde_mm_cmpeq_epi64(lhs, rhs)) == 0xFFFF; // SSE4.1
 				#endif
 			}
-			else if constexpr (UnsignedInteger64<T>) {
+			else if constexpr (CT::UnsignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_cmpeq_epu64_mask(lhs, rhs) == 0x7;	// AVX512F + AVX512VL
 				#else
@@ -126,7 +126,7 @@ namespace Langulus::SIMD
 					return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi32(lhs, rhs)) == 0xFFFFFFFF; // AVX2
 				#endif
 			}
-			else if constexpr (UnsignedInteger32<T>) {
+			else if constexpr (CT::UnsignedInteger32<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epu32_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512F + AVX512VL
 				#else
@@ -140,7 +140,7 @@ namespace Langulus::SIMD
 					return simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(lhs, rhs)) == 0xFFFFFFFF; // AVX2
 				#endif
 			}
-			else if constexpr (UnsignedInteger64<T>) {
+			else if constexpr (CT::UnsignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epu64_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512F + AVX512VL
 				#else
@@ -164,11 +164,11 @@ namespace Langulus::SIMD
 				return simde_mm512_cmpeq_epu16_mask(lhs, rhs) == 0xFFFFFFFF;
 			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm512_cmpeq_epi32_mask(lhs, rhs) == 0xFFFF;
-			else if constexpr (UnsignedInteger32<T>)
+			else if constexpr (CT::UnsignedInteger32<T>)
 				return simde_mm512_cmpeq_epu32_mask(lhs, rhs) == 0xFFFF;
 			else if constexpr (CT::SignedInteger64<T>)
 				return simde_mm512_cmpeq_epi64_mask(lhs, rhs) == 0xFF;
-			else if constexpr (UnsignedInteger64<T>)
+			else if constexpr (CT::UnsignedInteger64<T>)
 				return simde_mm512_cmpeq_epu64_mask(lhs, rhs) == 0xFF;
 			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_EQ_OQ) == 0xFFFF;
@@ -185,11 +185,11 @@ namespace Langulus::SIMD
 	///	@param lhsOrig - the left array or number										
 	///	@param rhsOrig - the right array or number									
 	///	@return true if all elements match												
-	template<CT::Number LHS, CT::Number RHS>
+	template<class LHS, class RHS>
 	NOD() bool Equals(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
-		constexpr auto S = ResultSize<LHS, RHS>();
+		constexpr auto S = OverlapCount<LHS, RHS>();
 		const auto result = AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
 			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
@@ -200,9 +200,10 @@ namespace Langulus::SIMD
 			}
 		);
 
-		if constexpr (CT::Bool<decltype(result)>)
+		if constexpr (CT::Bool<decltype(result)>) {
 			// EqualsInner was called successfully, just return				
 			return result;
+		}
 		else {
 			// Fallback as std::array<bool> - combine								
 			for (auto& i : result)

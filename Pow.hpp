@@ -12,7 +12,7 @@
 namespace Langulus::SIMD
 {
 
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto PowerInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
@@ -24,7 +24,7 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the raised values															
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto PowerInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		static_assert(CT::Real<T>, 
 			"SIMD::InnerPow doesn't work for whole numbers");
@@ -54,11 +54,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Number LHS, CT::Number RHS>
+	template<class LHS, class RHS>
 	NOD() auto Power(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
-		constexpr auto S = ResultSize<LHS, RHS>();
+		constexpr auto S = OverlapCount<LHS, RHS>();
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
 			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
@@ -71,14 +71,14 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
+	template<class LHS, class RHS, class OUT>
 	void Power(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = Power<LHS, RHS>(lhs, rhs);
-		if constexpr (TSIMD<decltype(result)>) {
+		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
-			SIMD::Store(result, output);
+			Store(result, output);
 		}
-		else if constexpr (CT::Number<decltype(result)>) {
+		else if constexpr (ExtentOf<OUT> == 1) {
 			// Extract from number														
 			output = result;
 		}
@@ -90,7 +90,7 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, class LHS, class RHS>
 	NOD() WRAPPER PowerWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Power<LHS, RHS>(lhs, rhs, result.mArray);

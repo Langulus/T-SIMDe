@@ -12,7 +12,7 @@
 namespace Langulus::SIMD
 {
 
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto LesserInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported {};
 	}
@@ -24,7 +24,7 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return true if lhs is lower than rhs											
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto LesserInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			#if LANGULUS_SIMD(AVX512)
@@ -38,11 +38,11 @@ namespace Langulus::SIMD
 					return _mm_cmplt_epu16_mask(lhs, rhs) == 0xFF;
 				else if constexpr (CT::SignedInteger32<T>)
 					return _mm_cmplt_epi32_mask(lhs, rhs) == 0xF;
-				else if constexpr (UnsignedInteger32<T>)
+				else if constexpr (CT::UnsignedInteger32<T>)
 					return _mm_cmplt_epu32_mask(lhs, rhs) == 0xF;
 				else if constexpr (CT::SignedInteger64<T>)
 					return _mm_cmplt_epi64_mask(lhs, rhs) == 0x7;
-				else if constexpr (UnsignedInteger64<T>)
+				else if constexpr (CT::UnsignedInteger64<T>)
 					return _mm_cmplt_epu64_mask(lhs, rhs) == 0x7;
 				else if constexpr (CT::Same<T, pcr32>)
 					return _mm_cmp_ps_mask(lhs, rhs, _CMP_LT_OQ) == 0xF;
@@ -76,11 +76,11 @@ namespace Langulus::SIMD
 					return _mm256_cmplt_epu16_mask(lhs, rhs) == 0xFFFF;
 				else if constexpr (CT::SignedInteger32<T>)
 					return _mm256_cmplt_epi32_mask(lhs, rhs) == 0xFF;
-				else if constexpr (UnsignedInteger32<T>)
+				else if constexpr (CT::UnsignedInteger32<T>)
 					return _mm256_cmplt_epu32_mask(lhs, rhs) == 0xFF;
 				else if constexpr (CT::SignedInteger64<T>)
 					return _mm256_cmplt_epi64_mask(lhs, rhs) == 0xF;
-				else if constexpr (UnsignedInteger64<T>)
+				else if constexpr (CT::UnsignedInteger64<T>)
 					return _mm256_cmplt_epu64_mask(lhs, rhs) == 0xF;
 				else if constexpr (CT::Same<T, pcr32>)
 					return _mm256_cmp_ps_mask(lhs, rhs, _CMP_LT_OQ) == 0xFF;
@@ -118,11 +118,11 @@ namespace Langulus::SIMD
 				return simde_mm512_cmplt_epu16_mask(lhs, rhs) == 0xFFFFFFFF;
 			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm512_cmplt_epi32_mask(lhs, rhs) == 0xFFFF;
-			else if constexpr (UnsignedInteger32<T>)
+			else if constexpr (CT::UnsignedInteger32<T>)
 				return simde_mm512_cmplt_epu32_mask(lhs, rhs) == 0xFFFF;
 			else if constexpr (CT::SignedInteger64<T>)
 				return simde_mm512_cmplt_epi64_mask(lhs, rhs) == 0xFF;
-			else if constexpr (UnsignedInteger64<T>)
+			else if constexpr (CT::UnsignedInteger64<T>)
 				return simde_mm512_cmplt_epu64_mask(lhs, rhs) == 0xFF;
 			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_LT_OQ) == 0xFFFF;
@@ -139,11 +139,11 @@ namespace Langulus::SIMD
 	///	@param lhsOrig - the left array or number										
 	///	@param rhsOrig - the right array or number									
 	///	@return true if all elements match												
-	template<CT::Number LHS, CT::Number RHS>
+	template<class LHS, class RHS>
 	NOD() bool Lesser(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
-		constexpr auto S = ResultSize<LHS, RHS>();
+		constexpr auto S = OverlapCount<LHS, RHS>();
 		const auto result = AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
 			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {

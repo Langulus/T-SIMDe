@@ -12,7 +12,7 @@
 namespace Langulus::SIMD
 {
 
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto DivideInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
@@ -24,7 +24,7 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the divided elements as a register									
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto DivideInner(const REGISTER& lhs, const REGISTER& rhs) {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::UnsignedInteger8<T>) {
@@ -47,7 +47,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm_div_epi16(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger32<T>) {
+			else if constexpr (CT::UnsignedInteger32<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi32(rhs, simde_mm_setzero_si128())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_epu32(lhs, rhs);
@@ -57,7 +57,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm_div_epi32(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger64<T>) {
+			else if constexpr (CT::UnsignedInteger64<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi64(rhs, simde_mm_setzero_si128())))
 					throw Except::DivisionByZero();
 				return simde_mm_div_epu64(lhs, rhs);
@@ -100,7 +100,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epi16(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger32<T>) {
+			else if constexpr (CT::UnsignedInteger32<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi32(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epu32(lhs, rhs);
@@ -110,7 +110,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epi32(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger64<T>) {
+			else if constexpr (CT::UnsignedInteger64<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
 				return simde_mm256_div_epu64(lhs, rhs);
@@ -153,7 +153,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epi16(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger32<T>) {
+			else if constexpr (CT::UnsignedInteger32<T>) {
 				if (simde_mm512_cmpeq_epi32(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epu32(lhs, rhs);
@@ -163,7 +163,7 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epi32(lhs, rhs);
 			}
-			else if constexpr (UnsignedInteger64<T>) {
+			else if constexpr (CT::UnsignedInteger64<T>) {
 				if (simde_mm512_cmpeq_epi64(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
 				return simde_mm512_div_epu64(lhs, rhs);
@@ -189,11 +189,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Number LHS, CT::Number RHS>
+	template<class LHS, class RHS>
 	NOD() auto Divide(LHS& lhsOrig, RHS& rhsOrig) {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
-		constexpr auto S = ResultSize<LHS, RHS>();
+		constexpr auto S = OverlapCount<LHS, RHS>();
 		return AttemptSIMD<1, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
 			[](const REGISTER& lhs, const REGISTER& rhs) {
@@ -208,14 +208,14 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
+	template<class LHS, class RHS, class OUT>
 	void Divide(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = Divide<LHS, RHS>(lhs, rhs);
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
-			SIMD::Store(result, output);
+			Store(result, output);
 		}
-		else if constexpr (CT::Number<decltype(result)>) {
+		else if constexpr (ExtentOf<OUT> == 1) {
 			// Extract from number														
 			output = result;
 		}
@@ -227,7 +227,7 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, class LHS, class RHS>
 	NOD() WRAPPER DivideWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Divide<LHS, RHS>(lhs, rhs, result.mArray);

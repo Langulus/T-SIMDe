@@ -20,7 +20,7 @@ namespace Langulus::SIMD
 	///	@tparam S - the size of the array 												
 	///	@param values - the array to access												
 	///	@return a reference to the element, or DEF if out of range				
-	template<int DEF, Offset IDX, Count MAXS, bool REVERSE = false, CT::Number T, Count S>
+	template<int DEF, Offset IDX, Count MAXS, bool REVERSE = false, class T, Count S>
 	const Decay<T>& InnerGet(const T(&values)[S]) {
 		static_assert(S <= MAXS, "S must be in MAXS limit");
 		static_assert(IDX < MAXS, "IDX must be in MAXS limit");
@@ -47,78 +47,90 @@ namespace Langulus::SIMD
 	///	@tparam INDICES - the indices to use											
 	///	@param values - the array to access												
 	///	@return the register																	
-	template<int DEF, Size CHUNK, CT::Number T, Count S, Offset... INDICES>
+	template<int DEF, Size CHUNK, class T, Count S, Offset... INDICES>
 	auto InnerSet(std::integer_sequence<Offset, INDICES...>, const T(&values)[S]) {
-		if constexpr (CHUNK == 16) {
-			if constexpr (CT::SignedInteger8<T>)
-				return simde_mm_setr_epi8(InnerGet<DEF, INDICES, 16>(values)...);
-			else if constexpr (CT::UnsignedInteger8<T>)
-				return simde_mm_setr_epi8(InnerGet<DEF, INDICES, 16>(reinterpret_cast<const int8_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger16<T>)
-				return simde_mm_setr_epi16(InnerGet<DEF, INDICES, 8>(values)...);
-			else if constexpr (CT::UnsignedInteger16<T>)
-				return simde_mm_setr_epi16(InnerGet<DEF, INDICES, 8>(reinterpret_cast<const int16_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger32<T>)
-				return simde_mm_setr_epi32(InnerGet<DEF, INDICES, 4>(values)...);
-			else if constexpr (UnsignedInteger32<T>)
-				return simde_mm_setr_epi32(InnerGet<DEF, INDICES, 4>(reinterpret_cast<const int32_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger64<T>)
-				return simde_mm_set_epi64x(InnerGet<DEF, INDICES, 2, true>(values)...);
-			else if constexpr (UnsignedInteger64<T>)
-				return simde_mm_set_epi64x(InnerGet<DEF, INDICES, 2, true>(reinterpret_cast<const int64_t(&)[S]>(values))...);
-			else if constexpr (CT::Same<T, float>)
-				return simde_mm_setr_ps(InnerGet<DEF, INDICES, 4>(values)...);
-			else if constexpr (CT::Same<T, double>)
-				return simde_mm_setr_pd(InnerGet<DEF, INDICES, 2>(values)...);
-			else LANGULUS_ASSERT("Can't SIMD::InnerSet 16-byte package");
-		}
-		else if constexpr (CHUNK == 32) {
-			if constexpr (CT::SignedInteger8<T>)
-				return simde_mm256_setr_epi8(InnerGet<DEF, INDICES, 32>(values)...);
-			else if constexpr (CT::UnsignedInteger8<T>)
-				return simde_mm256_setr_epi8(InnerGet<DEF, INDICES, 32>(reinterpret_cast<const int8_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger16<T>)
-				return simde_mm256_setr_epi16(InnerGet<DEF, INDICES, 16>(values)...);
-			else if constexpr (CT::UnsignedInteger16<T>)
-				return simde_mm256_setr_epi16(InnerGet<DEF, INDICES, 16>(reinterpret_cast<const int16_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger32<T>)
-				return simde_mm256_setr_epi32(InnerGet<DEF, INDICES, 8>(values)...);
-			else if constexpr (UnsignedInteger32<T>)
-				return simde_mm256_setr_epi32(InnerGet<DEF, INDICES, 8>(reinterpret_cast<const int32_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger64<T>)
-				return simde_mm256_setr_epi64x(InnerGet<DEF, INDICES, 4>(values)...);
-			else if constexpr (UnsignedInteger64<T>)
-				return simde_mm256_setr_epi64x(InnerGet<DEF, INDICES, 4>(reinterpret_cast<const int64_t(&)[S]>(values))...);
-			else if constexpr (CT::Same<T, float>)
-				return simde_mm256_setr_ps(InnerGet<DEF, INDICES, 8>(values)...);
-			else if constexpr (CT::Same<T, double>)
-				return simde_mm256_setr_pd(InnerGet<DEF, INDICES, 4>(values)...);
-			else LANGULUS_ASSERT("Can't SIMD::InnerSet 32-byte package");
-		}
-		else if constexpr (CHUNK == 64) {
-			if constexpr (CT::SignedInteger8<T>)
-				return simde_mm512_setr_epi8(InnerGet<DEF, INDICES, 64>(values)...);
-			else if constexpr (CT::UnsignedInteger8<T>)
-				return simde_mm512_setr_epi8(InnerGet<DEF, INDICES, 64>(reinterpret_cast<const int8_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger16<T>)
-				return simde_mm512_setr_epi16(InnerGet<DEF, INDICES, 32>(values)...);
-			else if constexpr (CT::UnsignedInteger16<T>)
-				return simde_mm512_setr_epi16(InnerGet<DEF, INDICES, 32>(reinterpret_cast<const int16_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger32<T>)
-				return simde_mm512_setr_epi32(InnerGet<DEF, INDICES, 16>(values)...);
-			else if constexpr (UnsignedInteger32<T>)
-				return simde_mm512_setr_epi32(InnerGet<DEF, INDICES, 16>(reinterpret_cast<const int32_t(&)[S]>(values))...);
-			else if constexpr (CT::SignedInteger64<T>)
-				return simde_mm512_setr_epi64(InnerGet<DEF, INDICES, 8>(values)...);
-			else if constexpr (UnsignedInteger64<T>)
-				return simde_mm512_setr_epi64(InnerGet<DEF, INDICES, 8>(reinterpret_cast<const int64_t(&)[S]>(values))...);
-			else if constexpr (CT::Same<T, float>)
-				return simde_mm512_setr_ps(InnerGet<DEF, INDICES, 16>(values)...);
-			else if constexpr (CT::Same<T, double>)
-				return simde_mm512_setr_pd(InnerGet<DEF, INDICES, 8>(values)...);
-			else LANGULUS_ASSERT("Can't SIMD::InnerSet 64-byte package");
-		}
-		else LANGULUS_ASSERT("Unsupported package size for SIMD::InnerSet");
+		#if LANGULUS_SIMD(128BIT)
+			if constexpr (CHUNK == 16) {
+				if constexpr (CT::SignedInteger8<T>)
+					return simde_mm_setr_epi8(InnerGet<DEF, INDICES, 16>(values)...);
+				else if constexpr (CT::UnsignedInteger8<T>)
+					return simde_mm_setr_epi8(InnerGet<DEF, INDICES, 16>(reinterpret_cast<const int8_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger16<T>)
+					return simde_mm_setr_epi16(InnerGet<DEF, INDICES, 8>(values)...);
+				else if constexpr (CT::UnsignedInteger16<T>)
+					return simde_mm_setr_epi16(InnerGet<DEF, INDICES, 8>(reinterpret_cast<const int16_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger32<T>)
+					return simde_mm_setr_epi32(InnerGet<DEF, INDICES, 4>(values)...);
+				else if constexpr (CT::UnsignedInteger32<T>)
+					return simde_mm_setr_epi32(InnerGet<DEF, INDICES, 4>(reinterpret_cast<const int32_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger64<T>)
+					return simde_mm_set_epi64x(InnerGet<DEF, INDICES, 2, true>(values)...);
+				else if constexpr (CT::UnsignedInteger64<T>)
+					return simde_mm_set_epi64x(InnerGet<DEF, INDICES, 2, true>(reinterpret_cast<const int64_t(&)[S]>(values))...);
+				else if constexpr (CT::Same<T, float>)
+					return simde_mm_setr_ps(InnerGet<DEF, INDICES, 4>(values)...);
+				else if constexpr (CT::Same<T, double>)
+					return simde_mm_setr_pd(InnerGet<DEF, INDICES, 2>(values)...);
+				else LANGULUS_ASSERT("Can't SIMD::InnerSet 16-byte package");
+			}
+			else
+		#endif
+
+		#if LANGULUS_SIMD(256BIT)
+			if constexpr (CHUNK == 32) {
+				if constexpr (CT::SignedInteger8<T>)
+					return simde_mm256_setr_epi8(InnerGet<DEF, INDICES, 32>(values)...);
+				else if constexpr (CT::UnsignedInteger8<T>)
+					return simde_mm256_setr_epi8(InnerGet<DEF, INDICES, 32>(reinterpret_cast<const int8_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger16<T>)
+					return simde_mm256_setr_epi16(InnerGet<DEF, INDICES, 16>(values)...);
+				else if constexpr (CT::UnsignedInteger16<T>)
+					return simde_mm256_setr_epi16(InnerGet<DEF, INDICES, 16>(reinterpret_cast<const int16_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger32<T>)
+					return simde_mm256_setr_epi32(InnerGet<DEF, INDICES, 8>(values)...);
+				else if constexpr (CT::UnsignedInteger32<T>)
+					return simde_mm256_setr_epi32(InnerGet<DEF, INDICES, 8>(reinterpret_cast<const int32_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger64<T>)
+					return simde_mm256_setr_epi64x(InnerGet<DEF, INDICES, 4>(values)...);
+				else if constexpr (CT::UnsignedInteger64<T>)
+					return simde_mm256_setr_epi64x(InnerGet<DEF, INDICES, 4>(reinterpret_cast<const int64_t(&)[S]>(values))...);
+				else if constexpr (CT::Same<T, float>)
+					return simde_mm256_setr_ps(InnerGet<DEF, INDICES, 8>(values)...);
+				else if constexpr (CT::Same<T, double>)
+					return simde_mm256_setr_pd(InnerGet<DEF, INDICES, 4>(values)...);
+				else LANGULUS_ASSERT("Can't SIMD::InnerSet 32-byte package");
+			}
+			else
+		#endif
+
+		#if LANGULUS_SIMD(512BIT)
+			if constexpr (CHUNK == 64) {
+				if constexpr (CT::SignedInteger8<T>)
+					return simde_mm512_setr_epi8(InnerGet<DEF, INDICES, 64>(values)...);
+				else if constexpr (CT::UnsignedInteger8<T>)
+					return simde_mm512_setr_epi8(InnerGet<DEF, INDICES, 64>(reinterpret_cast<const int8_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger16<T>)
+					return simde_mm512_setr_epi16(InnerGet<DEF, INDICES, 32>(values)...);
+				else if constexpr (CT::UnsignedInteger16<T>)
+					return simde_mm512_setr_epi16(InnerGet<DEF, INDICES, 32>(reinterpret_cast<const int16_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger32<T>)
+					return simde_mm512_setr_epi32(InnerGet<DEF, INDICES, 16>(values)...);
+				else if constexpr (CT::UnsignedInteger32<T>)
+					return simde_mm512_setr_epi32(InnerGet<DEF, INDICES, 16>(reinterpret_cast<const int32_t(&)[S]>(values))...);
+				else if constexpr (CT::SignedInteger64<T>)
+					return simde_mm512_setr_epi64(InnerGet<DEF, INDICES, 8>(values)...);
+				else if constexpr (CT::UnsignedInteger64<T>)
+					return simde_mm512_setr_epi64(InnerGet<DEF, INDICES, 8>(reinterpret_cast<const int64_t(&)[S]>(values))...);
+				else if constexpr (CT::Same<T, float>)
+					return simde_mm512_setr_ps(InnerGet<DEF, INDICES, 16>(values)...);
+				else if constexpr (CT::Same<T, double>)
+					return simde_mm512_setr_pd(InnerGet<DEF, INDICES, 8>(values)...);
+				else LANGULUS_ASSERT("Can't SIMD::InnerSet 64-byte package");
+			}
+			else
+		#endif
+
+		LANGULUS_ASSERT("Unsupported package size for SIMD::InnerSet");
 	}
 
 	/// Construct a register manually														
@@ -133,7 +145,7 @@ namespace Langulus::SIMD
 			return CT::Inner::NotSupported{};
 		else {
 			constexpr auto MaxS = CHUNK / sizeof(Decay<T>);
-			static_assert((Dense<T> && MaxS > S) || (Sparse<T> && MaxS >= S),
+			static_assert((CT::Dense<T> && MaxS > S) || (CT::Sparse<T> && MaxS >= S),
 				"S should be smaller (or equal if sparse) than MaxS - use load otherwise");
 			return InnerSet<DEF, CHUNK>(std::make_integer_sequence<Count, MaxS>(), values);
 		}

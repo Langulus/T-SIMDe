@@ -12,7 +12,7 @@
 namespace Langulus::SIMD
 {
 		
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto MaxInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
@@ -24,7 +24,7 @@ namespace Langulus::SIMD
 	///	@param lhs - the left-hand-side array 											
 	///	@param rhs - the right-hand-side array 										
 	///	@return the maxed values															
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto MaxInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::SignedInteger8<T>)
@@ -37,7 +37,7 @@ namespace Langulus::SIMD
 				return simde_mm_max_epu16(lhs, rhs);
 			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm_max_epi32(lhs, rhs);
-			else if constexpr (UnsignedInteger32<T>)
+			else if constexpr (CT::UnsignedInteger32<T>)
 				return simde_mm_max_epu32(lhs, rhs);
 			else if constexpr (CT::SignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
@@ -46,7 +46,7 @@ namespace Langulus::SIMD
 					return CT::Inner::NotSupported{};
 				#endif
 			}
-			else if constexpr (UnsignedInteger64<T>) {
+			else if constexpr (CT::UnsignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return simde_mm_max_epu64(lhs, rhs);
 				#else
@@ -70,7 +70,7 @@ namespace Langulus::SIMD
 				return simde_mm256_max_epu16(lhs, rhs);
 			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm256_max_epi32(lhs, rhs);
-			else if constexpr (UnsignedInteger32<T>)
+			else if constexpr (CT::UnsignedInteger32<T>)
 				return simde_mm256_max_epu32(lhs, rhs);
 			else if constexpr (CT::SignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
@@ -79,7 +79,7 @@ namespace Langulus::SIMD
 					return CT::Inner::NotSupported{};
 				#endif
 			}
-			else if constexpr (UnsignedInteger64<T>) {
+			else if constexpr (CT::UnsignedInteger64<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm_max_epu64(lhs, rhs);
 				#else
@@ -103,11 +103,11 @@ namespace Langulus::SIMD
 				return simde_mm512_max_epu16(lhs, rhs);
 			else if constexpr (CT::SignedInteger32<T>)
 				return simde_mm512_max_epi32(lhs, rhs);
-			else if constexpr (UnsignedInteger32<T>)
+			else if constexpr (CT::UnsignedInteger32<T>)
 				return simde_mm512_max_epu32(lhs, rhs);
 			else if constexpr (CT::SignedInteger64<T>)
 				return simde_mm512_max_epi64(lhs, rhs);
-			else if constexpr (UnsignedInteger64<T>)
+			else if constexpr (CT::UnsignedInteger64<T>)
 				return simde_mm512_max_epu64(lhs, rhs);
 			else if constexpr (CT::Same<T, float>)
 				return simde_mm512_max_ps(lhs, rhs);
@@ -119,11 +119,11 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Number LHS, CT::Number RHS>
+	template<class LHS, class RHS>
 	NOD() auto Max(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
-		constexpr auto S = ResultSize<LHS, RHS>();
+		constexpr auto S = OverlapCount<LHS, RHS>();
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
 			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
@@ -136,14 +136,14 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Number LHS, CT::Number RHS, CT::Number OUT>
+	template<class LHS, class RHS, class OUT>
 	void Max(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = Max<LHS, RHS>(lhs, rhs);
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
-			SIMD::Store(result, output);
+			Store(result, output);
 		}
-		else if constexpr (CT::Number<decltype(result)>) {
+		else if constexpr (ExtentOf<OUT> == 1) {
 			// Extract from number														
 			output = result;
 		}
@@ -155,7 +155,7 @@ namespace Langulus::SIMD
 	}
 
 	///																								
-	template<CT::Vector WRAPPER, CT::Number LHS, CT::Number RHS>
+	template<CT::Vector WRAPPER, class LHS, class RHS>
 	NOD() WRAPPER MaxWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Max<LHS, RHS>(lhs, rhs, result.mArray);

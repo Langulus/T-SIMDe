@@ -74,48 +74,47 @@ namespace Langulus::SIMD
 	
 	/// Attempt register encapsulation of LHS and RHS arrays							
 	/// Check if result of opSIMD is supported and return it, otherwise			
-	/// fallback to opFALL and return conventionally									
+	/// fallback to opFALL and calculate conventionally								
 	///	@tparam DEF - default value to fill empty register regions				
 	///					  useful against division-by-zero cases						
-	///	@tparam S1 - size of LHS array (deducible)									
-	///	@tparam S2 - size of RHS array (deducible)									
+	///	@tparam REGISTER - the register to use for the SIMD operation			
+	///	@tparam LOSSLESS - the type of data to use for the fallback				
 	///	@tparam LHS - left number type (deducible)									
 	///	@tparam RHS - right number type (deducible)									
-	///	@tparam OPSIMD - the SIMD operation to invoke (deducible)				
-	///	@tparam OPFALL - the fallback operation to invoke (deducible)			
+	///	@tparam FSIMD - the SIMD operation to invoke (deducible)					
+	///	@tparam FFALL - the fallback operation to invoke (deducible)			
 	///	@param lhs - left argument															
 	///	@param rhs - right argument														
 	///	@param opSIMD - the function to invoke											
 	///	@param opFALL - the function to invoke											
 	///	@return the result (either std::array, number, or register)				
-	template<int DEF, class REGISTER, class LOSSLESS, CT::Number LHS, CT::Number RHS, class FSIMD, class FFALL>
-	NOD() auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL)
-	requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
-		using OUTSIMD = ::std::invoke_result_t<FSIMD, REGISTER, REGISTER>;
-		constexpr auto S = ResultSize<LHS, RHS>();
-		if constexpr (S < 2 || IsNotSupported<REGISTER> || IsNotSupported<OUTSIMD>) {
+	template<int DEF, class REGISTER, class LOSSLESS, class LHS, class RHS, class FSIMD, class FFALL>
+	NOD() auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
+		using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
+		constexpr auto S = OverlapCount<LHS, RHS>();
+		if constexpr (S < 2 || CT::NotSupported<REGISTER> || CT::NotSupported<OUTSIMD>) {
 			// Call the fallback routine if unsupported or size 1				
 			return Fallback<LOSSLESS>(lhs, rhs, Forward<decltype(opFALL)>(opFALL));
 		}
 		else if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
 			// Both LHS and RHS are arrays, so wrap in registers				
 			return opSIMD(
-				SIMD::Convert<DEF, LOSSLESS>(reinterpret_cast<const Decay<LHS>(&)[S]>(lhs)),
-				SIMD::Convert<DEF, LOSSLESS>(reinterpret_cast<const Decay<RHS>(&)[S]>(rhs))
+				Convert<DEF, LOSSLESS>(reinterpret_cast<const Decay<LHS>(&)[S]>(lhs)),
+				Convert<DEF, LOSSLESS>(reinterpret_cast<const Decay<RHS>(&)[S]>(rhs))
 			);
 		}
 		else if constexpr (CT::Array<LHS>) {
 			// LHS is array, RHS is scalar											
 			return opSIMD(
-				SIMD::Convert<DEF, LOSSLESS>(lhs),
-				SIMD::Fill<REGISTER>(static_cast<LOSSLESS>(rhs))
+				Convert<DEF, LOSSLESS>(lhs),
+				Fill<REGISTER>(static_cast<LOSSLESS>(rhs))
 			);
 		}
 		else if constexpr (CT::Array<RHS>) {
 			// LHS is scalar, RHS is array											
 			return opSIMD(
-				SIMD::Fill<REGISTER>(static_cast<LOSSLESS>(lhs)),
-				SIMD::Convert<DEF, LOSSLESS>(rhs)
+				Fill<REGISTER>(static_cast<LOSSLESS>(lhs)),
+				Convert<DEF, LOSSLESS>(rhs)
 			);
 		}
 		else {

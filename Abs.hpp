@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 	///	@tparam REGISTER - the register type (deducible)							
 	///	@param v - the array 																
 	///	@return the absolute values														
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto InnerAbs(const REGISTER& v) noexcept {
 		static_assert(Signed<T>, 
 			"SIMD::InnerAbs is suboptimal and pointless for unsigned values, avoid calling it on such");

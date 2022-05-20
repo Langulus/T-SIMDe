@@ -18,7 +18,7 @@ namespace Langulus::SIMD
 	///	@tparam REGISTER - the register type (deducible)							
 	///	@param value - the array 															
 	///	@return the floored values															
-	template<CT::Number T, Count S, CT::TSIMD REGISTER>
+	template<class T, Count S, CT::TSIMD REGISTER>
 	auto InnerRound(const REGISTER& value) noexcept {
 		static_assert(CT::Real<T>,
 			"SIMD::InnerFloor is suboptimal for unreal numbers, avoid calling it on such");
@@ -47,7 +47,7 @@ namespace Langulus::SIMD
 		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerRound");
 	}
 
-	template<CT::Number T, Count S>
+	template<class T, Count S>
 	auto Round(const T(&value)[S]) noexcept {
 		return InnerRound<T, S>(Load<0>(value));
 	}

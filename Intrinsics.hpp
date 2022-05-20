@@ -195,7 +195,6 @@ namespace Langulus::CT
 	/// Vector concept																			
 	template<class T>
 	concept Vector = requires (T a) {
-		Number<decltype(a.mComponents)>;
 		Array<decltype(a.mComponents)>;
 	};
 
@@ -429,8 +428,11 @@ namespace Langulus::SIMD
 		#endif
 	}
 
-	template<class LOSSLESS, class FFALL>
-	concept Invocable = ::std::invocable<FFALL, LOSSLESS, LOSSLESS>;
+	template<class T, class F>
+	concept Invocable = ::std::invocable<F, T, T>;
+
+	template<class T, class F>
+	using InvocableResult = ::std::invoke_result_t<F, T, T>;
 
 	/// Fallback OP on a single pair of dense numbers									
 	/// It converts LHS and RHS to the most lossless of the two						
@@ -441,9 +443,9 @@ namespace Langulus::SIMD
 	///	@param rhs - right argument														
 	///	@param op - the fallback function to invoke									
 	///	@return the resulting number or std::array									
-	template<class LOSSLESS, CT::Number LHS, CT::Number RHS, class FFALL>
+	template<class LOSSLESS, class LHS, class RHS, class FFALL>
 	NOD() auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
-		using OUT = ::std::invoke_result_t<FFALL, LOSSLESS, LOSSLESS>;
+		using OUT = InvocableResult<FFALL, LOSSLESS>;
 		if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
 			// Array OP Array																
 			constexpr auto S = ((ExtentOf<LHS>) < (ExtentOf<RHS>)) ? ExtentOf<LHS> : ExtentOf<RHS>;
@@ -495,11 +497,12 @@ namespace Langulus::SIMD
 	}
 
 	/// Constrexpr function to calculate required elements			 				
+	/// LHS and RHS can be arrays, and it considers their extents					
 	///	@tparam LHS - left number type (deducible)									
 	///	@tparam RHS - right number type (deducible)									
 	///	@return the overlapping count of LHS and RHS									
-	template<CT::Number LHS, CT::Number RHS>
-	NOD() constexpr Count ResultCount() noexcept {
+	template<class LHS, class RHS>
+	NOD() constexpr Count OverlapCount() noexcept {
 		if constexpr (CT::Array<LHS> && CT::Array<RHS>)
 			// Array OP Array																
 			return ExtentOf<LHS> < ExtentOf<RHS> ? ExtentOf<LHS> : ExtentOf<RHS>;

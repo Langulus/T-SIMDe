@@ -21,9 +21,9 @@ namespace Langulus::SIMD
 	///	@tparam T - type of data to use for filling									
 	///	@param value - the value to use for filling									
 	///	@return the filled register														
-	template<CT::TSIMD REGISTER, CT::Number T>
+	template<CT::TSIMD REGISTER, class T>
 	NOD() decltype(auto) Fill(const T& valueOrig) noexcept {
-		auto& value = pcVal(valueOrig);
+		auto& value = MakeDense(valueOrig);
 		if constexpr (CT::Same<REGISTER,T>)
 			return value;
 		else if constexpr (CT::Same<REGISTER,simde__m128i>) {
