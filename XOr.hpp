@@ -9,6 +9,8 @@
 #include "Fill.hpp"
 #include "Convert.hpp"
 
+#include "IgnoreWarningsPush.inl"
+
 namespace Langulus::SIMD
 {
 		
@@ -43,7 +45,8 @@ namespace Langulus::SIMD
 			return simde_mm512_xor_ps(lhs, rhs);
 		else if constexpr (CT::Same<REGISTER,simde__m512d>)
 			return simde_mm512_xor_pd(lhs, rhs);
-		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerXOr");
+		else
+			LANGULUS_ASSERT("Unsupported type for SIMD::InnerXOr");
 	}
 
 	///																								
@@ -91,3 +94,5 @@ namespace Langulus::SIMD
 	}
 
 } // namespace Langulus::SIMD
+
+#include "IgnoreWarningsPop.inl"

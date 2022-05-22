@@ -20,7 +20,7 @@ namespace Langulus::SIMD
 	///	@return the absolute values														
 	template<class T, Count S, CT::TSIMD REGISTER>
 	auto InnerAbs(const REGISTER& v) noexcept {
-		static_assert(Signed<T>, 
+		static_assert(CT::Signed<T>, 
 			"SIMD::InnerAbs is suboptimal and pointless for unsigned values, avoid calling it on such");
 
 		#if LANGULUS_SIMD(128BIT)
@@ -33,7 +33,7 @@ namespace Langulus::SIMD
 					return simde_mm_abs_epi32(v);
 				else if constexpr (CT::SignedInteger64<T>)
 					return simde_mm_abs_epi64(v);
-				else if constexpr (Same < T, float> )
+				else if constexpr (CT::Same<T, float>)
 					return simde_mm_andnot_ps(simde_mm_set1_ps(-0.0F), v);
 				else if constexpr (CT::Same<T, double>)
 					return simde_mm_andnot_pd(simde_mm_set1_pd(-0.0F), v);

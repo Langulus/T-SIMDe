@@ -180,6 +180,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_ALIGN() 16
 #endif
 
+#include "IgnoreWarningsPush.inl"
 
 namespace Langulus::CT
 {
@@ -518,3 +519,5 @@ namespace Langulus::SIMD
 	}
 
 } // namespace Langulus::SIMD
+
+#include "IgnoreWarningsPop.inl"

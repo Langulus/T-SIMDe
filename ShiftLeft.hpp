@@ -72,13 +72,14 @@ namespace Langulus::SIMD
 	template<CT::Vector WRAPPER, class LHS, class RHS>
 	NOD() WRAPPER ShiftLeftWrap(LHS& lhs, RHS& rhs) noexcept {
 		const auto result = ShiftLeft<LHS, RHS>(lhs, rhs);
+
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
 			typename WRAPPER::MemberType output[WRAPPER::MemberCount];
 			Store(result, output);
 			return WRAPPER {result};
 		}
-		else if constexpr (Number<decltype(result)>) {
+		else if constexpr (CT::Number<decltype(result)>) {
 			// Extract from std::array													
 			return WRAPPER {result};
 		}

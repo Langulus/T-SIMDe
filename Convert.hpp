@@ -8,6 +8,8 @@
 #pragma once
 #include "Load.hpp"
 
+#include "IgnoreWarningsPush.inl"
+
 #if LANGULUS_SIMD(128BIT)
 	#include "ConvertFrom128.hpp"
 #endif
@@ -18,11 +20,6 @@
 
 #if LANGULUS_SIMD(512BIT)
 	#include "ConvertFrom512.hpp"
-#endif
-
-#if LANGULUS_COMPILER(GCC)
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
 
 namespace Langulus::SIMD
@@ -130,6 +127,4 @@ namespace Langulus::SIMD
 	
 } // namespace Langulus::SIMD
 
-#if LANGULUS_COMPILER(GCC)
-	#pragma GCC diagnostic pop
-#endif
+#include "IgnoreWarningsPop.inl"
