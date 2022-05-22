@@ -433,6 +433,27 @@ namespace Langulus::SIMD
 	using InvocableResult = ::std::invoke_result_t<F, T, T>;
 
 
+	/// Constrexpr function to calculate required elements			 				
+	/// LHS and RHS can be arrays, and it considers their extents					
+	///	@tparam LHS - left number type (deducible)									
+	///	@tparam RHS - right number type (deducible)									
+	///	@return the overlapping count of LHS and RHS									
+	template<class LHS, class RHS>
+	NOD() constexpr Count OverlapCount() noexcept {
+		if constexpr (CT::Array<LHS> && CT::Array<RHS>)
+			// Array OP Array																
+			return ExtentOf<LHS> < ExtentOf<RHS> ? ExtentOf<LHS> : ExtentOf<RHS>;
+		else if constexpr (CT::Array<LHS>)
+			// Array OP Scalar															
+			return ExtentOf<LHS>;
+		else if constexpr (CT::Array<RHS>)
+			// Scalar OP Array															
+			return ExtentOf<RHS>;
+		else
+			// Scalar OP Scalar															
+			return 1;
+	}
+
 	/// Fallback OP on a single pair of dense numbers									
 	/// It converts LHS and RHS to the most lossless of the two						
 	///	@tparam LHS - left number type (deducible)									
@@ -494,27 +515,6 @@ namespace Langulus::SIMD
 				static_cast<LOSSLESS>(MakeDense(rhs))
 			);
 		}
-	}
-
-	/// Constrexpr function to calculate required elements			 				
-	/// LHS and RHS can be arrays, and it considers their extents					
-	///	@tparam LHS - left number type (deducible)									
-	///	@tparam RHS - right number type (deducible)									
-	///	@return the overlapping count of LHS and RHS									
-	template<class LHS, class RHS>
-	NOD() constexpr Count OverlapCount() noexcept {
-		if constexpr (CT::Array<LHS> && CT::Array<RHS>)
-			// Array OP Array																
-			return ExtentOf<LHS> < ExtentOf<RHS> ? ExtentOf<LHS> : ExtentOf<RHS>;
-		else if constexpr (CT::Array<LHS>)
-			// Array OP Scalar															
-			return ExtentOf<LHS>;
-		else if constexpr (CT::Array<RHS>)
-			// Scalar OP Array															
-			return ExtentOf<RHS>;
-		else
-			// Scalar OP Scalar															
-			return 1;
 	}
 
 } // namespace Langulus::SIMD
