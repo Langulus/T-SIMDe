@@ -212,13 +212,13 @@ namespace Langulus::SIMD
 			else if constexpr (CT::SignedInteger16<FT> && S <= 4) {
 				// pci16[4] -> float[4]													
 				auto 
-				vi32 = simde_mm_unpacklo_epi16(vi32, simde_mm_setzero_si128());
+				vi32 = simde_mm_unpacklo_epi16(v, simde_mm_setzero_si128());
 				return simde_mm_cvtepi32_ps(vi32);											
 			}
 			else if constexpr (CT::UnsignedInteger16<FT> && S <= 4) {
 				// pcu16[4] -> float[4]													
 				auto 
-				cvt = simde_mm_unpacklo_epi16(cvt, simde_mm_setzero_si128());
+				cvt = simde_mm_unpacklo_epi16(v, simde_mm_setzero_si128());
 				return _mm_cvtepu32_ps(cvt);
 			}
 			else if constexpr (CT::SignedInteger32<FT> && S <= 4) {
@@ -260,13 +260,13 @@ namespace Langulus::SIMD
 			else if constexpr (CT::SignedInteger16<FT> && S <= 2) {
 				// pci16[2] -> double[2]												
 				auto 
-				vi32 = simde_mm_unpacklo_epi16(vi32, simde_mm_setzero_si128());
+				vi32 = simde_mm_unpacklo_epi16(v, simde_mm_setzero_si128());
 				return simde_mm_cvtepi32_pd(vi32);											
 			}
 			else if constexpr (CT::UnsignedInteger16<FT> && S <= 2) {
 				// pcu16[2] -> double[2]												
 				auto 
-				vi32 = simde_mm_unpacklo_epi16(vi32, simde_mm_setzero_si128());
+				vi32 = simde_mm_unpacklo_epi16(v, simde_mm_setzero_si128());
 				return _mm_cvtepu32_pd(vi32);											
 			}
 			else if constexpr (CT::SignedInteger32<FT> && S <= 2) {
