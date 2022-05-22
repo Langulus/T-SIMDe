@@ -23,28 +23,40 @@ namespace Langulus::SIMD
 		static_assert(CT::Real<T>,
 			"SIMD::InnerFloor is suboptimal and pointless for whole numbers, avoid calling it on such");
 
-		if constexpr (CT::SIMD128<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
-				return simde_mm_ceil_ps(value);
-			else if constexpr (CT::Same<T, double>)
-				return simde_mm_ceil_pd(value);
-			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 16-byte package");
-		}
-		else if constexpr (CT::SIMD256<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
-				return simde_mm256_ceil_ps(value);
-			else if constexpr (CT::Same<T, double>)
-				return simde_mm256_ceil_pd(value);
-			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 32-byte package");
-		}
-		else if constexpr (CT::SIMD512<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
-				return simde_mm512_ceil_ps(value);
-			else if constexpr (CT::Same<T, double>)
-				return simde_mm512_ceil_pd(value);
-			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 64-byte package");
-		}
-		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil");
+		#if LANGULUS_SIMD(128BIT)
+			if constexpr (CT::SIMD128<REGISTER>) {
+				if constexpr (CT::Same<T, float>)
+					return simde_mm_ceil_ps(value);
+				else if constexpr (CT::Same<T, double>)
+					return simde_mm_ceil_pd(value);
+				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 16-byte package");
+			}
+			else
+		#endif
+
+		#if LANGULUS_SIMD(256BIT)
+			if constexpr (CT::SIMD256<REGISTER>) {
+				if constexpr (CT::Same<T, float>)
+					return simde_mm256_ceil_ps(value);
+				else if constexpr (CT::Same<T, double>)
+					return simde_mm256_ceil_pd(value);
+				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 32-byte package");
+			}
+			else
+		#endif
+
+		#if LANGULUS_SIMD(512BIT)
+			if constexpr (CT::SIMD512<REGISTER>) {
+				if constexpr (CT::Same<T, float>)
+					return simde_mm512_ceil_ps(value);
+				else if constexpr (CT::Same<T, double>)
+					return simde_mm512_ceil_pd(value);
+				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 64-byte package");
+			}
+			else
+		#endif
+
+		LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil");
 	}
 
 	template<class T, Count S>

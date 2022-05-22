@@ -71,7 +71,8 @@ namespace Langulus::SIMD
 					return simde_mm_setr_ps(InnerGet<DEF, INDICES, 4>(values)...);
 				else if constexpr (CT::Same<T, double>)
 					return simde_mm_setr_pd(InnerGet<DEF, INDICES, 2>(values)...);
-				else LANGULUS_ASSERT("Can't SIMD::InnerSet 16-byte package");
+				else
+					LANGULUS_ASSERT("Can't SIMD::InnerSet 16-byte package");
 			}
 			else
 		#endif
@@ -98,7 +99,8 @@ namespace Langulus::SIMD
 					return simde_mm256_setr_ps(InnerGet<DEF, INDICES, 8>(values)...);
 				else if constexpr (CT::Same<T, double>)
 					return simde_mm256_setr_pd(InnerGet<DEF, INDICES, 4>(values)...);
-				else LANGULUS_ASSERT("Can't SIMD::InnerSet 32-byte package");
+				else
+					LANGULUS_ASSERT("Can't SIMD::InnerSet 32-byte package");
 			}
 			else
 		#endif
@@ -125,7 +127,8 @@ namespace Langulus::SIMD
 					return simde_mm512_setr_ps(InnerGet<DEF, INDICES, 16>(values)...);
 				else if constexpr (CT::Same<T, double>)
 					return simde_mm512_setr_pd(InnerGet<DEF, INDICES, 8>(values)...);
-				else LANGULUS_ASSERT("Can't SIMD::InnerSet 64-byte package");
+				else
+					LANGULUS_ASSERT("Can't SIMD::InnerSet 64-byte package");
 			}
 			else
 		#endif
@@ -141,13 +144,17 @@ namespace Langulus::SIMD
 	///	@return the register																	
 	template<int DEF, Size CHUNK, class T, Count S>
 	auto Set(const T(&values)[S]) noexcept {
-		if constexpr (S < 2)
-			return CT::Inner::NotSupported{};
+		if constexpr (S < 2) {
+			// No point in storing a single value in a large register		
+			// If this is reached, then the library did not choose the		
+			// optimal route for your operation										
+			return CT::Inner::NotSupported {};
+		}
 		else {
 			constexpr auto MaxS = CHUNK / sizeof(Decay<T>);
 			static_assert((CT::Dense<T> && MaxS > S) || (CT::Sparse<T> && MaxS >= S),
 				"S should be smaller (or equal if sparse) than MaxS - use load otherwise");
-			return InnerSet<DEF, CHUNK>(std::make_integer_sequence<Count, MaxS>(), values);
+			return InnerSet<DEF, CHUNK>(::std::make_integer_sequence<Count, MaxS>(), values);
 		}
 	}
 

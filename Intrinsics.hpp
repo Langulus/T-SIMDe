@@ -8,10 +8,8 @@
 #pragma once
 #include <immintrin.h>
 #include <Langulus.Core.hpp>
+#include <array>
 
-//#define SIMDE_X86_SSE_NO_NATIVE
-
-//#include <simde/x86/avx512.h>
 #include <simde/x86/avx2.h>
 #include <simde/x86/avx.h>
 #include <simde/x86/sse4.2.h>
@@ -264,7 +262,7 @@ namespace Langulus::SIMD
 
 	/// Got these from:																			
 	/// https://stackoverflow.com/questions/41144668									
-	simde__m128d uint64_to_double_full(simde__m128i x) {
+	inline simde__m128d uint64_to_double_full(simde__m128i x) {
 		simde__m128i xH = simde_mm_srli_epi64(x, 32);
 		xH = simde_mm_or_si128(xH, simde_mm_castpd_si128(simde_mm_set1_pd(19342813113834066795298816.)));          //  2^84
 		simde__m128i xL = simde_mm_blend_epi16(x, simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)), 0xcc);   //  2^52
@@ -272,7 +270,7 @@ namespace Langulus::SIMD
 		return simde_mm_add_pd(f, simde_mm_castsi128_pd(xL));
 	}
 
-	simde__m128d int64_to_double_full(simde__m128i x) {
+	inline simde__m128d int64_to_double_full(simde__m128i x) {
 		simde__m128i xH = simde_mm_srai_epi32(x, 16);
 		xH = simde_mm_blend_epi16(xH, simde_mm_setzero_si128(), 0x33);
 		xH = simde_mm_add_epi64(xH, simde_mm_castpd_si128(simde_mm_set1_pd(442721857769029238784.)));              //  3*2^67
@@ -282,19 +280,19 @@ namespace Langulus::SIMD
 	}
 
 	/// Only works for inputs in the range: [-2^51, 2^51]								
-	simde__m128d int64_to_double(simde__m128i x) {
+	inline simde__m128d int64_to_double(simde__m128i x) {
 		x = simde_mm_add_epi64(x, simde_mm_castpd_si128(simde_mm_set1_pd(0x0018000000000000)));
 		return simde_mm_sub_pd(simde_mm_castsi128_pd(x), simde_mm_set1_pd(0x0018000000000000));
 	}
 
 	/// Only works for inputs in the range: [0, 2^52)									
-	simde__m128d uint64_to_double(simde__m128i x) {
-		x = simde_mm_or_si128(x, _mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)));
-		return simde_mm_sub_pd(_mm_castsi128_pd(x), simde_mm_set1_pd(0x0010000000000000));
+	inline simde__m128d uint64_to_double(simde__m128i x) {
+		x = simde_mm_or_si128(x, simde_mm_castpd_si128(simde_mm_set1_pd(0x0010000000000000)));
+		return simde_mm_sub_pd(simde_mm_castsi128_pd(x), simde_mm_set1_pd(0x0010000000000000));
 	}
 
 	/// Only works for inputs in the range: [-2^51, 2^51]								
-	simde__m128i double_to_int64(simde__m128d x) {
+	inline simde__m128i double_to_int64(simde__m128d x) {
 		x = simde_mm_add_pd(x, simde_mm_set1_pd(0x0018000000000000));
 		return simde_mm_sub_epi64(
 			simde_mm_castpd_si128(x),
@@ -303,7 +301,7 @@ namespace Langulus::SIMD
 	}
 
 	/// Only works for inputs in the range: [0, 2^52)									
-	simde__m128i double_to_uint64(simde__m128d x) {
+	inline simde__m128i double_to_uint64(simde__m128d x) {
 		x = simde_mm_add_pd(x, simde_mm_set1_pd(0x0010000000000000));
 		return simde_mm_xor_si128(
 			simde_mm_castpd_si128(x),
@@ -428,11 +426,12 @@ namespace Langulus::SIMD
 		#endif
 	}
 
-	template<class T, class F>
+	template<class F, class T>
 	concept Invocable = ::std::invocable<F, T, T>;
 
-	template<class T, class F>
+	template<class F, class T>
 	using InvocableResult = ::std::invoke_result_t<F, T, T>;
+
 
 	/// Fallback OP on a single pair of dense numbers									
 	/// It converts LHS and RHS to the most lossless of the two						
@@ -446,12 +445,13 @@ namespace Langulus::SIMD
 	template<class LOSSLESS, class LHS, class RHS, class FFALL>
 	NOD() auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
 		using OUT = InvocableResult<FFALL, LOSSLESS>;
+
 		if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
 			// Array OP Array																
-			constexpr auto S = ((ExtentOf<LHS>) < (ExtentOf<RHS>)) ? ExtentOf<LHS> : ExtentOf<RHS>;
+			constexpr auto S = OverlapCount<LHS, RHS>();
 			::std::array<OUT, S> output;
 			for (Count i = 0; i < S; ++i)
-				output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], Forward<decltype(op)>(op));
+				output[i] = Fallback<LOSSLESS>(lhs[i], rhs[i], Move(op));
 			return output;
 		}
 		else if constexpr (CT::Array<LHS>) {
@@ -461,12 +461,12 @@ namespace Langulus::SIMD
 			if constexpr (CT::Bool<OUT>) {
 				auto& same_rhs = MakeDense(rhs);
 				for (Count i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Forward<decltype(op)>(op));
+					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
 			}
 			else {
 				const auto same_rhs = static_cast<LOSSLESS>(MakeDense(rhs));
 				for (Count i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Forward<decltype(op)>(op));
+					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
 			}
 			return output;
 		}
@@ -477,12 +477,12 @@ namespace Langulus::SIMD
 			if constexpr (CT::Bool<OUT>) {
 				auto& same_lhs = MakeDense(lhs);
 				for (Count i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Forward<decltype(op)>(op));
+					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
 			}
 			else {
-				const auto same_lhs = static_cast<LOSSLESS>(pcVal(lhs));
+				const auto same_lhs = static_cast<LOSSLESS>(MakeDense(lhs));
 				for (Count i = 0; i < S; ++i)
-					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Forward<decltype(op)>(op));
+					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
 			}
 			return output;
 		}

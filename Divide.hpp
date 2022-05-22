@@ -26,6 +26,7 @@ namespace Langulus::SIMD
 	///	@return the divided elements as a register									
 	template<class T, Count S, CT::TSIMD REGISTER>
 	auto DivideInner(const REGISTER& lhs, const REGISTER& rhs) {
+	#if LANGULUS_SIMD(128BIT)
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::UnsignedInteger8<T>) {
 				if (simde_mm_movemask_epi8(simde_mm_cmpeq_epi8(rhs, simde_mm_setzero_si128())))
@@ -79,7 +80,11 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerDiv of 16-byte package");
 		}
-		else if constexpr (CT::SIMD256<REGISTER>) {
+		else
+	#endif
+
+	#if LANGULUS_SIMD(256BIT)
+		if constexpr (CT::SIMD256<REGISTER>) {
 			if constexpr (CT::UnsignedInteger8<T>) {
 				if (simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi8(rhs, simde_mm256_setzero_si256())))
 					throw Except::DivisionByZero();
@@ -132,7 +137,11 @@ namespace Langulus::SIMD
 			}
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerDiv of 32-byte package");
 		}
-		else if constexpr (CT::SIMD512<REGISTER>) {
+		else
+	#endif
+
+	#if LANGULUS_SIMD(512BIT)
+		if constexpr (CT::SIMD512<REGISTER>) {
 			if constexpr (CT::UnsignedInteger8<T>) {
 				if (simde_mm512_cmpeq_epi8(rhs, simde_mm512_setzero_si512()))
 					throw Except::DivisionByZero();
@@ -183,9 +192,13 @@ namespace Langulus::SIMD
 					throw Except::DivisionByZero();
 				return simde_mm512_div_pd(lhs, rhs);
 			}
-			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerDiv of 64-byte package");
+			else
+			LANGULUS_ASSERT("Unsupported type for SIMD::InnerDiv of 64-byte package");
 		}
-		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerDiv");
+		else
+	#endif
+
+		LANGULUS_ASSERT("Unsupported type for SIMD::InnerDiv");
 	}
 
 	///																								
@@ -194,6 +207,7 @@ namespace Langulus::SIMD
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
+
 		return AttemptSIMD<1, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
 			[](const REGISTER& lhs, const REGISTER& rhs) {
@@ -201,7 +215,7 @@ namespace Langulus::SIMD
 			},
 			[](const LOSSLESS& lhs, const LOSSLESS& rhs) {
 				if (rhs == 0)
-					throw Except::DivisionByZero();
+					Throw<Except::DivisionByZero>();
 				return lhs / rhs;
 			}
 		);
@@ -209,7 +223,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS, class OUT>
-	void Divide(LHS& lhs, RHS& rhs, OUT& output) noexcept {
+	void Divide(LHS& lhs, RHS& rhs, OUT& output) {
 		const auto result = Divide<LHS, RHS>(lhs, rhs);
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
@@ -228,7 +242,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	NOD() WRAPPER DivideWrap(LHS& lhs, RHS& rhs) noexcept {
+	NOD() WRAPPER DivideWrap(LHS& lhs, RHS& rhs) {
 		WRAPPER result;
 		Divide<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;

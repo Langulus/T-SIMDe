@@ -45,6 +45,7 @@ namespace Langulus::SIMD
 			return CT::Inner::NotSupported{};
 		else if constexpr (CT::Same<TT, FT>)
 			return loaded;
+
 		#if LANGULUS_SIMD(128BIT)
 			else if constexpr (CT::Same<FROM, simde__m128>)
 				return ConvertFrom128<TT, S, FT, TO>(loaded);
@@ -53,6 +54,7 @@ namespace Langulus::SIMD
 			else if constexpr (CT::Same<FROM, simde__m128i>)
 				return ConvertFrom128i<TT, S, FT, TO>(loaded);
 		#endif
+
 		#if LANGULUS_SIMD(256BIT)
 			else if constexpr (CT::Same<FROM, simde__m256>)
 				return ConvertFrom256<TT, S, FT, TO>(loaded);
@@ -61,6 +63,7 @@ namespace Langulus::SIMD
 			else if constexpr (CT::Same<FROM, simde__m256i>)
 				return ConvertFrom256i<TT, S, FT, TO>(loaded);
 		#endif
+
 		#if LANGULUS_SIMD(512BIT)
 			else if constexpr (CT::Same<FROM, simde__m512>)
 				return ConvertFrom512<TT, S, FT, TO>(loaded);
@@ -69,6 +72,7 @@ namespace Langulus::SIMD
 			else if constexpr (CT::Same<FROM, simde__m512i>)
 				return ConvertFrom512i<TT, S, FT, TO>(loaded);
 		#endif
+
 		else LANGULUS_ASSERT("Can't convert from unsupported");
 	}
 	
@@ -92,9 +96,10 @@ namespace Langulus::SIMD
 	NOD() auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
 		using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
+
 		if constexpr (S < 2 || CT::NotSupported<REGISTER> || CT::NotSupported<OUTSIMD>) {
 			// Call the fallback routine if unsupported or size 1				
-			return Fallback<LOSSLESS>(lhs, rhs, Forward<decltype(opFALL)>(opFALL));
+			return Fallback<LOSSLESS>(lhs, rhs, Move(opFALL));
 		}
 		else if constexpr (CT::Array<LHS> && CT::Array<RHS>) {
 			// Both LHS and RHS are arrays, so wrap in registers				
@@ -119,7 +124,7 @@ namespace Langulus::SIMD
 		}
 		else {
 			// Both LHS and RHS are scalars											
-			return Fallback<LOSSLESS>(lhs, rhs, Forward<decltype(opFALL)>(opFALL));
+			return Fallback<LOSSLESS>(lhs, rhs, Move(opFALL));
 		}
 	}
 	

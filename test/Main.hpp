@@ -18,5 +18,5 @@ using namespace Langulus;
 	#define CATCH_CONFIG_ENABLE_BENCHMARKING
 #endif
 
-#define SIGNED_TYPES int8_t, int16_t, int32_t, int64_t, float, double
-#define UNSIGNED_TYPES uint8_t, uint16_t, uint32_t, uint64_t, ::std::byte, char8_t, char16_t, char32_t, wchar_t
+#define SIGNED_TYPES() ::std::int8_t, ::std::int16_t, ::std::int32_t, ::std::int64_t, float, double
+#define UNSIGNED_TYPES() ::std::uint8_t, ::std::uint16_t, ::std::uint32_t, ::std::uint64_t, ::std::byte, char8_t, char16_t, char32_t, wchar_t

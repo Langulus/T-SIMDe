@@ -26,6 +26,7 @@ namespace Langulus::SIMD
 	///	@return true if lhs is equal to rhs												
 	template<class T, Count S, CT::TSIMD REGISTER>
 	auto EqualsInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	#if LANGULUS_SIMD(128BIT)
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::SignedInteger8<T>) {
 				#if LANGULUS_SIMD(AVX512)
@@ -90,7 +91,11 @@ namespace Langulus::SIMD
 			else
 				LANGULUS_ASSERT("Unsupported type for SIMD::InnerEquals of 16-byte package");
 		}
-		else if constexpr (CT::SIMD256<REGISTER>) {
+		else
+	#endif
+
+	#if LANGULUS_SIMD(256BIT)
+		if constexpr (CT::SIMD256<REGISTER>) {
 			if constexpr (CT::SignedInteger8<T>) {
 				#if LANGULUS_SIMD(AVX512)
 					return _mm256_cmpeq_epi8_mask(lhs, rhs) == 0xFFFFFFFF;	// AVX512BW + AVX512VL
@@ -153,7 +158,11 @@ namespace Langulus::SIMD
 				return simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_EQ_OQ)) == 0xF;	// AVX
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerEquals of 32-byte package");
 		}
-		else if constexpr (CT::SIMD512<REGISTER>) {
+		else
+	#endif
+
+	#if LANGULUS_SIMD(512BIT)
+		if constexpr (CT::SIMD512<REGISTER>) {
 			if constexpr (CT::SignedInteger8<T>)
 				return simde_mm512_cmpeq_epi8_mask(lhs, rhs) == 0xFFFFFFFFFFFFFFFF;
 			else if constexpr (CT::UnsignedInteger8<T>)
@@ -176,7 +185,10 @@ namespace Langulus::SIMD
 				return simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_EQ_OQ) == 0xFF;
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerEquals of 64-byte package");
 		}
-		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerEquals");
+		else
+	#endif
+
+		LANGULUS_ASSERT("Unsupported type for SIMD::InnerEquals");
 	}
 
 	/// Compare any lhs and rhs numbers, arrays or not, sparse or dense			
@@ -190,25 +202,37 @@ namespace Langulus::SIMD
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
-		const auto result = AttemptSIMD<0, REGISTER, LOSSLESS>(
-			lhsOrig, rhsOrig, 
-			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
-				return EqualsInner<LOSSLESS, S>(lhs, rhs);
-			},
-			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
-				return lhs == rhs;
-			}
-		);
 
-		if constexpr (CT::Bool<decltype(result)>) {
-			// EqualsInner was called successfully, just return				
-			return result;
+		if constexpr (S < 2 || CT::NotSupported<REGISTER>) {
+			// Call the fallback routine if unsupported or size 1				
+			return Fallback<LOSSLESS>(lhsOrig, rhsOrig,
+				[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
+					return lhs == rhs;
+				}
+			);
 		}
 		else {
-			// Fallback as std::array<bool> - combine								
-			for (auto& i : result)
-				if (!i) return false;
-			return true;
+			const auto result = AttemptSIMD<0, REGISTER, LOSSLESS>(
+				lhsOrig, rhsOrig,
+				[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+					return EqualsInner<LOSSLESS, S>(lhs, rhs);
+				},
+				[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
+					return lhs == rhs;
+				}
+			);
+
+			if constexpr (CT::Bool<decltype(result)>) {
+				// EqualsInner was called successfully, just return			
+				return result;
+			}
+			else if constexpr (CT::Same<decltype(result), ::std::array<bool, S>>) {
+				// Fallback as std::array<bool> - combine							
+				for (auto& i : result)
+					if (!i) return false;
+				return true;
+			}
+			else LANGULUS_ASSERT("Bad return from AttemptSIMD with EqualsInner");
 		}
 	}
 
