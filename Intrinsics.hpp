@@ -338,7 +338,8 @@ namespace Langulus::SIMD
 	}
 
 	inline simde__m128i _mm_halfflip(const simde__m128i& what) noexcept {
-		return simde_mm_shuffle_epi32(what, Shuffle(0, 1, 2, 3));
+		constexpr int8_t imm8 = Shuffle(0, 1, 2, 3);
+		return simde_mm_shuffle_epi32(what, imm8);
 	}
 
 	inline simde__m256 _mm_halfflip(const simde__m256& what) noexcept {
