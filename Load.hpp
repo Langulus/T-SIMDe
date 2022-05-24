@@ -72,7 +72,7 @@ namespace Langulus::SIMD
 			else
 		#endif
 
-		LANGULUS_ASSERT("Unsupported array size for SIMD::Load");
+		return CT::Inner::NotSupported {};
 	}
 
 } // namespace Langulus::SIMD

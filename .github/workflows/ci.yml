@@ -1,4 +1,4 @@
-name: Langulus::Anyness CI
+name: Langulus::TSIMDe CI
 on: [push, pull_request] # Trigger on pushes to all branches and for all pull-requests
 
 jobs:
@@ -15,7 +15,8 @@ jobs:
             os: ubuntu-22.04,
             build_type: Debug,
             cc: "gcc", cxx: "g++",
-            cmake_args: ""
+            cmake_args: "",
+            compiler_args: "-mavx2"
           }
         - {
             # GCC 11 is the minimum required compiler, and comes with Ubuntu 22.04
@@ -23,7 +24,8 @@ jobs:
             os: ubuntu-22.04,
             build_type: RelWithDebInfo,
             cc: "gcc", cxx: "g++",
-            cmake_args: ""
+            cmake_args: "", 
+            compiler_args: "-mavx2"
           }
         - {
             # Clang 11 is the minimum required compiler, and comes with Ubuntu 22.04
@@ -31,7 +33,8 @@ jobs:
             os: ubuntu-22.04,
             build_type: Debug,
             cc: "clang", cxx: "clang++",
-            cmake_args: ""
+            cmake_args: "", 
+            compiler_args: "-mavx2"
           }
         - {
             # Clang 11 is the minimum required compiler, and comes with Ubuntu 22.04
@@ -39,7 +42,8 @@ jobs:
             os: ubuntu-22.04,
             build_type: RelWithDebInfo,
             cc: "clang", cxx: "clang++",
-            cmake_args: ""
+            cmake_args: "",
+            compiler_args: "-mavx2"
           }
         - {
             name: "Windows-MSVC-2022-Debug-x64", artifact: "Windows-MSVC-x64.tar.xz",
@@ -47,6 +51,7 @@ jobs:
             build_type: Debug,
             cc: "cl", cxx: "cl",
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64",
+            compiler_args: "/arch:AVX2"
           }
         - {
             name: "Windows-MSVC-2022-Release-x64", artifact: "Windows-MSVC-x64.tar.xz",
@@ -54,6 +59,7 @@ jobs:
             build_type: RelWithDebInfo,
             cc: "cl", cxx: "cl",
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64",
+            compiler_args: "/arch:AVX2"
           }
         - {
             name: "Windows-MSVC-2022-Debug-x86", artifact: "Windows-MSVC-x86.tar.xz",
@@ -61,6 +67,7 @@ jobs:
             build_type: Debug,
             cc: "cl", cxx: "cl",
             cmake_args: "-G \"Visual Studio 17 2022\" -A Win32",
+            compiler_args: "/arch:AVX2"
           }
         - {
             name: "Windows-MSVC-2022-Release-x86", artifact: "Windows-MSVC-x86.tar.xz",
@@ -68,6 +75,7 @@ jobs:
             build_type: RelWithDebInfo,
             cc: "cl", cxx: "cl",
             cmake_args: "-G \"Visual Studio 17 2022\" -A Win32",
+            compiler_args: "/arch:AVX2"
           }
         # Consider adding these when Apple fix their shit
         #- {
@@ -89,7 +97,15 @@ jobs:
       - name: Clone
         uses: actions/checkout@v2
       - name: Configure
-        run: cmake -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -S . -B out/${{ matrix.config.name }} -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.cmake_args }}
+        run: |
+            cmake \
+                -DCMAKE_C_COMPILER=${{ matrix.config.cc }} \
+                -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} \
+                -S . \
+                -B out/${{ matrix.config.name }} \
+                -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
+                -DCMAKE_CXX_FLAGS="$(CMAKE_CXX_FLAGS) ${{ matrix.config.compiler_args }}" \
+                ${{ matrix.config.cmake_args }}
       - name: Build
         run: cmake --build out/${{ matrix.config.name }} --config ${{ matrix.config.build_type }}
       - name: Test

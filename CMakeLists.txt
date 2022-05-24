@@ -3,15 +3,6 @@ include(cmake/DownloadProject.cmake)
 
 project(Langulus_TSIMDe)
 
-# AVX512 stuff is not yet fully supported by SIMDe, so we'll stick to AVX2 for now
-if (MSVC)
-	message(STATUS "Configuring for MSVC")
-    add_compile_options(/arch:AVX2)
-else()
-	message(STATUS "Configuring for GCC/Clang")
-    add_compile_options(-mavx2)
-endif()
-
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
     # We're building T-SIMDe as standalone
