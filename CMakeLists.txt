@@ -3,6 +3,8 @@ include(cmake/DownloadProject.cmake)
 
 project(Langulus_TSIMDe)
 
+message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")
+
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
     # We're building T-SIMDe as standalone

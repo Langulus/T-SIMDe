@@ -11,7 +11,7 @@ jobs:
         config:
         - {
             # GCC 11 is the minimum required compiler, and comes with Ubuntu 22.04
-            name: "Linux-GCC-11-Debug", artifact: "Linux.tar.xz",
+            name: "Linux-GCC-11-Debug-AVX2", artifact: "Linux-Debug-AVX2.tar.xz",
             os: ubuntu-22.04,
             build_type: Debug,
             cc: "gcc", cxx: "g++",
@@ -20,7 +20,7 @@ jobs:
           }
         - {
             # GCC 11 is the minimum required compiler, and comes with Ubuntu 22.04
-            name: "Linux-GCC-11-Release", artifact: "Linux.tar.xz",
+            name: "Linux-GCC-11-Release-AVX2", artifact: "Linux-Release-AVX2.tar.xz",
             os: ubuntu-22.04,
             build_type: RelWithDebInfo,
             cc: "gcc", cxx: "g++",
@@ -29,7 +29,7 @@ jobs:
           }
         - {
             # Clang 11 is the minimum required compiler, and comes with Ubuntu 22.04
-            name: "Linux-Clang-11-Debug", artifact: "Linux.tar.xz",
+            name: "Linux-Clang-11-Debug-AVX2", artifact: "Linux-Debug-AVX2.tar.xz",
             os: ubuntu-22.04,
             build_type: Debug,
             cc: "clang", cxx: "clang++",
@@ -38,7 +38,7 @@ jobs:
           }
         - {
             # Clang 11 is the minimum required compiler, and comes with Ubuntu 22.04
-            name: "Linux-Clang-11-Release", artifact: "Linux.tar.xz",
+            name: "Linux-Clang-11-Release-AVX2", artifact: "Linux-Release-AVX2.tar.xz",
             os: ubuntu-22.04,
             build_type: RelWithDebInfo,
             cc: "clang", cxx: "clang++",
@@ -46,36 +46,36 @@ jobs:
             compiler_args: "-mavx2"
           }
         - {
-            name: "Windows-MSVC-2022-Debug-x64", artifact: "Windows-MSVC-x64.tar.xz",
+            name: "Windows-MSVC-2022-Debug-x64-AVX2", artifact: "Windows-MSVC-Debug-x64-AVX2.tar.xz",
             os: windows-latest,
             build_type: Debug,
             cc: "cl", cxx: "cl",
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64",
-            compiler_args: "/arch:AVX2"
+            compiler_args: "/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc"
           }
         - {
-            name: "Windows-MSVC-2022-Release-x64", artifact: "Windows-MSVC-x64.tar.xz",
+            name: "Windows-MSVC-2022-Release-x64-AVX2", artifact: "Windows-MSVC-Release-x64-AVX2.tar.xz",
             os: windows-latest,
             build_type: RelWithDebInfo,
             cc: "cl", cxx: "cl",
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64",
-            compiler_args: "/arch:AVX2"
+            compiler_args: "/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc"
           }
         - {
-            name: "Windows-MSVC-2022-Debug-x86", artifact: "Windows-MSVC-x86.tar.xz",
+            name: "Windows-MSVC-2022-Debug-x86-AVX2", artifact: "Windows-MSVC-Debug-x86-AVX2.tar.xz",
             os: windows-latest,
             build_type: Debug,
             cc: "cl", cxx: "cl",
             cmake_args: "-G \"Visual Studio 17 2022\" -A Win32",
-            compiler_args: "/arch:AVX2"
+            compiler_args: "/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc"
           }
         - {
-            name: "Windows-MSVC-2022-Release-x86", artifact: "Windows-MSVC-x86.tar.xz",
+            name: "Windows-MSVC-2022-Release-x86-AVX2", artifact: "Windows-MSVC-Release-x86-AVX2.tar.xz",
             os: windows-latest,
             build_type: RelWithDebInfo,
             cc: "cl", cxx: "cl",
             cmake_args: "-G \"Visual Studio 17 2022\" -A Win32",
-            compiler_args: "/arch:AVX2"
+            compiler_args: "/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc"
           }
         # Consider adding these when Apple fix their shit
         #- {
@@ -97,7 +97,7 @@ jobs:
       - name: Clone
         uses: actions/checkout@v2
       - name: Configure
-        run: cmake -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -S . -B out/${{ matrix.config.name }} -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DCMAKE_CXX_FLAGS="$(CMAKE_CXX_FLAGS) ${{ matrix.config.compiler_args }}" ${{ matrix.config.cmake_args }}
+        run: cmake -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -S . -B out/${{ matrix.config.name }} -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.config.compiler_args }}" ${{ matrix.config.cmake_args }}
       - name: Build
         run: cmake --build out/${{ matrix.config.name }} --config ${{ matrix.config.build_type }}
       - name: Test
