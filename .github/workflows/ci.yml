@@ -18,7 +18,7 @@ jobs:
           [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2'],
           [AVX, 32, '-mavx', '/arch:AVX'],
           [AVX2, 32, '-mavx2', '/arch:AVX2'],
-          [AVX512, 64, '-mavx512', '/arch:AVX512']
+          [AVX512, 64, '-mavx512f', '/arch:AVX512']
         ]
         compiler: [g++, clang++, cl]
         exclude:

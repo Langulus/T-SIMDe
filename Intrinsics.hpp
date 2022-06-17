@@ -379,7 +379,7 @@ namespace Langulus::SIMD
 		return reinterpret_cast<const uint32_t&>(result);
 	}
 
-	inline uint64_t _mm_hmax_epu64(const simde__m128i v) noexcept {
+	/*inline uint64_t _mm_hmax_epu64(const simde__m128i v) noexcept {
 		simde__m128i vmax = v;
 		vmax = _mm_max_epu64(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
 		#if LANGULUS_BITNESS() == 32
@@ -390,7 +390,7 @@ namespace Langulus::SIMD
 			const auto result = _mm_extract_epi64(vmax, 0); // SSE4.1
 			return reinterpret_cast<const uint64_t&>(result);
 		#endif
-	}
+	}*/
 
 	inline int8_t _mm_hmax_epi8(const simde__m128i v) noexcept {
 		simde__m128i vmax = v;
@@ -418,7 +418,7 @@ namespace Langulus::SIMD
 		return simde_mm_extract_epi32(vmax, 0);	// SSE2
 	}
 
-	inline int64_t _mm_hmax_epi64(const simde__m128i v) noexcept {
+	/*inline int64_t _mm_hmax_epi64(const simde__m128i v) noexcept {
 		simde__m128i vmax = v;
 		vmax = _mm_max_epi64(vmax, simde_mm_shuffle_epi32(vmax, Shuffle(2, 3, 0, 1))); // SSE2
 		#if LANGULUS_BITNESS() == 32
@@ -429,7 +429,7 @@ namespace Langulus::SIMD
 			const auto result = _mm_extract_epi64(vmax, 0); // SSE4.1
 			return reinterpret_cast<const int64_t&>(result);
 		#endif
-	}
+	}*/
 
 	template<class F, class T>
 	concept Invocable = ::std::invocable<F, T, T>;
