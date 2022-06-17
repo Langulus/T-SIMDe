@@ -20,32 +20,31 @@ jobs:
           [AVX2, 32, '-mavx2', '/arch:AVX2'],
           [AVX512, 64, '-mavx512', '/arch:AVX512']
         ]
-        compiler: [
-            [g++, 2], 
-            [clang++, 2], 
-            [cl, 3]
-        ]
+        compiler: [g++, clang++, cl]
         exclude:
           - os: ubuntu-22.04
-            compiler: [g++, 2]
+            compiler: cl
           - os: ubuntu-22.04
             architecture: x86
           - os: windows-latest
-            compiler: [g++, 2]
+            compiler: g++
           - os: windows-latest
-            compiler: [clang++, 2]
+            compiler: clang++
 
         include:
           - os: ubuntu-22.04
             cmake_args: ""
+            flags: ${{matrix.feature[2]}}
           - os: windows-latest
             architecture: x86
             cmake_args: "-G \"Visual Studio 17 2022\" -A Win32"
+            flags: ${{matrix.feature[3]}}
           - os: windows-latest
             architecture: x64
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
+            flags: ${{matrix.feature[3]}}
 
-    name: "${{matrix.os}}-${{matrix.compiler[0]}}-${{matrix.build}}-${{matrix.architecture}}-${{matrix.feature[0]}}"
+    name: "${{matrix.os}}-${{matrix.compiler}}-${{matrix.build}}-${{matrix.architecture}}-${{matrix.feature[0]}}"
     runs-on: ${{matrix.os}}
     steps:
       - name: Clone
@@ -53,12 +52,12 @@ jobs:
       - name: Configure
         run: >
           cmake
-          -DCMAKE_CXX_COMPILER=${{matrix.compiler[0]}}
+          -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           -S .
           -B out/${{matrix.name}}
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
           ${{matrix.cmake_args}}
-          -DCMAKE_CXX_FLAGS=${{matrix.feature[${{matrix.compiler[1]}}]}}
+          -DCMAKE_CXX_FLAGS=${{matrix.flags}}
           -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - name: Build
