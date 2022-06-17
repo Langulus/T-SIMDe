@@ -47,7 +47,7 @@ jobs:
       - name: Clone
         uses: actions/checkout@v2
       - name: Configure Linux
-        if: matrix.os == ubuntu-22.04
+        if: ${{matrix.os}} == 'ubuntu-22.04'
         run: >
           cmake
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
@@ -59,7 +59,7 @@ jobs:
           -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - name: Configure Windows
-        if: matrix.os == windows-latest
+        if: ${{matrix.os}} == 'windows-latest'
         run: >
           cmake
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
