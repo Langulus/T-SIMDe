@@ -14,8 +14,8 @@ jobs:
           [SSE2, 16, '-msse2', '/arch:SSE2'],
           [SSE3, 16, '-msse3', '/arch:SSE3'],
           [SSSE3, 16, '-mssse3', '/arch:SSSE3'],
-          [SSE4.1, 16, '-msse4.1', /arch:SSE4.1'],
-          [SSE4.2, 16, '-msse4.2', /arch:SSE4.2'],
+          [SSE4.1, 16, '-msse4.1', '/arch:SSE4.1'],
+          [SSE4.2, 16, '-msse4.2', '/arch:SSE4.2'],
           [AVX, 32, '-mavx', '/arch:AVX'],
           [AVX2, 32, '-mavx2', '/arch:AVX2'],
           [AVX512, 64, '-mavx512', '/arch:AVX512']
