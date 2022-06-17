@@ -34,22 +34,20 @@ jobs:
         include:
           - os: ubuntu-22.04
             cmake_args: ""
-            flags: ${{matrix.feature[2]}}
           - os: windows-latest
             architecture: x86
             cmake_args: "-G \"Visual Studio 17 2022\" -A Win32"
-            flags: ${{matrix.feature[3]}}
           - os: windows-latest
             architecture: x64
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
-            flags: ${{matrix.feature[3]}}
 
     name: "${{matrix.os}}-${{matrix.compiler}}-${{matrix.build}}-${{matrix.architecture}}-${{matrix.feature[0]}}"
     runs-on: ${{matrix.os}}
     steps:
       - name: Clone
         uses: actions/checkout@v2
-      - name: Configure
+      - name: Configure Linux
+        if: matrix.os == ubuntu-22.04
         run: >
           cmake
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
@@ -57,7 +55,19 @@ jobs:
           -B out/${{matrix.name}}
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
           ${{matrix.cmake_args}}
-          -DCMAKE_CXX_FLAGS=${{matrix.flags}}
+          -DCMAKE_CXX_FLAGS=${{matrix.feature[2]}}
+          -DLANGULUS_ENABLE_SAFE_MODE=ON
+          -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
+      - name: Configure Windows
+        if: matrix.os == windows-latest
+        run: >
+          cmake
+          -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+          -S .
+          -B out/${{matrix.name}}
+          -DCMAKE_BUILD_TYPE=${{matrix.build}}
+          ${{matrix.cmake_args}}
+          -DCMAKE_CXX_FLAGS=${{matrix.feature[3]}}
           -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - name: Build
