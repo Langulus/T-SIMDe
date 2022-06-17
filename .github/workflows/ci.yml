@@ -1,4 +1,4 @@
-name: Langulus::Anyness CI
+name: Langulus::TSIMDe CI
 on: [push, pull_request] # Trigger on pushes to all branches and for all pull-requests
 
 jobs:
@@ -10,15 +10,15 @@ jobs:
         build: [Debug, Release]
         architecture: [x86, x64]
         feature: [
-          [SSE, 16, -msse, /arch:SSE],
-          [SSE2, 16, -msse2, /arch:SSE2],
-          [SSE3, 16, -msse3, /arch:SSE3],
-          [SSSE3, 16, -mssse3, /arch:SSSE3],
-          [SSE4.1, 16, -msse4.1, /arch:SSE4.1],
-          [SSE4.2, 16, -msse4.2, /arch:SSE4.2],
-          [AVX, 32, -mavx, /arch:AVX],
-          [AVX2, 32, -mavx2, /arch:AVX2],
-          [AVX512, 64, -mavx512, /arch:AVX512]
+          [SSE, 16, '-msse', '/arch:SSE'],
+          [SSE2, 16, '-msse2', '/arch:SSE2'],
+          [SSE3, 16, '-msse3', '/arch:SSE3'],
+          [SSSE3, 16, '-mssse3', '/arch:SSSE3'],
+          [SSE4.1, 16, '-msse4.1', /arch:SSE4.1'],
+          [SSE4.2, 16, '-msse4.2', /arch:SSE4.2'],
+          [AVX, 32, '-mavx', '/arch:AVX'],
+          [AVX2, 32, '-mavx2', '/arch:AVX2'],
+          [AVX512, 64, '-mavx512', '/arch:AVX512']
         ]
         compiler: [
             [g++, 2], 
