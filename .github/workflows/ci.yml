@@ -37,6 +37,11 @@ jobs:
             compiler: cl
             feature: [SSE2, 16, '-msse2', '/arch:SSE2']
 
+          # Compiler bug :(
+          - architecture: x64
+            compiler: clang++
+            feature: [AVX512, 64, '-mavx512f', '/arch:AVX512']
+
         include:
           - os: ubuntu-22.04
             cmake_args: ""
