@@ -1,89 +1,67 @@
-name: Langulus::TSIMDe CI
+name: Langulus::Anyness CI
 on: [push, pull_request] # Trigger on pushes to all branches and for all pull-requests
 
 jobs:
   build:
-    name: ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false # do not abort on a failed job
       matrix:
-        config:
-        - {
-            # GCC 11 is the minimum required compiler, and comes with Ubuntu 22.04
-            name: "Linux-GCC-11-Debug-AVX2", artifact: "Linux-Debug-AVX2.tar.xz",
-            os: ubuntu-22.04,
-            build_type: Debug,
-            cc: "gcc", cxx: "g++",
-            cmake_args: "",
-            compiler_args: "-mavx2"
-          }
-        - {
-            # GCC 11 is the minimum required compiler, and comes with Ubuntu 22.04
-            name: "Linux-GCC-11-Release-AVX2", artifact: "Linux-Release-AVX2.tar.xz",
-            os: ubuntu-22.04,
-            build_type: RelWithDebInfo,
-            cc: "gcc", cxx: "g++",
-            cmake_args: "", 
-            compiler_args: "-mavx2"
-          }
-        - {
-            # Clang 11 is the minimum required compiler, and comes with Ubuntu 22.04
-            name: "Linux-Clang-11-Debug-AVX2", artifact: "Linux-Debug-AVX2.tar.xz",
-            os: ubuntu-22.04,
-            build_type: Debug,
-            cc: "clang", cxx: "clang++",
-            cmake_args: "", 
-            compiler_args: "-mavx2"
-          }
-        - {
-            # Clang 11 is the minimum required compiler, and comes with Ubuntu 22.04
-            name: "Linux-Clang-11-Release-AVX2", artifact: "Linux-Release-AVX2.tar.xz",
-            os: ubuntu-22.04,
-            build_type: RelWithDebInfo,
-            cc: "clang", cxx: "clang++",
-            cmake_args: "",
-            compiler_args: "-mavx2"
-          }
-        - {
-            name: "Windows-MSVC-2022-Debug-x64-AVX2", artifact: "Windows-MSVC-Debug-x64-AVX2.tar.xz",
-            os: windows-latest,
-            build_type: Debug,
-            cc: "cl", cxx: "cl",
-            cmake_args: "-G \"Visual Studio 17 2022\" -A x64",
-            compiler_args: "/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc"
-          }
-        - {
-            name: "Windows-MSVC-2022-Release-x64-AVX2", artifact: "Windows-MSVC-Release-x64-AVX2.tar.xz",
-            os: windows-latest,
-            build_type: RelWithDebInfo,
-            cc: "cl", cxx: "cl",
-            cmake_args: "-G \"Visual Studio 17 2022\" -A x64",
-            compiler_args: "/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc"
-          }
-        - {
-            name: "Windows-MSVC-2022-Debug-x86-AVX2", artifact: "Windows-MSVC-Debug-x86-AVX2.tar.xz",
-            os: windows-latest,
-            build_type: Debug,
-            cc: "cl", cxx: "cl",
-            cmake_args: "-G \"Visual Studio 17 2022\" -A Win32",
-            compiler_args: "/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc"
-          }
-        - {
-            name: "Windows-MSVC-2022-Release-x86-AVX2", artifact: "Windows-MSVC-Release-x86-AVX2.tar.xz",
-            os: windows-latest,
-            build_type: RelWithDebInfo,
-            cc: "cl", cxx: "cl",
-            cmake_args: "-G \"Visual Studio 17 2022\" -A Win32",
-            compiler_args: "/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc"
-          }
+        os: [ubuntu-22.04, windows-latest]
+        build: [Debug, Release]
+        architecture: [x86, x64]
+        feature: [
+          [SSE, 16, -msse, /arch:SSE],
+          [SSE2, 16, -msse2, /arch:SSE2],
+          [SSE3, 16, -msse3, /arch:SSE3],
+          [SSSE3, 16, -mssse3, /arch:SSSE3],
+          [SSE4.1, 16, -msse4.1, /arch:SSE4.1],
+          [SSE4.2, 16, -msse4.2, /arch:SSE4.2],
+          [AVX, 32, -mavx, /arch:AVX],
+          [AVX2, 32, -mavx2, /arch:AVX2],
+          [AVX512, 64, -mavx512, /arch:AVX512]
+        ]
+        compiler: [
+            [g++, 2], 
+            [clang++, 2], 
+            [cl, 3]
+        ]
+        exclude:
+          - os: ubuntu-22.04
+            compiler: [g++, 2]
+          - os: ubuntu-22.04
+            architecture: x86
+          - os: windows-latest
+            compiler: [g++, 2]
+          - os: windows-latest
+            compiler: [clang++, 2]
 
+        include:
+          - os: ubuntu-22.04
+            cmake_args: ""
+          - os: windows-latest
+            architecture: x86
+            cmake_args: "-G \"Visual Studio 17 2022\" -A Win32"
+          - os: windows-latest
+            architecture: x64
+            cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
+
+    name: "${{matrix.os}}-${{matrix.compiler}}-${{matrix.build}}-${{matrix.architecture}}-${{matrix.feature[0]}}"
+    runs-on: ${{matrix.os}}
     steps:
       - name: Clone
         uses: actions/checkout@v2
       - name: Configure
-        run: cmake -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -S . -B out/${{ matrix.config.name }} -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DCMAKE_CXX_FLAGS="${{ matrix.config.compiler_args }}" ${{ matrix.config.cmake_args }}
+        run: >
+          cmake
+          -DCMAKE_CXX_COMPILER=${{matrix.compiler[0]}}
+          -S .
+          -B out/${{matrix.name}}
+          -DCMAKE_BUILD_TYPE=${{matrix.build}}
+          ${{matrix.cmake_args}}
+          -DCMAKE_CXX_FLAGS=${{matrix.feature[${{matrix.compiler[1]}}]}}
+          -DLANGULUS_ENABLE_SAFE_MODE=ON
+          -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - name: Build
-        run: cmake --build out/${{ matrix.config.name }} --config ${{ matrix.config.build_type }}
+        run: cmake --build out/${{matrix.name}} --config ${{matrix.build}}
       - name: Test
-        run: ctest --output-on-failure
+        run: cd out/${{matrix.name}} && ctest -V -C ${{matrix.build}}

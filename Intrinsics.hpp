@@ -49,7 +49,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 #define LANGULUS_SIMD_256BIT() 0
 #define LANGULUS_SIMD_512BIT() 0
 
-#if defined (__AVX512BW__)
+#if defined (__AVX512BW__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512BW
 	#define LANGULUS_SIMD_AVX512BW() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -58,7 +58,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512CD__)
+#if defined(__AVX512CD__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512CD
 	#define LANGULUS_SIMD_AVX512CD() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -67,7 +67,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512DQ__)
+#if defined(__AVX512DQ__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512DQ
 	#define LANGULUS_SIMD_AVX512DQ() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -76,7 +76,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512F__)
+#if defined(__AVX512F__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512F
 	#define LANGULUS_SIMD_AVX512F() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -85,7 +85,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512VL__)
+#if defined(__AVX512VL__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512VL
 	#define LANGULUS_SIMD_AVX512VL() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -94,7 +94,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if LANGULUS_SIMD(AVX512BW) && LANGULUS_SIMD(AVX512CD) && LANGULUS_SIMD(AVX512DQ) && LANGULUS_SIMD(AVX512F) && LANGULUS_SIMD(AVX512VL)
+#if LANGULUS_SIMD(AVX512BW) && LANGULUS_SIMD(AVX512CD) && LANGULUS_SIMD(AVX512DQ) && LANGULUS_SIMD(AVX512F) && LANGULUS_SIMD(AVX512VL) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512
 	#define LANGULUS_SIMD_AVX512() 1
 	#undef LANGULUS_SIMD_512BIT
@@ -105,7 +105,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX2__)
+#if defined(__AVX2__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 32
 	#undef LANGULUS_SIMD_AVX2
 	#define LANGULUS_SIMD_AVX2() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -114,7 +114,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX__)
+#if defined(__AVX__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 32
 	#undef LANGULUS_SIMD_AVX
 	#define LANGULUS_SIMD_AVX() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -123,61 +123,46 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE4_2__)
+#if defined(__SSE4_2__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE4_2
 	#define LANGULUS_SIMD_SSE4_2() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE4_1__)
+#if defined(__SSE4_1__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE4_1
 	#define LANGULUS_SIMD_SSE4_1() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSSE3__)
+#if defined(__SSSE3__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSSE3
 	#define LANGULUS_SIMD_SSSE3() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE3__)
+#if defined(__SSE3__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE3
 	#define LANGULUS_SIMD_SSE3() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE2__)
+#if defined(__SSE2__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE2
 	#define LANGULUS_SIMD_SSE2() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE__)
+#if defined(__SSE__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE
 	#define LANGULUS_SIMD_SSE() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
-#endif
-
-
-///																									
-///	Memory alignment for vectorization													
-///																									
-#if LANGULUS_SIMD(AVX512) && LANGULUS_ALIGN() < 64
-	#undef LANGULUS_ALIGN
-	#define LANGULUS_ALIGN() 64
-#elif (LANGULUS_SIMD(AVX) || LANGULUS_SIMD(AVX2)) && LANGULUS_ALIGN() < 32
-	#undef LANGULUS_ALIGN
-	#define LANGULUS_ALIGN() 32
-#elif (LANGULUS_SIMD(SSE) || LANGULUS_SIMD(SSE2) || LANGULUS_SIMD(SSE3) || LANGULUS_SIMD(SSSE3) || LANGULUS_SIMD(SSE4_1) || LANGULUS_SIMD(SSE4_2)) && LANGULUS_ALIGN() < 16
-	#undef LANGULUS_ALIGN
-	#define LANGULUS_ALIGN() 16
 #endif
 
 #include "IgnoreWarningsPush.inl"
@@ -500,12 +485,12 @@ namespace Langulus::SIMD
 			constexpr auto S = ExtentOf<LHS>;
 			::std::array<OUT, S> output;
 			if constexpr (CT::Bool<OUT>) {
-				auto& same_rhs = MakeDense(rhs);
+				auto& same_rhs = DenseCast(rhs);
 				for (Count i = 0; i < S; ++i)
 					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
 			}
 			else {
-				const auto same_rhs = static_cast<LOSSLESS>(MakeDense(rhs));
+				const auto same_rhs = static_cast<LOSSLESS>(DenseCast(rhs));
 				for (Count i = 0; i < S; ++i)
 					output[i] = Fallback<LOSSLESS>(lhs[i], same_rhs, Move(op));
 			}
@@ -516,12 +501,12 @@ namespace Langulus::SIMD
 			constexpr auto S = ExtentOf<RHS>;
 			::std::array<OUT, S> output;
 			if constexpr (CT::Bool<OUT>) {
-				auto& same_lhs = MakeDense(lhs);
+				auto& same_lhs = DenseCast(lhs);
 				for (Count i = 0; i < S; ++i)
 					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
 			}
 			else {
-				const auto same_lhs = static_cast<LOSSLESS>(MakeDense(lhs));
+				const auto same_lhs = static_cast<LOSSLESS>(DenseCast(lhs));
 				for (Count i = 0; i < S; ++i)
 					output[i] = Fallback<LOSSLESS>(same_lhs, rhs[i], Move(op));
 			}
@@ -531,8 +516,8 @@ namespace Langulus::SIMD
 			// Scalar OP Scalar															
 			// Casts should be optimized-out if type is same (I hope)		
 			return op(
-				static_cast<LOSSLESS>(MakeDense(lhs)), 
-				static_cast<LOSSLESS>(MakeDense(rhs))
+				static_cast<LOSSLESS>(DenseCast(lhs)), 
+				static_cast<LOSSLESS>(DenseCast(rhs))
 			);
 		}
 	}
