@@ -7,7 +7,7 @@ jobs:
       fail-fast: false # do not abort on a failed job
       matrix:
         os: [ubuntu-22.04, windows-latest]
-        build: [Debug, Release]
+        build: [Release]
         architecture: [x86, x64]
         feature: [
           [SSE, 16, '-msse', '/arch:SSE'],
@@ -30,6 +30,12 @@ jobs:
             compiler: g++
           - os: windows-latest
             compiler: clang++
+          - architecture: x64
+            compiler: cl
+            feature: [SSE, 16, '-msse', '/arch:SSE']
+          - architecture: x64
+            compiler: cl
+            feature: [SSE2, 16, '-msse2', '/arch:SSE2']
 
         include:
           - os: ubuntu-22.04
@@ -53,9 +59,9 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           -S .
           -B out/${{matrix.name}}
-          -DCMAKE_BUILD_TYPE=${{matrix.build}}
           ${{matrix.cmake_args}}
-          -DCMAKE_CXX_FLAGS=${{matrix.feature[2]}}
+          -DCMAKE_BUILD_TYPE=${{matrix.build}}
+          -DCMAKE_CXX_FLAGS="${{matrix.feature[2]}}"
           -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - name: Configure Windows
@@ -65,9 +71,9 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           -S .
           -B out/${{matrix.name}}
-          -DCMAKE_BUILD_TYPE=${{matrix.build}}
           ${{matrix.cmake_args}}
-          -DCMAKE_CXX_FLAGS=${{matrix.feature[3]}}
+          -DCMAKE_BUILD_TYPE=${{matrix.build}}
+          -DCMAKE_CXX_FLAGS="${{matrix.feature[3]}}"
           -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - name: Build
