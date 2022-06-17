@@ -45,7 +45,7 @@ jobs:
             architecture: x64
             cmake_args: "-G \"Visual Studio 17 2022\" -A x64"
 
-    name: "${{matrix.os}}-${{matrix.compiler}}-${{matrix.build}}-${{matrix.architecture}}-${{matrix.feature[0]}}"
+    name: "${{matrix.os}}-${{matrix.compiler[0]}}-${{matrix.build}}-${{matrix.architecture}}-${{matrix.feature[0]}}"
     runs-on: ${{matrix.os}}
     steps:
       - name: Clone
