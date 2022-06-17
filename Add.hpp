@@ -111,7 +111,14 @@ namespace Langulus::SIMD
 				return AddInner<LOSSLESS, S>(lhs, rhs);
 			},
 			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
-				return lhs + rhs;
+				if constexpr (CT::Same<LOSSLESS, ::std::byte>) {
+					// ::std::byte doesn't have + operator							
+					return static_cast<LOSSLESS>(
+						reinterpret_cast<const unsigned char&>(lhs) +
+						reinterpret_cast<const unsigned char&>(rhs)
+					);
+				}
+				else return lhs + rhs;
 			}
 		);
 	}

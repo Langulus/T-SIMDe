@@ -203,13 +203,13 @@ namespace Langulus::CT
 
 	/// When given two arithmetic types, choose the one that is most lossless	
 	/// after an arithmetic operation of any kind is performed between both		
-	template<CT::Number T1, CT::Number T2>
+	template<class T1, class T2>
 	using Lossless = Conditional<
-			// Always pick real numbers if available								
-			(Real<T1>&& Integer<T2>)
-			// Always pick signed numbers if available							
+			// Always pick real numbers over integers if available			
+			(Real<T1> && Integer<T2>)
+			// Always pick signed type if available								
 			|| (Signed<T1> && Unsigned<T2>)
-			// Always pick the larger number as a last resort					
+			// Always pick the larger type as a last resort						
 			|| (sizeof(Decay<T1>) > sizeof(Decay<T2>)
 		), Decay<T1>, Decay<T2>>;
 
