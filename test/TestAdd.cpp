@@ -203,7 +203,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 			}
 		}
 
-		WHEN("Added in reverse") {
+		WHEN("Added in reverse") { 
 			SIMD::Add(y, x, r);
 
 			THEN("The result should be correct") {
