@@ -65,7 +65,7 @@ jobs:
           -B out/${{matrix.name}}
           ${{matrix.cmake_args}}
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
-          -DCMAKE_CXX_FLAGS="${{matrix.feature[2]}}"
+          -DCMAKE_CXX_FLAGS="${{matrix.feature[2]}}" #only difference is, uses feature[2] as flags
           -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - if: matrix.os == 'windows-latest'
@@ -77,7 +77,7 @@ jobs:
           -B out/${{matrix.name}}
           ${{matrix.cmake_args}}
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
-          -DCMAKE_CXX_FLAGS="${{matrix.feature[3]}}"
+          -DCMAKE_CXX_FLAGS="${{matrix.feature[3]}}" #only difference is, uses feature[3] as flags
           -DLANGULUS_ENABLE_SAFE_MODE=ON
           -DLANGULUS_ALIGNMENT=${{matrix.feature[1]}}
       - name: Build

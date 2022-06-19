@@ -36,9 +36,8 @@ auto Control(const T1(&lhsArray)[C], const T2(&rhsArray)[C]) noexcept {
 			);
 		}
 		else *r = DenseCast(*lhs) + DenseCast(*rhs);
-		++lhs;
-		++rhs;
-		++r;
+
+		++lhs; ++rhs; ++r;
 	}
 
 	return result;
@@ -46,18 +45,20 @@ auto Control(const T1(&lhsArray)[C], const T2(&rhsArray)[C]) noexcept {
 
 TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGNED_TYPES(), SPARSE_UNSIGNED_TYPES()) {
 	using T = TestType;
+	using DenseT = Decay<TestType>;
 
 	GIVEN("scalar + scalar = scalar") {
-		const T x = T{ 1 };
-		const T y = Neg<T>(5);
-		T r;
+		T x, y;
+		DenseT r;
+		InitOne(x, 1);
+		InitOne(y, -5);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
 			SIMD::Add(x, y, r);
 
 			THEN("The result should be correct") {
-				REQUIRE(r == rCheck);
+				REQUIRE(DenseCast(r) == rCheck);
 			}
 		}
 
@@ -65,15 +66,16 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 			SIMD::Add(y, x, r);
 
 			THEN("The result should be correct") {
-				REQUIRE(r == rCheck);
+				REQUIRE(DenseCast(r) == rCheck);
 			}
 		}
 	}
 
 	GIVEN("vector[1] + vector[1] = vector[1]") {
-		const T x[1] = { T{1} };
-		const T y[1] = { Neg<T>(5) };
-		T r[1];
+		T x[1], y[1];
+		DenseT r[1];
+		Init(x, 1);
+		Init(y, -5);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
@@ -81,7 +83,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 1; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
 
@@ -90,15 +92,19 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 1; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
+
+		Free(x);
+		Free(y);
 	}
 
 	GIVEN("vector[2] + vector[2] = vector[2]") {
-		const T x[2] = { T{1}, T{2} };
-		const T y[2] = { Neg<T>(5), T{6} };
-		T r[2];
+		T x[2], y[2];
+		DenseT r[2];
+		Init(x, 1, 2);
+		Init(y, -5, 6);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
@@ -106,7 +112,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 2; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
 
@@ -115,15 +121,19 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 2; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
+
+		Free(x);
+		Free(y);
 	}
 
 	GIVEN("vector[3] + vector[3] = vector[3]") {
-		const T x[3] = { T{1}, T{2}, T{0} };
-		const T y[3] = { Neg<T>(5), T{6}, Neg<T>(22) };
-		T r[3];
+		T x[3], y[3];
+		DenseT r[3];
+		Init(x, 1, 2, 0);
+		Init(y, -5, 6, -22);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
@@ -131,7 +141,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for(int i = 0; i < 3; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
 
@@ -140,15 +150,19 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 3; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
+
+		Free(x);
+		Free(y);
 	}
 
 	GIVEN("vector[4] + vector[4] = vector[4]") {
-		const T x[4] = { T{1}, T{2}, T{0}, T{66} };
-		const T y[4] = { Neg<T>(5), T{6}, Neg<T>(22), T{2} };
-		T r[4];
+		T x[4], y[4];
+		DenseT r[4];
+		Init(x, 1, 2, 0, 66);
+		Init(y, -5, 6, -22, 2);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
@@ -156,7 +170,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 4; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
 
@@ -165,15 +179,19 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 4; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
+
+		Free(x);
+		Free(y);
 	}
 
 	GIVEN("vector[7] + vector[7] = vector[7]") {
-		const T x[7] = { T{1}, T{2}, T{0}, T{66}, T{1}, T{2}, T{0} };
-		const T y[7] = { Neg<T>(5), T{6}, Neg<T>(22), T{2}, Neg<T>(5), T{6}, Neg<T>(22) };
-		T r[7];
+		T x[7], y[7];
+		DenseT r[7];
+		Init(x, 1, 2, 0, 66, 1, 2, 0);
+		Init(y, -5, 6, -22, 2, -5, 6, -22);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
@@ -181,7 +199,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 7; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
 
@@ -190,15 +208,19 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 7; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
+
+		Free(x);
+		Free(y);
 	}
 
 	GIVEN("vector[8] + vector[8] = vector[8]") {
-		const T x[8] = { T{1}, T{2}, T{2}, T{0}, T{66}, T{1}, T{2}, T{0} };
-		const T y[8] = { Neg<T>(5), T{6}, T{6}, Neg<T>(22), T{2}, Neg<T>(5), T{6}, Neg<T>(22) };
-		T r[8];
+		T x[8], y[8];
+		DenseT r[8];
+		Init(x, 1, 2, 2, 0, 66, 1, 2, 0);
+		Init(y, -5, 6, 6, -22, 2, -5, 6, -22);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
@@ -206,7 +228,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 8; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
 
@@ -215,15 +237,19 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 8; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
+
+		Free(x);
+		Free(y);
 	}
 
 	GIVEN("vector[15] + vector[15] = vector[15]") {
-		const T x[15] = { T{1}, T{2}, T{2}, T{0}, T{66}, T{1}, T{2}, T{0}, T{2}, T{2}, T{0}, T{66}, T{1}, T{2}, T{0} };
-		const T y[15] = { Neg<T>(5), T{6}, T{6}, Neg<T>(22), T{2}, Neg<T>(5), T{6}, Neg<T>(22), T{6}, T{6}, Neg<T>(22), T{2}, Neg<T>(5), T{6}, Neg<T>(22) };
-		T r[15];
+		T x[15], y[15];
+		DenseT r[15];
+		Init(x, 1, 2, 2, 0, 66, 1, 2, 0, 2, 2, 0, 66, 1, 2, 0);
+		Init(y, -5, 6, 6, -22, 2, -5, 6, -22, 6, 6, -22, 2, -5, 6, -22);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
@@ -231,7 +257,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 15; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
 
@@ -240,15 +266,19 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 15; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
+
+		Free(x);
+		Free(y);
 	}
 
 	GIVEN("vector[16] + vector[16] = vector[16]") {
-		const T x[16] = { T{1}, T{2}, T{2}, T{2}, T{0}, T{66}, T{1}, T{2}, T{0}, T{2}, T{2}, T{0}, T{66}, T{1}, T{2}, T{0} };
-		const T y[16] = { Neg<T>(5), Neg<T>(5), T{6}, T{6}, Neg<T>(22), T{2}, Neg<T>(5), T{6}, Neg<T>(22), T{6}, T{6}, Neg<T>(22), T{2}, Neg<T>(5), T{6}, Neg<T>(22) };
-		T r[16];
+		T x[16], y[16];
+		DenseT r[16];
+		Init(x, 1, 2, 2, 2, 0, 66, 1, 2, 0, 2, 2, 0, 66, 1, 2, 0);
+		Init(y, -5, 6, 6, -22, 2, -5, 6, -22, 6, 6, 6, -22, 2, -5, 6, -22);
 		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
@@ -256,7 +286,7 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 16; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
 
@@ -265,8 +295,11 @@ TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGN
 
 			THEN("The result should be correct") {
 				for (int i = 0; i < 16; ++i)
-					REQUIRE(r[i] == rCheck[i]);
+					REQUIRE(DenseCast(r[i]) == rCheck[i]);
 			}
 		}
+
+		Free(x);
+		Free(y);
 	}
 }
