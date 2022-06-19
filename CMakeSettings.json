@@ -39,7 +39,7 @@
       "configurationType": "RelWithDebInfo",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"/DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ]
@@ -51,7 +51,7 @@
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeExecutable": "cmake",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"-mavx2\"",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-mavx2\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
@@ -64,7 +64,7 @@
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeExecutable": "cmake",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"-mavx2\"",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-mavx2\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
@@ -76,7 +76,7 @@
       "configurationType": "Debug",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"-m32 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-m32 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "clang_cl_x86" ]
@@ -87,7 +87,7 @@
       "configurationType": "RelWithDebInfo",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"-m32 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-m32 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "clang_cl_x86" ]
@@ -98,7 +98,7 @@
       "configurationType": "Debug",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"-m64 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-m64 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "clang_cl_x64_x64" ]
@@ -109,7 +109,7 @@
       "configurationType": "RelWithDebInfo",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCMAKE_CXX_FLAGS:STRING=\"-m64 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
+      "cmakeCommandArgs": "-DLANGULUS_ALIGNMENT=32 -DCMAKE_CXX_FLAGS:STRING=\"-m64 /DWIN32 /D_WINDOWS /arch:AVX2 /EHsc\"",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "clang_cl_x64_x64" ]

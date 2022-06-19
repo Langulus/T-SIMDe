@@ -105,7 +105,7 @@ namespace Langulus::SIMD
 	///	@param rhsOrig - the right array or number									
 	///	@return true if all elements match												
 	template<class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() bool EqualsOrLesser(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) bool EqualsOrLesser(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();

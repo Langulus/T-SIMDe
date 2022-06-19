@@ -105,7 +105,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() auto Add(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) auto Add(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -147,7 +147,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() WRAPPER AddWrap(const LHS& lhs, const RHS& rhs) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) WRAPPER AddWrap(const LHS& lhs, const RHS& rhs) noexcept {
 		WRAPPER result;
 		Add<LHS, RHS>(lhs, rhs, result.mComponents);
 		return result;

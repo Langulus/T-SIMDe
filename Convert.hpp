@@ -90,7 +90,7 @@ namespace Langulus::SIMD
 	///	@param opFALL - the function to invoke											
 	///	@return the result (either std::array, number, or register)				
 	template<int DEF, class REGISTER, class LOSSLESS, class LHS, class RHS, class FSIMD, class FFALL>
-	LANGULUS(ALWAYSINLINE) NOD() auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
+	NOD() LANGULUS(ALWAYSINLINE) auto AttemptSIMD(const LHS& lhs, const RHS& rhs, FSIMD&& opSIMD, FFALL&& opFALL) requires (Invocable<FSIMD, REGISTER> && Invocable<FFALL, LOSSLESS>) {
 		using OUTSIMD = InvocableResult<FSIMD, REGISTER>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
 

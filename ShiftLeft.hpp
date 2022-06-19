@@ -53,7 +53,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() auto ShiftLeft(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) auto ShiftLeft(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -70,7 +70,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() WRAPPER ShiftLeftWrap(LHS& lhs, RHS& rhs) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) WRAPPER ShiftLeftWrap(LHS& lhs, RHS& rhs) noexcept {
 		const auto result = ShiftLeft<LHS, RHS>(lhs, rhs);
 
 		if constexpr (CT::TSIMD<decltype(result)>) {

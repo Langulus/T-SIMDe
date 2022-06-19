@@ -9,11 +9,6 @@
 #include <catch2/catch.hpp>
 #include <random>
 
-#if LANGULUS_COMPILER(GCC)
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wattributes"
-#endif
-
 using timer = Catch::Benchmark::Chronometer;
 template<class T>
 using uninitialized = Catch::Benchmark::storage_for<T>;
@@ -505,7 +500,3 @@ TEMPLATE_TEST_CASE("Add", "[add]", SPARSE_UNSIGNED_TYPES(), SPARSE_SIGNED_TYPES(
 		}
 	}
 }
-
-#if LANGULUS_COMPILER(GCC)
-	#pragma GCC diagnostic pop
-#endif

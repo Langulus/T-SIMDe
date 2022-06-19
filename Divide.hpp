@@ -204,7 +204,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() auto Divide(LHS& lhsOrig, RHS& rhsOrig) {
+	NOD() LANGULUS(ALWAYSINLINE) auto Divide(LHS& lhsOrig, RHS& rhsOrig) {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -243,7 +243,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() WRAPPER DivideWrap(LHS& lhs, RHS& rhs) {
+	NOD() LANGULUS(ALWAYSINLINE) WRAPPER DivideWrap(LHS& lhs, RHS& rhs) {
 		WRAPPER result;
 		Divide<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;

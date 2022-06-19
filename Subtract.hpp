@@ -89,7 +89,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() auto Subtract(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) auto Subtract(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -125,7 +125,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() WRAPPER SubtractWrap(LHS& lhs, RHS& rhs) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) WRAPPER SubtractWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Subtract<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;

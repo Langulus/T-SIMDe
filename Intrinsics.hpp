@@ -480,7 +480,7 @@ namespace Langulus::SIMD
 	///	@param op - the fallback function to invoke									
 	///	@return the resulting number or std::array									
 	template<class LOSSLESS, class LHS, class RHS, class FFALL>
-	LANGULUS(ALWAYSINLINE) NOD() auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
+	NOD() LANGULUS(ALWAYSINLINE) auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
 		using OUT = InvocableResult<FFALL, LOSSLESS>;
 
 		if constexpr (CT::Array<LHS> && CT::Array<RHS>) {

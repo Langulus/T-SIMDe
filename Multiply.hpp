@@ -128,7 +128,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() auto Multiply(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) auto Multiply(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -164,7 +164,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	LANGULUS(ALWAYSINLINE) NOD() WRAPPER MultiplyWrap(LHS& lhs, RHS& rhs) noexcept {
+	NOD() LANGULUS(ALWAYSINLINE) WRAPPER MultiplyWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Multiply<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
