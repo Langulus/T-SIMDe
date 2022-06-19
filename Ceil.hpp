@@ -19,15 +19,15 @@ namespace Langulus::SIMD
 	///	@param value - the array 															
 	///	@return the ceiling values															
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto InnerCeil(const REGISTER& value) noexcept {
+	LANGULUS(ALWAYSINLINE) auto InnerCeil(const REGISTER& value) noexcept {
 		static_assert(CT::Real<T>,
 			"SIMD::InnerFloor is suboptimal and pointless for whole numbers, avoid calling it on such");
 
 		#if LANGULUS_SIMD(128BIT)
 			if constexpr (CT::SIMD128<REGISTER>) {
-				if constexpr (CT::Same<T, float>)
+				if constexpr (CT::RealSP<T>)
 					return simde_mm_ceil_ps(value);
-				else if constexpr (CT::Same<T, double>)
+				else if constexpr (CT::RealDP<T>)
 					return simde_mm_ceil_pd(value);
 				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 16-byte package");
 			}
@@ -36,9 +36,9 @@ namespace Langulus::SIMD
 
 		#if LANGULUS_SIMD(256BIT)
 			if constexpr (CT::SIMD256<REGISTER>) {
-				if constexpr (CT::Same<T, float>)
+				if constexpr (CT::RealSP<T>)
 					return simde_mm256_ceil_ps(value);
-				else if constexpr (CT::Same<T, double>)
+				else if constexpr (CT::RealDP<T>)
 					return simde_mm256_ceil_pd(value);
 				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 32-byte package");
 			}
@@ -47,9 +47,9 @@ namespace Langulus::SIMD
 
 		#if LANGULUS_SIMD(512BIT)
 			if constexpr (CT::SIMD512<REGISTER>) {
-				if constexpr (CT::Same<T, float>)
+				if constexpr (CT::RealSP<T>)
 					return simde_mm512_ceil_ps(value);
-				else if constexpr (CT::Same<T, double>)
+				else if constexpr (CT::RealDP<T>)
 					return simde_mm512_ceil_pd(value);
 				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerCeil of 64-byte package");
 			}
@@ -60,7 +60,7 @@ namespace Langulus::SIMD
 	}
 
 	template<class T, Count S>
-	auto Ceil(const T(&value)[S]) noexcept {
+	LANGULUS(ALWAYSINLINE) auto Ceil(const T(&value)[S]) noexcept {
 		return InnerCeil<T, S>(Load<0>(value));
 	}
 

@@ -7,11 +7,7 @@
 ///																									
 #pragma once
 #include "Intrinsics.hpp"
-
-#if LANGULUS_COMPILER(GCC)
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wignored-attributes"
-#endif
+#include "IgnoreWarningsPush.inl"
 
 namespace Langulus::SIMD
 {
@@ -23,7 +19,7 @@ namespace Langulus::SIMD
 	///	@param from - the source register												
 	///	@param to - the destination array												
 	template<CT::TSIMD FROM, class T, Count S>
-	void Store(const FROM& from, T(&to)[S]) noexcept {
+	LANGULUS(ALWAYSINLINE) void Store(const FROM& from, T(&to)[S]) noexcept {
 		static_assert(S > 1, 
 			"Storing less than two elements is suboptimal - avoid SIMD operations on such arrays as a whole");
 		constexpr Size toSize = sizeof(Decay<T>) * S;
@@ -43,7 +39,7 @@ namespace Langulus::SIMD
 				if constexpr (CT::Dense<T>)
 					::std::memcpy(to, temp, toSize);
 				else for(Count i = 0; i < S; ++i)
-					MakeDense(to[i]) = temp[i];
+					DenseCast(to[i]) = temp[i];
 			}
 		}
 		else if constexpr (CT::Same<FROM, simde__m128d>) {
@@ -68,7 +64,7 @@ namespace Langulus::SIMD
 				alignas(16) Byte temp[16];
 				simde_mm_store_si128(reinterpret_cast<simde__m128i*>(temp), from);
 				for (Offset i = 0; i < S; ++i)
-					MakeDense(to[i]) = reinterpret_cast<const Decay<T>*>(temp)[i];
+					DenseCast(to[i]) = reinterpret_cast<const Decay<T>*>(temp)[i];
 			}
 		}
 
@@ -87,7 +83,7 @@ namespace Langulus::SIMD
 				if constexpr (CT::Dense<T>)
 					::std::memcpy(to, temp, toSize);
 				else for (Offset i = 0; i < S; ++i)
-					MakeDense(to[i]) = temp[i];
+					DenseCast(to[i]) = temp[i];
 			}
 		}
 		else if constexpr (CT::Same<FROM, simde__m256d>) {
@@ -102,7 +98,7 @@ namespace Langulus::SIMD
 				if constexpr (CT::Dense<T>)
 					::std::memcpy(to, temp, toSize);
 				else for (Offset i = 0; i < S; ++i)
-					MakeDense(to[i]) = temp[i];
+					DenseCast(to[i]) = temp[i];
 			}
 		}
 		else if constexpr (CT::Same<FROM, simde__m256i>) {
@@ -117,7 +113,7 @@ namespace Langulus::SIMD
 				if constexpr (CT::Dense<T>)
 					::std::memcpy(to, temp, toSize);
 				else for (Offset i = 0; i < S; ++i)
-					MakeDense(to[i]) = reinterpret_cast<const Decay<T>*>(temp)[i];
+					DenseCast(to[i]) = reinterpret_cast<const Decay<T>*>(temp)[i];
 			}
 		}
 
@@ -136,7 +132,7 @@ namespace Langulus::SIMD
 				if constexpr (CT::Dense<T>)
 					::std::memcpy(to, temp, toSize);
 				else for (Offset i = 0; i < S; ++i)
-					MakeDense(to[i]) = temp[i];
+					DenseCast(to[i]) = temp[i];
 			}
 		}
 		else if constexpr (CT::Same<FROM, simde__m512d>) {
@@ -151,7 +147,7 @@ namespace Langulus::SIMD
 				if constexpr (CT::Dense<T>)
 					::std::memcpy(to, temp, toSize);
 				else for (Offset i = 0; i < S; ++i)
-					MakeDense(to[i]) = temp[i];
+					DenseCast(to[i]) = temp[i];
 			}
 		}
 		else if constexpr (CT::Same<FROM, simde__m512i>) {
@@ -166,7 +162,7 @@ namespace Langulus::SIMD
 				if constexpr (CT::Dense<T>)
 					::std::memcpy(to, temp, toSize);
 				else for (Offset i = 0; i < S; ++i)
-					MakeDense(to[i]) = reinterpret_cast<const Decay<T>*>(temp)[i];
+					DenseCast(to[i]) = reinterpret_cast<const Decay<T>*>(temp)[i];
 			}
 		}
 		else LANGULUS_ASSERT("Unsupported FROM register for SIMD::Store");
@@ -174,6 +170,4 @@ namespace Langulus::SIMD
 
 } // namespace Langulus::SIMD
 
-#if LANGULUS_COMPILER(GCC)
-	#pragma GCC diagnostic pop
-#endif
+#include "IgnoreWarningsPop.inl"

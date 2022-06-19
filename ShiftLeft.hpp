@@ -20,7 +20,7 @@ namespace Langulus::SIMD
 	///	@param rhs - the right-hand-side array 										
 	///	@return the shifted elements as a register									
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto ShiftLeftInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) auto ShiftLeftInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::Integer16<T>)
 				return simde_mm_sllv_epi16(lhs, rhs);
@@ -53,7 +53,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	NOD() auto ShiftLeft(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() auto ShiftLeft(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -70,7 +70,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	NOD() WRAPPER ShiftLeftWrap(LHS& lhs, RHS& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() WRAPPER ShiftLeftWrap(LHS& lhs, RHS& rhs) noexcept {
 		const auto result = ShiftLeft<LHS, RHS>(lhs, rhs);
 
 		if constexpr (CT::TSIMD<decltype(result)>) {

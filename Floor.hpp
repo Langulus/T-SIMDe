@@ -19,36 +19,39 @@ namespace Langulus::SIMD
 	///	@param value - the array 															
 	///	@return the floored values															
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto InnerFloor(const REGISTER& value) noexcept {
+	LANGULUS(ALWAYSINLINE) auto InnerFloor(const REGISTER& value) noexcept {
 		static_assert(CT::Real<T>,
 			"SIMD::InnerFloor is suboptimal and pointless for whole numbers, avoid calling it on such");
 
 		if constexpr (CT::SIMD128<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
+			if constexpr (CT::RealSP<T>)
 				return simde_mm_floor_ps(value);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm_floor_pd(value);
-			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerFloor of 16-byte package");
+			else
+				LANGULUS_ASSERT("Unsupported type for SIMD::InnerFloor of 16-byte package");
 		}
 		else if constexpr (CT::SIMD256<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
+			if constexpr (CT::RealSP<T>)
 				return simde_mm256_floor_ps(value);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm256_floor_pd(value);
-			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerFloor of 32-byte package");
+			else
+				LANGULUS_ASSERT("Unsupported type for SIMD::InnerFloor of 32-byte package");
 		}
 		else if constexpr (CT::SIMD512<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
+			if constexpr (CT::RealSP<T>)
 				return simde_mm512_floor_ps(value);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm512_floor_pd(value);
-			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerFloor of 64-byte package");
+			else
+				LANGULUS_ASSERT("Unsupported type for SIMD::InnerFloor of 64-byte package");
 		}
 		else LANGULUS_ASSERT("Unsupported type for SIMD::InnerFloor");
 	}
 
 	template<class T, Count S>
-	auto Floor(const T(&value)[S]) noexcept {
+	LANGULUS(ALWAYSINLINE) auto Floor(const T(&value)[S]) noexcept {
 		return InnerFloor<T, S>(Load<0>(value));
 	}
 

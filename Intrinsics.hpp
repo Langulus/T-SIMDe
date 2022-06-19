@@ -24,7 +24,6 @@ LANGULUS_EXCEPTION(DivisionByZero);
 
 #define LANGULUS_SIMD(a) LANGULUS_SIMD_##a()
 
-
 ///																									
 ///	Detect available SIMD																	
 ///																									
@@ -49,7 +48,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 #define LANGULUS_SIMD_256BIT() 0
 #define LANGULUS_SIMD_512BIT() 0
 
-#if defined (__AVX512BW__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
+#if defined (__AVX512BW__) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512BW
 	#define LANGULUS_SIMD_AVX512BW() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -58,7 +57,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512CD__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
+#if defined(__AVX512CD__) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512CD
 	#define LANGULUS_SIMD_AVX512CD() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -67,7 +66,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512DQ__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
+#if defined(__AVX512DQ__) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512DQ
 	#define LANGULUS_SIMD_AVX512DQ() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -76,7 +75,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512F__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
+#if defined(__AVX512F__) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512F
 	#define LANGULUS_SIMD_AVX512F() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -85,7 +84,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX512VL__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
+#if defined(__AVX512VL__) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512VL
 	#define LANGULUS_SIMD_AVX512VL() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -94,7 +93,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if LANGULUS_SIMD(AVX512BW) && LANGULUS_SIMD(AVX512CD) && LANGULUS_SIMD(AVX512DQ) && LANGULUS_SIMD(AVX512F) && LANGULUS_SIMD(AVX512VL) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 64
+#if LANGULUS_SIMD(AVX512BW) && LANGULUS_SIMD(AVX512CD) && LANGULUS_SIMD(AVX512DQ) && LANGULUS_SIMD(AVX512F) && LANGULUS_SIMD(AVX512VL) && LANGULUS_ALIGNMENT >= 64
 	#undef LANGULUS_SIMD_AVX512
 	#define LANGULUS_SIMD_AVX512() 1
 	#undef LANGULUS_SIMD_512BIT
@@ -105,7 +104,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX2__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 32
+#if defined(__AVX2__) && LANGULUS_ALIGNMENT >= 32
 	#undef LANGULUS_SIMD_AVX2
 	#define LANGULUS_SIMD_AVX2() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -114,7 +113,7 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__AVX__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 32
+#if defined(__AVX__) && LANGULUS_ALIGNMENT >= 32
 	#undef LANGULUS_SIMD_AVX
 	#define LANGULUS_SIMD_AVX() 1
 	#undef LANGULUS_SIMD_256BIT
@@ -123,42 +122,42 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE4_2__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
+#if defined(__SSE4_2__) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE4_2
 	#define LANGULUS_SIMD_SSE4_2() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE4_1__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
+#if defined(__SSE4_1__) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE4_1
 	#define LANGULUS_SIMD_SSE4_1() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSSE3__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
+#if defined(__SSSE3__) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSSE3
 	#define LANGULUS_SIMD_SSSE3() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE3__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
+#if defined(__SSE3__) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE3
 	#define LANGULUS_SIMD_SSE3() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE2__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
+#if defined(__SSE2__) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE2
 	#define LANGULUS_SIMD_SSE2() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE__) && defined(LANGULUS_ALIGNMENT) && LANGULUS_ALIGNMENT >= 16
+#if defined(__SSE__) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE
 	#define LANGULUS_SIMD_SSE() 1
 	#undef LANGULUS_SIMD_128BIT
@@ -213,33 +212,45 @@ namespace Langulus::CT
 			|| (sizeof(Decay<T1>) > sizeof(Decay<T2>)
 		), Decay<T1>, Decay<T2>>;
 
+	/// Byte concept																				
+	template<class T>
+	concept Byte = Same<::Langulus::Byte, T>;
+
+	/// Single precision real number concept												
+	template<class T>
+	concept RealSP = Same<float, T>;
+
+	/// Double precision real number concept												
+	template<class T>
+	concept RealDP = Same<double, T>;
+
 	/// More precise number concepts															
 	template<class T>
-	concept Integer8 = CT::Integer<T> && sizeof(T) == 1;
+	concept SignedInteger8 = CT::SignedInteger<T> && sizeof(Decay<T>) == 1;
 	template<class T>
-	concept Integer16 = CT::Integer<T> && sizeof(T) == 2;
+	concept SignedInteger16 = CT::SignedInteger<T> && sizeof(Decay<T>) == 2;
 	template<class T>
-	concept Integer32 = CT::Integer<T> && sizeof(T) == 4;
+	concept SignedInteger32 = CT::SignedInteger<T> && sizeof(Decay<T>) == 4;
 	template<class T>
-	concept Integer64 = CT::Integer<T> && sizeof(T) == 8;
+	concept SignedInteger64 = CT::SignedInteger<T> && sizeof(Decay<T>) == 8;
 
 	template<class T>
-	concept SignedInteger8 = CT::SignedInteger<T> && sizeof(T) == 1;
+	concept UnsignedInteger8  = (CT::UnsignedInteger<T> || CT::Character<T> || CT::Byte<T>) && sizeof(Decay<T>) == 1;
 	template<class T>
-	concept SignedInteger16 = CT::SignedInteger<T> && sizeof(T) == 2;
+	concept UnsignedInteger16 = (CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 2;
 	template<class T>
-	concept SignedInteger32 = CT::SignedInteger<T> && sizeof(T) == 4;
+	concept UnsignedInteger32 = (CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 4;
 	template<class T>
-	concept SignedInteger64 = CT::SignedInteger<T> && sizeof(T) == 8;
+	concept UnsignedInteger64 = (CT::UnsignedInteger<T> || CT::Character<T>) && sizeof(Decay<T>) == 8;
 
 	template<class T>
-	concept UnsignedInteger8 = CT::UnsignedInteger<T> && sizeof(T) == 1;
+	concept Integer8 = SignedInteger8<T> || UnsignedInteger8<T>;
 	template<class T>
-	concept UnsignedInteger16 = CT::UnsignedInteger<T> && sizeof(T) == 2;
+	concept Integer16 = SignedInteger16<T> || UnsignedInteger16<T>;
 	template<class T>
-	concept UnsignedInteger32 = CT::UnsignedInteger<T> && sizeof(T) == 4;
+	concept Integer32 = SignedInteger32<T> || UnsignedInteger32<T>;
 	template<class T>
-	concept UnsignedInteger64 = CT::UnsignedInteger<T> && sizeof(T) == 8;
+	concept Integer64 = SignedInteger64<T> || UnsignedInteger64<T>;
 
 } // namespace Langulus::CT
 
@@ -469,7 +480,7 @@ namespace Langulus::SIMD
 	///	@param op - the fallback function to invoke									
 	///	@return the resulting number or std::array									
 	template<class LOSSLESS, class LHS, class RHS, class FFALL>
-	NOD() auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
+	LANGULUS(ALWAYSINLINE) NOD() auto Fallback(LHS& lhs, RHS& rhs, FFALL&& op) requires Invocable<FFALL, LOSSLESS> {
 		using OUT = InvocableResult<FFALL, LOSSLESS>;
 
 		if constexpr (CT::Array<LHS> && CT::Array<RHS>) {

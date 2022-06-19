@@ -13,7 +13,7 @@ namespace Langulus::SIMD
 {
 
 	template<class T, Count S>
-	auto PowerInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) auto PowerInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
 
@@ -25,28 +25,28 @@ namespace Langulus::SIMD
 	///	@param rhs - the right-hand-side array 										
 	///	@return the raised values															
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto PowerInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) auto PowerInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		static_assert(CT::Real<T>, 
 			"SIMD::InnerPow doesn't work for whole numbers");
 
 		if constexpr (CT::SIMD128<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
+			if constexpr (CT::RealSP<T>)
 				return simde_mm_pow_ps(lhs, rhs);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm_pow_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerPow of 16-byte package");
 		}
 		else if constexpr (CT::SIMD256<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
+			if constexpr (CT::RealSP<T>)
 				return simde_mm256_pow_ps(lhs, rhs);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm256_pow_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerPow of 32-byte package");
 		}
 		else if constexpr (CT::SIMD512<REGISTER>) {
-			if constexpr (CT::Same<T, float>)
+			if constexpr (CT::RealSP<T>)
 				return simde_mm512_pow_ps(lhs, rhs);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm512_pow_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerPow of 64-byte package");
 		}
@@ -55,7 +55,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	NOD() auto Power(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() auto Power(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -72,7 +72,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS, class OUT>
-	void Power(LHS& lhs, RHS& rhs, OUT& output) noexcept {
+	LANGULUS(ALWAYSINLINE) void Power(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = Power<LHS, RHS>(lhs, rhs);
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
@@ -91,7 +91,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	NOD() WRAPPER PowerWrap(LHS& lhs, RHS& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() WRAPPER PowerWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Power<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;

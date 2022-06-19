@@ -12,5 +12,10 @@ download_project(
 )
 add_subdirectory(${Catch2_SOURCE_DIR} ${Catch2_BINARY_DIR})
 
-add_executable(Test.TSIMDe ${SOURCE_FILES}) 
+add_executable(Test.TSIMDe ${SOURCE_FILES})
+
+if(MSVC)
+	target_compile_options(Test.TSIMDe PRIVATE /bigobj)
+endif()
+
 target_link_libraries(Test.TSIMDe PRIVATE Langulus.TSIMDe Catch2)

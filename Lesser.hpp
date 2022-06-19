@@ -13,7 +13,7 @@ namespace Langulus::SIMD
 {
 
 	template<class T, Count S>
-	auto LesserInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) auto LesserInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported {};
 	}
 
@@ -25,7 +25,7 @@ namespace Langulus::SIMD
 	///	@param rhs - the right-hand-side array 										
 	///	@return true if lhs is lower than rhs											
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto LesserInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) auto LesserInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			#if LANGULUS_SIMD(AVX512)
 				if constexpr (CT::SignedInteger8<T>)
@@ -57,9 +57,9 @@ namespace Langulus::SIMD
 					return simde_mm_movemask_epi8(simde_mm_cmplt_epi32(lhs, rhs)) == 0xFFFF;
 				else if constexpr (CT::Integer64<T>)
 					return CT::Inner::NotSupported{};
-				else if constexpr (CT::Same<T, float>)
+				else if constexpr (CT::RealSP<T>)
 					return simde_mm_movemask_ps(_mm_cmplt_ps(lhs, rhs)) == 0xF;
-				else if constexpr (CT::Same<T, double>)
+				else if constexpr (CT::RealDP<T>)
 					return simde_mm_movemask_pd(_mm_cmplt_pd(lhs, rhs)) == 0x7;
 			#endif
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLower of 16-byte package");
@@ -100,9 +100,9 @@ namespace Langulus::SIMD
 				else if constexpr (CT::Integer64<T>)
 					return simde_mm256_movemask_epi8(simde_mm256_cmpgt_epi64(lhs, rhs)) == 0 &&
 							 simde_mm256_movemask_epi8(simde_mm256_cmpeq_epi64(lhs, rhs)) == 0;
-				else if constexpr (CT::Same<T, float>)
+				else if constexpr (CT::RealSP<T>)
 					return simde_mm256_movemask_ps(simde_mm256_cmp_ps(lhs, rhs, _CMP_LT_OQ)) == 0xFF;
-				else if constexpr (CT::Same<T, double>)
+				else if constexpr (CT::RealDP<T>)
 					return simde_mm256_movemask_pd(simde_mm256_cmp_pd(lhs, rhs, _CMP_LT_OQ)) == 0xF;
 			#endif
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLower of 32-byte package");
@@ -124,9 +124,9 @@ namespace Langulus::SIMD
 				return simde_mm512_cmplt_epi64_mask(lhs, rhs) == 0xFF;
 			else if constexpr (CT::UnsignedInteger64<T>)
 				return simde_mm512_cmplt_epu64_mask(lhs, rhs) == 0xFF;
-			else if constexpr (CT::Same<T, float>)
+			else if constexpr (CT::RealSP<T>)
 				return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_LT_OQ) == 0xFFFF;
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_LT_OQ) == 0xFF;
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLower of 64-byte package");
 		}
@@ -140,7 +140,7 @@ namespace Langulus::SIMD
 	///	@param rhsOrig - the right array or number									
 	///	@return true if all elements match												
 	template<class LHS, class RHS>
-	NOD() bool Lesser(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() bool Lesser(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();

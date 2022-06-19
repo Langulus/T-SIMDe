@@ -13,7 +13,7 @@ namespace Langulus::SIMD
 {
 	
 	template<class T, Count S>
-	auto EqualsOrGreaterInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) auto EqualsOrGreaterInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported {};
 	}
 
@@ -25,7 +25,7 @@ namespace Langulus::SIMD
 	///	@param rhs - the right-hand-side array 										
 	///	@return true if lhs is equal-or-greater than rhs							
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto EqualsOrGreaterInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) auto EqualsOrGreaterInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::SignedInteger8<T>)
 				return simde_mm_cmpge_epi8_mask(lhs, rhs) == 0xFFFF;
@@ -43,9 +43,9 @@ namespace Langulus::SIMD
 				return simde_mm_cmpge_epi64_mask(lhs, rhs) == 0x7;
 			else if constexpr (CT::UnsignedInteger64<T>)
 				return simde_mm_cmpge_epu64_mask(lhs, rhs) == 0x7;
-			else if constexpr (CT::Same<T, float>)
+			else if constexpr (CT::RealSP<T>)
 				return simde_mm_movemask_ps(_mm_cmpge_ps(lhs, rhs)) == 0xF;
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm_movemask_pd(_mm_cmpge_pd(lhs, rhs)) == 0x7;
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerEqualsOrGreater of 16-byte package");
 		}
@@ -66,9 +66,9 @@ namespace Langulus::SIMD
 				return simde_mm256_cmpge_epi64_mask(lhs, rhs) == 0xF;
 			else if constexpr (CT::UnsignedInteger64<T>)
 				return simde_mm256_cmpge_epu64_mask(lhs, rhs) == 0xF;
-			else if constexpr (CT::Same<T, float>)
+			else if constexpr (CT::RealSP<T>)
 				return simde_mm256_movemask_ps(_mm256_cmp_ps(lhs, rhs, _CMP_GE_OQ)) == 0xFF;
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm256_movemask_pd(_mm256_cmp_pd(lhs, rhs, _CMP_GE_OQ)) == 0xF;
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerEqualsOrGreater of 32-byte package");
 		}
@@ -89,9 +89,9 @@ namespace Langulus::SIMD
 				return simde_mm512_cmpge_epi64_mask(lhs, rhs) == 0xFF;
 			else if constexpr (CT::UnsignedInteger64<T>)
 				return simde_mm512_cmpge_epu64_mask(lhs, rhs) == 0xFF;
-			else if constexpr (CT::Same<T, float>)
+			else if constexpr (CT::RealSP<T>)
 				return simde_mm512_cmp_ps_mask(lhs, rhs, _CMP_GE_OQ) == 0xFFFF;
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm512_cmp_pd_mask(lhs, rhs, _CMP_GE_OQ) == 0xFF;
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerEqualsOrGreater of 64-byte package");
 		}
@@ -105,7 +105,7 @@ namespace Langulus::SIMD
 	///	@param rhsOrig - the right array or number									
 	///	@return true if all elements match												
 	template<class LHS, class RHS>
-	NOD() bool EqualsOrGreater(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() bool EqualsOrGreater(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();

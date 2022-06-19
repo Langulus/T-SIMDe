@@ -9,24 +9,25 @@
 #include "Fill.hpp"
 #include "Convert.hpp"
 #include "Store.hpp"
+#include "IgnoreWarningsPush.inl"
 
 namespace Langulus::SIMD
 {
 		
 	template<class T, Count S>
-	auto AddInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) auto AddInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
 
-	/// Add two arrays using SIMD															
-	///	@tparam T - the type of the array element									
-	///	@tparam S - the size of the array											
-	///	@tparam REGISTER - the register type (deducible)						
-	///	@param lhs - the left-hand-side array 										
-	///	@param rhs - the right-hand-side array 									
-	///	@return the added elements as a register									
+	/// Add two arrays using SIMD																
+	///	@tparam T - the type of the array element										
+	///	@tparam S - the size of the array												
+	///	@tparam REGISTER - the register type (deducible)							
+	///	@param lhs - the left-hand-side array 											
+	///	@param rhs - the right-hand-side array 										
+	///	@return the added elements as a register										
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto AddInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) auto AddInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		#if LANGULUS_SIMD(128BIT)
 			if constexpr (CT::SIMD128<REGISTER>) {
 				if constexpr (CT::SignedInteger8<T>)
@@ -41,11 +42,12 @@ namespace Langulus::SIMD
 					return simde_mm_add_epi32(lhs, rhs);
 				else if constexpr (CT::Integer64<T>)
 					return simde_mm_add_epi64(lhs, rhs);
-				else if constexpr (CT::Same<T, float>)
+				else if constexpr (CT::RealSP<T>)
 					return simde_mm_add_ps(lhs, rhs);
-				else if constexpr (CT::Same<T, double>)
+				else if constexpr (CT::RealDP<T>)
 					return simde_mm_add_pd(lhs, rhs);
-				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 16-byte package");
+				else
+					LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 16-byte package");
 			}
 			else
 		#endif
@@ -64,11 +66,12 @@ namespace Langulus::SIMD
 					return simde_mm256_add_epi32(lhs, rhs);
 				else if constexpr (CT::Integer64<T>)
 					return simde_mm256_add_epi64(lhs, rhs);
-				else if constexpr (CT::Same<T, float>)
+				else if constexpr (CT::RealSP<T>)
 					return simde_mm256_add_ps(lhs, rhs);
-				else if constexpr (CT::Same<T, double>)
+				else if constexpr (CT::RealDP<T>)
 					return simde_mm256_add_pd(lhs, rhs);
-				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 32-byte package");
+				else
+					LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 32-byte package");
 			}
 			else
 		#endif
@@ -87,11 +90,12 @@ namespace Langulus::SIMD
 					return simde_mm512_add_epi32(lhs, rhs);
 				else if constexpr (CT::Integer64<T>)
 					return simde_mm512_add_epi64(lhs, rhs);
-				else if constexpr (CT::Same<T, float>)
+				else if constexpr (CT::RealSP<T>)
 					return simde_mm512_add_ps(lhs, rhs);
-				else if constexpr (CT::Same<T, double>)
+				else if constexpr (CT::RealDP<T>)
 					return simde_mm512_add_pd(lhs, rhs);
-				else LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 64-byte package");
+				else
+					LANGULUS_ASSERT("Unsupported type for SIMD::InnerAdd of 64-byte package");
 			}
 			else
 		#endif
@@ -101,7 +105,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	NOD() auto Add(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() auto Add(const LHS& lhsOrig, const RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -125,7 +129,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS, class OUT>
-	void Add(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
+	LANGULUS(ALWAYSINLINE) void Add(const LHS& lhs, const RHS& rhs, OUT& output) noexcept {
 		const auto result = Add<LHS, RHS>(lhs, rhs);
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
@@ -137,17 +141,18 @@ namespace Langulus::SIMD
 		}
 		else {
 			// Extract from std::array													
-			for (Offset i = 0; i < ExtentOf<OUT>; ++i)
-				output[i] = result[i];
+			std::memcpy(output, result.data(), sizeof(output));
 		}
 	}
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	NOD() WRAPPER AddWrap(const LHS& lhs, const RHS& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() WRAPPER AddWrap(const LHS& lhs, const RHS& rhs) noexcept {
 		WRAPPER result;
 		Add<LHS, RHS>(lhs, rhs, result.mComponents);
 		return result;
 	}
 
 } // namespace Langulus::SIMD
+
+#include "IgnoreWarningsPop.inl"

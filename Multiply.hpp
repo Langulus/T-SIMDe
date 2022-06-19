@@ -8,12 +8,13 @@
 #pragma once
 #include "Fill.hpp"
 #include "Convert.hpp"
+#include "IgnoreWarningsPush.inl"
 
 namespace Langulus::SIMD
 {
 
 	template<class T, Count S>
-	auto MultiplyInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) auto MultiplyInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
 
@@ -25,7 +26,7 @@ namespace Langulus::SIMD
 	///	@param rhs - the right-hand-side array 										
 	///	@return the multiplied elements as a register								
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto MultiplyInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) auto MultiplyInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::Integer8<T>) {
 				auto loLHS = simde_mm_cvtepi8_epi16(lhs);
@@ -52,9 +53,9 @@ namespace Langulus::SIMD
 					return CT::Inner::NotSupported{};
 				#endif
 			}
-			else if constexpr (CT::Same<T, float>)
+			else if constexpr (CT::RealSP<T>)
 				return simde_mm_mul_ps(lhs, rhs);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm_mul_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMul of 16-byte package");
 		}
@@ -84,9 +85,9 @@ namespace Langulus::SIMD
 					return CT::Inner::NotSupported{};
 				#endif
 			}
-			else if constexpr (CT::Same<T, float>)
+			else if constexpr (CT::RealSP<T>)
 				return simde_mm256_mul_ps(lhs, rhs);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm256_mul_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMul of 32-byte package");
 		}
@@ -116,9 +117,9 @@ namespace Langulus::SIMD
 					return CT::Inner::NotSupported{};
 				#endif
 			}
-			else if constexpr (CT::Same<T, float>)
+			else if constexpr (CT::RealSP<T>)
 				return simde_mm512_mul_ps(lhs, rhs);
-			else if constexpr (CT::Same<T, double>)
+			else if constexpr (CT::RealDP<T>)
 				return simde_mm512_mul_pd(lhs, rhs);
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerMul of 64-byte package");
 		}
@@ -127,7 +128,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	NOD() auto Multiply(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() auto Multiply(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -144,7 +145,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS, class OUT>
-	void Multiply(LHS& lhs, RHS& rhs, OUT& output) noexcept {
+	LANGULUS(ALWAYSINLINE) void Multiply(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = Multiply<LHS, RHS>(lhs, rhs);
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
@@ -163,10 +164,12 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	NOD() WRAPPER MultiplyWrap(LHS& lhs, RHS& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() WRAPPER MultiplyWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		Multiply<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;
 	}
 
 } // namespace Langulus::SIMD
+
+#include "IgnoreWarningsPop.inl"

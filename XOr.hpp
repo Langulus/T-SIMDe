@@ -8,14 +8,13 @@
 #pragma once
 #include "Fill.hpp"
 #include "Convert.hpp"
-
 #include "IgnoreWarningsPush.inl"
 
 namespace Langulus::SIMD
 {
 		
 	template<class T, Count S>
-	auto XOrInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) auto XOrInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
 
@@ -26,7 +25,7 @@ namespace Langulus::SIMD
 	///	@param rhs - the right-hand-side array 										
 	///	@return the xor'd elements as a register										
 	template<class T, Count S, class REGISTER>
-	auto XOrInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) auto XOrInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::Same<REGISTER,simde__m128i>)
 			return simde_mm_xor_si128(lhs, rhs);
 		else if constexpr (CT::Same<REGISTER,simde__m128>)
@@ -51,7 +50,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	NOD() auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() auto XOr(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -68,7 +67,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS, class OUT>
-	void XOr(LHS& lhs, RHS& rhs, OUT& output) noexcept {
+	LANGULUS(ALWAYSINLINE) void XOr(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = XOr<LHS, RHS>(lhs, rhs);
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
@@ -87,7 +86,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	NOD() WRAPPER XOrWrap(LHS& lhs, RHS& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() WRAPPER XOrWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		XOr<LHS, RHS>(lhs, rhs, result.mArray);
 		return result;

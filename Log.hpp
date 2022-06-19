@@ -28,11 +28,11 @@ namespace Langulus::SIMD
 	///	@param value - the array 															
 	///	@return the logarithm values														
 	template<LogStyle STYLE = LogStyle::Base10, class T, Count S, CT::TSIMD REGISTER>
-	REGISTER InnerLog(const REGISTER& value) noexcept {
+	LANGULUS(ALWAYSINLINE) REGISTER InnerLog(const REGISTER& value) noexcept {
 		static_assert(CT::Real<T>, "SIMD::InnerLog doesn't work for whole numbers");
 
 		if constexpr (CT::SIMD128<REGISTER>) {
-			if constexpr (CT::Same<T, float>) {
+			if constexpr (CT::RealSP<T>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm_log_ps(value);
 				else if constexpr (STYLE == LogStyle::Base10)
@@ -45,7 +45,7 @@ namespace Langulus::SIMD
 					return simde_mm_logb_ps(value);
 				else LANGULUS_ASSERT("Unsupported style for SIMD::InnerLog of float[4] package");
 			}
-			else if constexpr (CT::Same<T, double>) {
+			else if constexpr (CT::RealDP<T>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm_log_pd(value);
 				else if constexpr (STYLE == LogStyle::Base10)
@@ -61,7 +61,7 @@ namespace Langulus::SIMD
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLog of 16-byte package");
 		}
 		else if constexpr (CT::SIMD256<REGISTER>) {
-			if constexpr (CT::Same<T, float>) {
+			if constexpr (CT::RealSP<T>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm256_log_ps(value);
 				else if constexpr (STYLE == LogStyle::Base10)
@@ -74,7 +74,7 @@ namespace Langulus::SIMD
 					return simde_mm256_logb_ps(value);
 				else LANGULUS_ASSERT("Unsupported style for SIMD::InnerLog of float[8] package");
 			}
-			else if constexpr (CT::Same<T, double>) {
+			else if constexpr (CT::RealDP<T>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm256_log_pd(value);
 				else if constexpr (STYLE == LogStyle::Base10)
@@ -90,7 +90,7 @@ namespace Langulus::SIMD
 			else LANGULUS_ASSERT("Unsupported type for SIMD::InnerLog of 32-byte package");
 		}
 		else if constexpr (CT::SIMD512<REGISTER>) {
-			if constexpr (CT::Same<T, float>) {
+			if constexpr (CT::RealSP<T>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm512_log_ps(value);
 				else if constexpr (STYLE == LogStyle::Base10)
@@ -103,7 +103,7 @@ namespace Langulus::SIMD
 					return simde_mm512_logb_ps(value);
 				else LANGULUS_ASSERT("Unsupported style for SIMD::InnerLog of float[16] package");
 			}
-			else if constexpr (CT::Same<T, double>) {
+			else if constexpr (CT::RealDP<T>) {
 				if constexpr (STYLE == LogStyle::Natural)
 					return simde_mm512_log_pd(value);
 				else if constexpr (STYLE == LogStyle::Base10)
@@ -122,7 +122,7 @@ namespace Langulus::SIMD
 	}
 
 	template<LogStyle STYLE, class T, Count S>
-	auto Log(const T(&value)[S]) noexcept {
+	LANGULUS(ALWAYSINLINE) auto Log(const T(&value)[S]) noexcept {
 		return InnerLog<STYLE, T, S>(Load<0>(value));
 	}
 

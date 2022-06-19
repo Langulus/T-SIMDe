@@ -7,30 +7,68 @@
 ///																									
 #include "Main.hpp"
 #include <catch2/catch.hpp>
+#include <random>
 
-template<class T1, class T2>
-CT::Lossless<T1, T2> Control(const T1& lhs, const T2& rhs) noexcept {
-	if constexpr (CT::Same<CT::Lossless<T1, T2>, ::std::byte>) {
-		return static_cast<CT::Lossless<T1, T2>>(
+#if LANGULUS_COMPILER(GCC)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wattributes"
+#endif
+
+using timer = Catch::Benchmark::Chronometer;
+template<class T>
+using uninitialized = Catch::Benchmark::storage_for<T>;
+std::random_device rd;
+std::mt19937 gen(rd());
+
+template<class T, Count C>
+struct alignas(Langulus::Alignment) Vector {
+	T mArray[C];
+
+	Vector() {
+		for (auto& i : mArray) {
+			if constexpr (CT::Sparse<T>) {
+				using TD = Decay<T>;
+				i = new TD {static_cast<TD>(gen() % 66)};
+			}
+			else i = static_cast<T>(gen() % 66);
+		}
+	}
+
+	~Vector() {
+		for (auto& i : mArray) {
+			if constexpr (CT::Sparse<T>)
+				delete i;
+		}
+	}
+
+	bool operator == (const Vector& e) const noexcept {
+		for (int i = 0; i < C; ++i)
+			if (DenseCast(mArray[i]) != DenseCast(e.mArray[i]))
+				return false;
+		return true;
+	}
+};
+
+template<class LHS, class RHS, class OUT>
+LANGULUS(ALWAYSINLINE) void Control(const LHS& lhs, const RHS& rhs, OUT& out) noexcept {
+	if constexpr (CT::Same<OUT, ::std::byte>) {
+		out = static_cast<OUT>(
 			reinterpret_cast<const unsigned char&>(DenseCast(lhs)) +
 			reinterpret_cast<const unsigned char&>(DenseCast(rhs))
 		);
 	}
-	else return DenseCast(lhs) + DenseCast(rhs);
+	else out = DenseCast(lhs) + DenseCast(rhs);
 }
 
-template<class T1, class T2, size_t C>
-auto Control(const T1(&lhsArray)[C], const T2(&rhsArray)[C]) noexcept {
-	using RT = CT::Lossless<T1, T2>;
-	::std::array<RT, C> result;
-	auto r = result.data();
-	auto lhs = lhsArray;
-	auto rhs = rhsArray;
+template<class LHS, class RHS, size_t C, class OUT>
+LANGULUS(ALWAYSINLINE) void Control(const Vector<LHS, C>& lhsArray, const Vector<RHS, C>& rhsArray, Vector<OUT, C>& out) noexcept {
+	auto r = out.mArray;
+	auto lhs = lhsArray.mArray;
+	auto rhs = rhsArray.mArray;
 	const auto lhsEnd = lhs + C;
-	const auto rhsEnd = rhs + C;
 	while (lhs != lhsEnd) {
-		if constexpr (CT::Same<RT, ::std::byte>) {
-			*r = static_cast<RT>(
+		if constexpr (CT::Same<OUT, ::std::byte>) {
+			*r = static_cast<OUT>(
 				reinterpret_cast<const unsigned char&>(DenseCast(*lhs)) +
 				reinterpret_cast<const unsigned char&>(DenseCast(*rhs))
 			);
@@ -39,267 +77,435 @@ auto Control(const T1(&lhsArray)[C], const T2(&rhsArray)[C]) noexcept {
 
 		++lhs; ++rhs; ++r;
 	}
-
-	return result;
 }
 
-TEMPLATE_TEST_CASE("Add", "[add]", SIGNED_TYPES(), UNSIGNED_TYPES(), SPARSE_SIGNED_TYPES(), SPARSE_UNSIGNED_TYPES()) {
+TEMPLATE_TEST_CASE("Add", "[add]", SPARSE_UNSIGNED_TYPES(), SPARSE_SIGNED_TYPES(), SIGNED_TYPES(), UNSIGNED_TYPES()) {
 	using T = TestType;
 	using DenseT = Decay<TestType>;
 
 	GIVEN("scalar + scalar = scalar") {
 		T x, y;
-		DenseT r;
+		DenseT r, rCheck;
 		InitOne(x, 1);
 		InitOne(y, -5);
-		const auto rCheck = Control(x, y);
 
 		WHEN("Added") {
+			Control(x, y, rCheck);
 			SIMD::Add(x, y, r);
 
 			THEN("The result should be correct") {
-				REQUIRE(DenseCast(r) == rCheck);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<T> nx(meter.runs());
+					for (auto& i : nx)
+						InitOne(i, 1);
+
+					some<T> ny(meter.runs());
+					for (auto& i : ny)
+						InitOne(i, 1);
+
+					some<DenseT> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<T> nx(meter.runs());
+					for (auto& i : nx)
+						InitOne(i, 1);
+
+					some<T> ny(meter.runs());
+					for (auto& i : ny)
+						InitOne(i, 1);
+
+					some<DenseT> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i], ny[i], nr[i]);
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") {
+			Control(y, x, rCheck);
 			SIMD::Add(y, x, r);
 
 			THEN("The result should be correct") {
-				REQUIRE(DenseCast(r) == rCheck);
+				REQUIRE(r == rCheck);
 			}
+		}
+
+		if constexpr (CT::Sparse<T>) {
+			delete x;
+			delete y;
 		}
 	}
 
 	GIVEN("vector[1] + vector[1] = vector[1]") {
-		T x[1], y[1];
-		DenseT r[1];
-		Init(x, 1);
-		Init(y, -5);
-		const auto rCheck = Control(x, y);
+		Vector<T, 1> x, y;
+		Vector<DenseT, 1> r, rCheck;
 
 		WHEN("Added") {
-			SIMD::Add(x, y, r);
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 1; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 1>> nx(meter.runs());
+					some<Vector<T, 1>> ny(meter.runs());
+					some<Vector<DenseT, 1>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 1>> nx(meter.runs());
+					some<Vector<T, 1>> ny(meter.runs());
+					some<Vector<DenseT, 1>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") {
-			SIMD::Add(y, x, r);
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 1; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
 		}
-
-		Free(x);
-		Free(y);
 	}
 
 	GIVEN("vector[2] + vector[2] = vector[2]") {
-		T x[2], y[2];
-		DenseT r[2];
-		Init(x, 1, 2);
-		Init(y, -5, 6);
-		const auto rCheck = Control(x, y);
+		Vector<T, 2> x, y;
+		Vector<DenseT, 2> r, rCheck;
 
 		WHEN("Added") {
-			SIMD::Add(x, y, r);
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 2; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 2>> nx(meter.runs());
+					some<Vector<T, 2>> ny(meter.runs());
+					some<Vector<DenseT, 2>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 2>> nx(meter.runs());
+					some<Vector<T, 2>> ny(meter.runs());
+					some<Vector<DenseT, 2>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") {
-			SIMD::Add(y, x, r);
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 2; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
 		}
-
-		Free(x);
-		Free(y);
 	}
 
 	GIVEN("vector[3] + vector[3] = vector[3]") {
-		T x[3], y[3];
-		DenseT r[3];
-		Init(x, 1, 2, 0);
-		Init(y, -5, 6, -22);
-		const auto rCheck = Control(x, y);
+		Vector<T, 3> x, y;
+		Vector<DenseT, 3> r, rCheck;
 
 		WHEN("Added") {
-			SIMD::Add(x, y, r);
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for(int i = 0; i < 3; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 3>> nx(meter.runs());
+					some<Vector<T, 3>> ny(meter.runs());
+					some<Vector<DenseT, 3>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 3>> nx(meter.runs());
+					some<Vector<T, 3>> ny(meter.runs());
+					some<Vector<DenseT, 3>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") {
-			SIMD::Add(y, x, r);
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 3; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
 		}
-
-		Free(x);
-		Free(y);
 	}
 
 	GIVEN("vector[4] + vector[4] = vector[4]") {
-		T x[4], y[4];
-		DenseT r[4];
-		Init(x, 1, 2, 0, 66);
-		Init(y, -5, 6, -22, 2);
-		const auto rCheck = Control(x, y);
+		Vector<T, 4> x, y;
+		Vector<DenseT, 4> r, rCheck;
 
 		WHEN("Added") {
-			SIMD::Add(x, y, r);
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 4; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 4>> nx(meter.runs());
+					some<Vector<T, 4>> ny(meter.runs());
+					some<Vector<DenseT, 4>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 4>> nx(meter.runs());
+					some<Vector<T, 4>> ny(meter.runs());
+					some<Vector<DenseT, 4>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") {
-			SIMD::Add(y, x, r);
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 4; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
 		}
-
-		Free(x);
-		Free(y);
 	}
 
 	GIVEN("vector[7] + vector[7] = vector[7]") {
-		T x[7], y[7];
-		DenseT r[7];
-		Init(x, 1, 2, 0, 66, 1, 2, 0);
-		Init(y, -5, 6, -22, 2, -5, 6, -22);
-		const auto rCheck = Control(x, y);
+		Vector<T, 7> x, y;
+		Vector<DenseT, 7> r, rCheck;
 
 		WHEN("Added") {
-			SIMD::Add(x, y, r);
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 7; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 7>> nx(meter.runs());
+					some<Vector<T, 7>> ny(meter.runs());
+					some<Vector<DenseT, 7>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 7>> nx(meter.runs());
+					some<Vector<T, 7>> ny(meter.runs());
+					some<Vector<DenseT, 7>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") { 
-			SIMD::Add(y, x, r);
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 7; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
 		}
-
-		Free(x);
-		Free(y);
 	}
 
 	GIVEN("vector[8] + vector[8] = vector[8]") {
-		T x[8], y[8];
-		DenseT r[8];
-		Init(x, 1, 2, 2, 0, 66, 1, 2, 0);
-		Init(y, -5, 6, 6, -22, 2, -5, 6, -22);
-		const auto rCheck = Control(x, y);
+		Vector<T, 8> x, y;
+		Vector<DenseT, 8> r, rCheck;
 
 		WHEN("Added") {
-			SIMD::Add(x, y, r);
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 8; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 8>> nx(meter.runs());
+					some<Vector<T, 8>> ny(meter.runs());
+					some<Vector<DenseT, 8>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 8>> nx(meter.runs());
+					some<Vector<T, 8>> ny(meter.runs());
+					some<Vector<DenseT, 8>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") {
-			SIMD::Add(y, x, r);
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 8; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
 		}
-
-		Free(x);
-		Free(y);
 	}
 
 	GIVEN("vector[15] + vector[15] = vector[15]") {
-		T x[15], y[15];
-		DenseT r[15];
-		Init(x, 1, 2, 2, 0, 66, 1, 2, 0, 2, 2, 0, 66, 1, 2, 0);
-		Init(y, -5, 6, 6, -22, 2, -5, 6, -22, 6, 6, -22, 2, -5, 6, -22);
-		const auto rCheck = Control(x, y);
+		Vector<T, 15> x, y;
+		Vector<DenseT, 15> r, rCheck;
 
 		WHEN("Added") {
-			SIMD::Add(x, y, r);
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 15; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 15>> nx(meter.runs());
+					some<Vector<T, 15>> ny(meter.runs());
+					some<Vector<DenseT, 15>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 15>> nx(meter.runs());
+					some<Vector<T, 15>> ny(meter.runs());
+					some<Vector<DenseT, 15>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") {
-			SIMD::Add(y, x, r);
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 15; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
 		}
-
-		Free(x);
-		Free(y);
 	}
 
 	GIVEN("vector[16] + vector[16] = vector[16]") {
-		T x[16], y[16];
-		DenseT r[16];
-		Init(x, 1, 2, 2, 2, 0, 66, 1, 2, 0, 2, 2, 0, 66, 1, 2, 0);
-		Init(y, -5, 6, 6, -22, 2, -5, 6, -22, 6, 6, 6, -22, 2, -5, 6, -22);
-		const auto rCheck = Control(x, y);
+		Vector<T, 16> x, y;
+		Vector<DenseT, 16> r, rCheck;
 
 		WHEN("Added") {
-			SIMD::Add(x, y, r);
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 16; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 16>> nx(meter.runs());
+					some<Vector<T, 16>> ny(meter.runs());
+					some<Vector<DenseT, 16>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 16>> nx(meter.runs());
+					some<Vector<T, 16>> ny(meter.runs());
+					some<Vector<DenseT, 16>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
 		}
 
 		WHEN("Added in reverse") {
-			SIMD::Add(y, x, r);
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
 
 			THEN("The result should be correct") {
-				for (int i = 0; i < 16; ++i)
-					REQUIRE(DenseCast(r[i]) == rCheck[i]);
+				REQUIRE(r == rCheck);
 			}
 		}
-
-		Free(x);
-		Free(y);
 	}
 }
+
+#if LANGULUS_COMPILER(GCC)
+	#pragma GCC diagnostic pop
+#endif

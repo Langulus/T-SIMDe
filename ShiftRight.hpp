@@ -20,7 +20,7 @@ namespace Langulus::SIMD
 	///	@param rhs - the right-hand-side array 										
 	///	@return the shifted elements as a register									
 	template<class T, Count S, CT::TSIMD REGISTER>
-	auto ShiftRightInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) auto ShiftRightInner(const REGISTER& lhs, const REGISTER& rhs) noexcept {
 		if constexpr (CT::SIMD128<REGISTER>) {
 			if constexpr (CT::Integer16<T>)
 				return simde_mm_srlv_epi16(lhs, rhs);
@@ -53,7 +53,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS>
-	NOD() auto ShiftRight(LHS& lhsOrig, RHS& rhsOrig) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() auto ShiftRight(LHS& lhsOrig, RHS& rhsOrig) noexcept {
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
@@ -70,7 +70,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<class LHS, class RHS, class OUT>
-	void ShiftRight(LHS& lhs, RHS& rhs, OUT& output) noexcept {
+	LANGULUS(ALWAYSINLINE) void ShiftRight(LHS& lhs, RHS& rhs, OUT& output) noexcept {
 		const auto result = ShiftRight<LHS, RHS>(lhs, rhs);
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
@@ -89,7 +89,7 @@ namespace Langulus::SIMD
 
 	///																								
 	template<CT::Vector WRAPPER, class LHS, class RHS>
-	NOD() WRAPPER ShiftRightWrap(LHS& lhs, RHS& rhs) noexcept {
+	LANGULUS(ALWAYSINLINE) NOD() WRAPPER ShiftRightWrap(LHS& lhs, RHS& rhs) noexcept {
 		WRAPPER result;
 		ShiftRight<LHS, RHS>(lhs, rhs, result.mComponents);
 		return result;

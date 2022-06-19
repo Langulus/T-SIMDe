@@ -19,7 +19,7 @@ namespace Langulus::SIMD
 	///	@param v - the input data															
 	///	@return the resulting register													
 	template<class TT, Count S, class FT, class TO>
-	auto ConvertFrom512(const simde__m512& v) noexcept {
+	LANGULUS(ALWAYSINLINE) auto ConvertFrom512(const simde__m512& v) noexcept {
 		//																						
 		// Converting FROM float[16]													
 		//																						
@@ -178,7 +178,7 @@ namespace Langulus::SIMD
 	///	@param v - the input data															
 	///	@return the resulting register													
 	template<class TT, Count S, class FT, class TO>
-	auto ConvertFrom512d(const simde__m512d& v) noexcept {
+	LANGULUS(ALWAYSINLINE) auto ConvertFrom512d(const simde__m512d& v) noexcept {
 		//																						
 		// Converting FROM double[8]													
 		//																						
@@ -269,7 +269,7 @@ namespace Langulus::SIMD
 	///	@param v - the input data															
 	///	@return the resulting register													
 	template<class TT, Count S, class FT, class TO>
-	auto ConvertFrom512i(const simde__m512i& v) noexcept {
+	LANGULUS(ALWAYSINLINE) auto ConvertFrom512i(const simde__m512i& v) noexcept {
 		//																						
 		// Converting FROM pci8[64], pcu8[64], pci16[32], pcu16[32]			
 		//						 pci32[16], pcu32[16], pci64[8], pcu64[8]			
