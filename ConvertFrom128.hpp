@@ -227,7 +227,7 @@ namespace Langulus::SIMD
 			}
 			else if constexpr (CT::UnsignedInteger32<FT> && S <= 4) {
 				// pcu32[4] -> float[4]													
-				return simde_mm256_cvtpd_ps(_mm256_cvtepu32_pd(v));
+				return simde_mm256_cvtpd_ps(simde_mm256_cvtepi32_pd(v));
 			}
 			else if constexpr (CT::SignedInteger64<FT> && S <= 2) {
 				// pci64[2] -> float[2]													

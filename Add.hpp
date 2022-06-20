@@ -111,7 +111,7 @@ namespace Langulus::SIMD
 		constexpr auto S = OverlapCount<LHS, RHS>();
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
-			[](const REGISTER& lhs, const REGISTER& rhs) noexcept -> REGISTER {
+			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
 				return AddInner<LOSSLESS, S>(lhs, rhs);
 			},
 			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {

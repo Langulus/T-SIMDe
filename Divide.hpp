@@ -211,7 +211,7 @@ namespace Langulus::SIMD
 
 		return AttemptSIMD<1, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
-			[](const REGISTER& lhs, const REGISTER& rhs) -> REGISTER {
+			[](const REGISTER& lhs, const REGISTER& rhs) {
 				return DivideInner<LOSSLESS, S>(lhs, rhs);
 			},
 			[](const LOSSLESS& lhs, const LOSSLESS& rhs) -> LOSSLESS {
