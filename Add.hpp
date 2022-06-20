@@ -15,7 +15,7 @@ namespace Langulus::SIMD
 {
 		
 	template<class T, Count S>
-	LANGULUS(ALWAYSINLINE) auto AddInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) constexpr auto AddInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
 
@@ -111,10 +111,10 @@ namespace Langulus::SIMD
 		constexpr auto S = OverlapCount<LHS, RHS>();
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
-			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+			[](const REGISTER& lhs, const REGISTER& rhs) noexcept -> REGISTER {
 				return AddInner<LOSSLESS, S>(lhs, rhs);
 			},
-			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
+			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
 				if constexpr (CT::Same<LOSSLESS, ::std::byte>) {
 					// ::std::byte doesn't have + operator							
 					return static_cast<LOSSLESS>(

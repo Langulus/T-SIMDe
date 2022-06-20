@@ -13,7 +13,7 @@ namespace Langulus::SIMD
 {
 
 	template<class T, Count S>
-	LANGULUS(ALWAYSINLINE) auto GreaterInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) constexpr auto GreaterInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
 

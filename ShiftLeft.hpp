@@ -11,7 +11,12 @@
 
 namespace Langulus::SIMD
 {
-		
+	
+	template<class T, Count S>
+	LANGULUS(ALWAYSINLINE) constexpr auto ShiftLeftInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+		return CT::Inner::NotSupported{};
+	}
+
 	/// Shift two arrays left using SIMD (shifting in zeroes)						
 	///	@tparam T - the type of the array element										
 	///	@tparam S - the size of the array												
@@ -57,36 +62,42 @@ namespace Langulus::SIMD
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
+
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
-			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+			[](const REGISTER& lhs, const REGISTER& rhs) noexcept -> REGISTER {
 				return ShiftLeftInner<LOSSLESS, S>(lhs, rhs);
 			},
-			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
+			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
 				return lhs << rhs;
 			}
 		);
 	}
 
 	///																								
-	template<CT::Vector WRAPPER, class LHS, class RHS>
-	NOD() LANGULUS(ALWAYSINLINE) WRAPPER ShiftLeftWrap(LHS& lhs, RHS& rhs) noexcept {
+	template<class LHS, class RHS, class OUT>
+	LANGULUS(ALWAYSINLINE) void ShiftLeft(LHS& lhs, RHS& rhs, OUT& output) {
 		const auto result = ShiftLeft<LHS, RHS>(lhs, rhs);
-
 		if constexpr (CT::TSIMD<decltype(result)>) {
 			// Extract from register													
-			typename WRAPPER::MemberType output[WRAPPER::MemberCount];
 			Store(result, output);
-			return WRAPPER {result};
 		}
-		else if constexpr (CT::Number<decltype(result)>) {
-			// Extract from std::array													
-			return WRAPPER {result};
+		else if constexpr (!CT::Array<OUT>) {
+			// Extract from number														
+			output = result;
 		}
 		else {
 			// Extract from std::array													
-			return WRAPPER {result.data()};
+			std::memcpy(output, result.data(), sizeof(output));
 		}
+	}
+
+	///																								
+	template<CT::Vector WRAPPER, class LHS, class RHS>
+	NOD() LANGULUS(ALWAYSINLINE) WRAPPER ShiftLeftWrap(LHS& lhs, RHS& rhs) {
+		WRAPPER result;
+		ShiftLeft<LHS, RHS>(lhs, rhs, result.mArray);
+		return result;
 	}
 
 } // namespace Langulus::SIMD

@@ -14,7 +14,7 @@ namespace Langulus::SIMD
 {
 
 	template<class T, Count S>
-	LANGULUS(ALWAYSINLINE) auto DivideInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+	LANGULUS(ALWAYSINLINE) constexpr auto DivideInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
 		return CT::Inner::NotSupported{};
 	}
 
@@ -211,10 +211,10 @@ namespace Langulus::SIMD
 
 		return AttemptSIMD<1, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
-			[](const REGISTER& lhs, const REGISTER& rhs) {
+			[](const REGISTER& lhs, const REGISTER& rhs) -> REGISTER {
 				return DivideInner<LOSSLESS, S>(lhs, rhs);
 			},
-			[](const LOSSLESS& lhs, const LOSSLESS& rhs) {
+			[](const LOSSLESS& lhs, const LOSSLESS& rhs) -> LOSSLESS {
 				if (rhs == 0)
 					Throw<Except::DivisionByZero>();
 				return lhs / rhs;
@@ -230,14 +230,13 @@ namespace Langulus::SIMD
 			// Extract from register													
 			Store(result, output);
 		}
-		else if constexpr (ExtentOf<OUT> == 1) {
+		else if constexpr (!CT::Array<OUT>) {
 			// Extract from number														
 			output = result;
 		}
 		else {
 			// Extract from std::array													
-			for (Offset i = 0; i < ExtentOf<OUT>; ++i)
-				output[i] = result[i];
+			std::memcpy(output, result.data(), sizeof(output));
 		}
 	}
 

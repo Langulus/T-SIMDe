@@ -150,14 +150,14 @@ LANGULUS_EXCEPTION(DivisionByZero);
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE2__) && LANGULUS_ALIGNMENT >= 16
+#if defined(__SSE2__) && LANGULUS_ALIGNMENT >= 16 //|| (defined(_M_IX86_FP) && _M_IX86_FP == 2) || defined(_M_AMD64) || defined(_M_X64)) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE2
 	#define LANGULUS_SIMD_SSE2() 1
 	#undef LANGULUS_SIMD_128BIT
 	#define LANGULUS_SIMD_128BIT() 1
 #endif
 
-#if defined(__SSE__) && LANGULUS_ALIGNMENT >= 16
+#if (defined(__SSE__) || (defined(_M_IX86_FP) && _M_IX86_FP == 1)) && LANGULUS_ALIGNMENT >= 16
 	#undef LANGULUS_SIMD_SSE
 	#define LANGULUS_SIMD_SSE() 1
 	#undef LANGULUS_SIMD_128BIT

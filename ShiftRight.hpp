@@ -11,7 +11,12 @@
 
 namespace Langulus::SIMD
 {
-		
+
+	template<class T, Count S>
+	LANGULUS(ALWAYSINLINE) constexpr auto ShiftRightInner(const CT::Inner::NotSupported&, const CT::Inner::NotSupported&) noexcept {
+		return CT::Inner::NotSupported{};
+	}
+
 	/// Shift two arrays right using SIMD (shifting in zeroes)						
 	///	@tparam T - the type of the array element										
 	///	@tparam S - the size of the array												
@@ -57,12 +62,13 @@ namespace Langulus::SIMD
 		using REGISTER = CT::Register<LHS, RHS>;
 		using LOSSLESS = CT::Lossless<LHS, RHS>;
 		constexpr auto S = OverlapCount<LHS, RHS>();
+
 		return AttemptSIMD<0, REGISTER, LOSSLESS>(
 			lhsOrig, rhsOrig, 
-			[](const REGISTER& lhs, const REGISTER& rhs) noexcept {
+			[](const REGISTER& lhs, const REGISTER& rhs) noexcept -> REGISTER {
 				return ShiftRightInner<LOSSLESS, S>(lhs, rhs);
 			},
-			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept {
+			[](const LOSSLESS& lhs, const LOSSLESS& rhs) noexcept -> LOSSLESS {
 				return lhs >> rhs;
 			}
 		);
@@ -76,14 +82,13 @@ namespace Langulus::SIMD
 			// Extract from register													
 			Store(result, output);
 		}
-		else if constexpr (ExtentOf<OUT> == 1) {
+		else if constexpr (!CT::Array<OUT>) {
 			// Extract from number														
 			output = result;
 		}
 		else {
 			// Extract from std::array													
-			for (Offset i = 0; i < ExtentOf<OUT>; ++i)
-				output[i] = result[i];
+			std::memcpy(output, result.data(), sizeof(output));
 		}
 	}
 
