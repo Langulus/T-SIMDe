@@ -140,6 +140,51 @@ TEMPLATE_TEST_CASE("Add", "[add]", SPARSE_UNSIGNED_TYPES(), SPARSE_SIGNED_TYPES(
 		}
 	}
 
+	GIVEN("vector[15] + vector[15] = vector[15]") {
+		Vector<T, 15> x, y;
+		Vector<DenseT, 15> r, rCheck;
+
+		WHEN("Added") {
+			Control(x, y, rCheck);
+			SIMD::Add(x.mArray, y.mArray, r.mArray);
+
+			THEN("The result should be correct") {
+				REQUIRE(r == rCheck);
+			}
+
+			#ifdef LANGULUS_STD_BENCHMARK
+				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
+					some<Vector<T, 15>> nx(meter.runs());
+					some<Vector<T, 15>> ny(meter.runs());
+					some<Vector<DenseT, 15>> nr(meter.runs());
+					meter.measure([&](int i) {
+						Control(nx[i], ny[i], nr[i]);
+						return nr[i];
+					});
+				};
+
+				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
+					some<Vector<T, 15>> nx(meter.runs());
+					some<Vector<T, 15>> ny(meter.runs());
+					some<Vector<DenseT, 15>> nr(meter.runs());
+					meter.measure([&](int i) {
+						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
+						return nr[i];
+					});
+				};
+			#endif
+		}
+
+		WHEN("Added in reverse") {
+			Control(y, x, rCheck);
+			SIMD::Add(y.mArray, x.mArray, r.mArray);
+
+			THEN("The result should be correct") {
+				REQUIRE(r == rCheck);
+			}
+		}
+	}
+
 	GIVEN("vector[1] + vector[1] = vector[1]") {
 		Vector<T, 1> x, y;
 		Vector<DenseT, 1> r, rCheck;
@@ -392,51 +437,6 @@ TEMPLATE_TEST_CASE("Add", "[add]", SPARSE_UNSIGNED_TYPES(), SPARSE_SIGNED_TYPES(
 					some<Vector<T, 8>> nx(meter.runs());
 					some<Vector<T, 8>> ny(meter.runs());
 					some<Vector<DenseT, 8>> nr(meter.runs());
-					meter.measure([&](int i) {
-						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
-						return nr[i];
-					});
-				};
-			#endif
-		}
-
-		WHEN("Added in reverse") {
-			Control(y, x, rCheck);
-			SIMD::Add(y.mArray, x.mArray, r.mArray);
-
-			THEN("The result should be correct") {
-				REQUIRE(r == rCheck);
-			}
-		}
-	}
-
-	GIVEN("vector[15] + vector[15] = vector[15]") {
-		Vector<T, 15> x, y;
-		Vector<DenseT, 15> r, rCheck;
-
-		WHEN("Added") {
-			Control(x, y, rCheck);
-			SIMD::Add(x.mArray, y.mArray, r.mArray);
-
-			THEN("The result should be correct") {
-				REQUIRE(r == rCheck);
-			}
-
-			#ifdef LANGULUS_STD_BENCHMARK
-				BENCHMARK_ADVANCED("Add (control)") (timer meter) {
-					some<Vector<T, 15>> nx(meter.runs());
-					some<Vector<T, 15>> ny(meter.runs());
-					some<Vector<DenseT, 15>> nr(meter.runs());
-					meter.measure([&](int i) {
-						Control(nx[i], ny[i], nr[i]);
-						return nr[i];
-					});
-				};
-
-				BENCHMARK_ADVANCED("Add (SIMD)") (timer meter) {
-					some<Vector<T, 15>> nx(meter.runs());
-					some<Vector<T, 15>> ny(meter.runs());
-					some<Vector<DenseT, 15>> nr(meter.runs());
 					meter.measure([&](int i) {
 						SIMD::Add(nx[i].mArray, ny[i].mArray, nr[i].mArray);
 						return nr[i];
