@@ -18,4 +18,6 @@ if(MSVC)
 	target_compile_options(Test.TSIMDe PRIVATE /bigobj)
 endif()
 
-target_link_libraries(Test.TSIMDe PRIVATE Langulus.TSIMDe Catch2)
+target_link_libraries(Test.TSIMDe PRIVATE Catch2 Langulus.TSIMDe)
+
+add_test(NAME Test.TSIMDe COMMAND Test.TSIMDe)

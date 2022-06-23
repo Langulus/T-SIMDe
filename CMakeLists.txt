@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-include(cmake/DownloadProject.cmake)
+include(cmake/FetchLangulusModule.cmake)
 
 project(Langulus_TSIMDe)
 
@@ -10,21 +10,13 @@ add_definitions(-DLANGULUS_ALIGNMENT=${LANGULUS_ALIGNMENT})
 
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
-    # We're building T-SIMDe as standalone
+    # We're building TSIMDe as standalone
     set(CMAKE_CXX_STANDARD 20)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    enable_testing()
 
-    # Configure Langulus.Core
-    message(STATUS "Configuring external project: Langulus.Core...")
-    download_project(
-	    PROJ                Langulus_Core
-	    GIT_REPOSITORY      https://github.com/Langulus/Core.git
-	    GIT_TAG             main
-	    GIT_PROGRESS        TRUE
-	    UPDATE_DISCONNECTED 1
-    )
-    include_directories(${Langulus_Core_SOURCE_DIR}/include)
+    fetch_langulus_module(Core)
+    enable_testing()
+	add_subdirectory(test)
 endif()
 
 # Configure SIMDe library
@@ -36,16 +28,14 @@ download_project(
 	GIT_PROGRESS        TRUE
 	UPDATE_DISCONNECTED 1
 )
-include_directories(${SIMDe_SOURCE_DIR})
 
-# Build and install T-SIMDe library
+# Build and install TSIMDe library
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
 add_library(Langulus.TSIMDe INTERFACE)
 
-target_include_directories(Langulus.TSIMDe
-	INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
+target_link_libraries(Langulus.TSIMDe
+	INTERFACE Langulus.Core
 )
-
-# Testing
-add_subdirectory(test)
-add_test(NAME Test.TSIMDe COMMAND Test.TSIMDe)
+target_include_directories(Langulus.TSIMDe
+	INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${SIMDe_SOURCE_DIR}
+)
