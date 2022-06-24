@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 include(cmake/FetchLangulusModule.cmake)
-
 project(Langulus_TSIMDe)
-
-message(STATUS "Compiler flags: ${CMAKE_CXX_FLAGS}")
 
 set(LANGULUS_ALIGNMENT 16 CACHE STRING "Overall langulus alignment")
 add_definitions(-DLANGULUS_ALIGNMENT=${LANGULUS_ALIGNMENT})
@@ -15,6 +12,7 @@ if(PROJECT_IS_TOP_LEVEL)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
     fetch_langulus_module(Core)
+
     enable_testing()
 	add_subdirectory(test)
 endif()
@@ -36,6 +34,7 @@ add_library(Langulus.TSIMDe INTERFACE)
 target_link_libraries(Langulus.TSIMDe
 	INTERFACE Langulus.Core
 )
+
 target_include_directories(Langulus.TSIMDe
 	INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${SIMDe_SOURCE_DIR}
 )
