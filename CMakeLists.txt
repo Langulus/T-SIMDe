@@ -32,9 +32,10 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
 add_library(Langulus.TSIMDe INTERFACE)
 
 target_link_libraries(Langulus.TSIMDe
-	INTERFACE Langulus.Core
+	INTERFACE	Langulus.Core
 )
 
 target_include_directories(Langulus.TSIMDe
-	INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${SIMDe_SOURCE_DIR}
+	INTERFACE	include/
+	INTERFACE	${SIMDe_SOURCE_DIR}
 )
