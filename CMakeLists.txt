@@ -1,16 +1,15 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.22)
 include(cmake/FetchLangulusModule.cmake)
 project(Langulus_TSIMDe)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(LANGULUS_ALIGNMENT 16 CACHE STRING "Overall langulus alignment")
 add_definitions(-DLANGULUS_ALIGNMENT=${LANGULUS_ALIGNMENT})
 
 # Check if this project is built as standalone, or a part of something else
 if(PROJECT_IS_TOP_LEVEL)
-    # We're building TSIMDe as standalone
-    set(CMAKE_CXX_STANDARD 20)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
     fetch_langulus_module(Core)
 
     enable_testing()
@@ -31,11 +30,9 @@ download_project(
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} SOURCE_FILES)
 add_library(Langulus.TSIMDe INTERFACE)
 
-target_link_libraries(Langulus.TSIMDe
-	INTERFACE	Langulus.Core
-)
+target_link_libraries(Langulus.TSIMDe INTERFACE	Langulus.Core)
 
 target_include_directories(Langulus.TSIMDe
-	INTERFACE	include/
-	INTERFACE	${SIMDe_SOURCE_DIR}
+	INTERFACE include
+	INTERFACE ${SIMDe_SOURCE_DIR}
 )
