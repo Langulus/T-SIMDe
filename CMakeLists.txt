@@ -22,7 +22,6 @@ download_project(
 	PROJ                SIMDe
 	GIT_REPOSITORY      https://github.com/simd-everywhere/simde.git
 	GIT_TAG             master
-	GIT_PROGRESS        TRUE
 	UPDATE_DISCONNECTED 1
 )
 
